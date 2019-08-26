@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+
+<head>
+  <meta charset="utf-8">
+  <title>CelebKonect</title>
+  <base href="/">
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@CelebKonect" />
+  <meta name="twitter:creator" content="@CelebKonect" />
+  <!-- <meta name="twitter:image:src" content="https://testapi.celebkonect.com:4300/uploads/web/add1.png" /> -->
+  <meta property="og:site_name" content="CelebKonect">
+
+
+  <!-- <meta property="og:title" content="CelebKonect | Celebrity Live Chat | celebrity Voice Call | Celebrity Video Call" /> -->
+  <meta property="og:title"      content="When Great Minds Don’t Think Alike" />
+
+  <!-- <meta property="og:description" content="Download the CelebKonect App and Connect with your Celebrities at a much more personal level, get exclusive Celebrity posts & feeds updates, Make 1 on 1 Celebrity video calls, Celebrity voice calls, Celebrity Live chat, connect with celebrity directly and Greet them. Also get chance to act in movies through our auditions." -->
+  <meta property="og:description"        content="How much does culture influence creative thinking?" />
+
+  <!-- <meta property="og:url" content="http://dev.celebkonect.com/feedsdetails" /> -->
+  <!-- <meta property="og:url" content="http://www.nytimes.com/2015/02/19/arts/international/when-great-minds-dont-think-alike.html" /> -->
+
+  <!-- <meta property="og:type" content="image/jpeg" /> -->
+  <meta property="og:image:type" content="image/jpeg" />
+
+  <!-- <meta property="og:type" content="article" /> -->
+  <meta property="fb:app_id" content="577526039363067" />
+
+
+  <meta property="og:image" content="https://devapi.celebkonect.com:4300/uploads/feeds/ck_pr2_2019-4-3_1554264614326_8BA62AAD-A1D5-4147-A1BF-73F92AB3730F.JPG" />
+
+  
+  <!-- <meta property="og:image" content=`${{this.sharefeedimage}}` /> -->
+  <!-- <meta property="og:image" content="http://static01.nyt.com/images/2015/02/19/arts/international/19iht-btnumbers19A/19iht-btnumbers19A-facebookJumbo-v2.jpg" /> -->
+  <!-- <meta property="og:image" content="http://static01.nyt.com/images/2015/02/19/arts/international/19iht-btnumbers19A/19iht-btnumbers19A-facebookJumbo-v2.jpg" /> -->
+
+  <!-- <meta property="og:image:secure_url" content="https://testapi.celebkonect.com:4300/uploads/web/add1.png" /> -->
+
+  <meta property="og:image:width" content="400" />
+  <meta property="og:image:height" content="300" />
+  <meta property="og:image:alt" content="CelebKonect" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="icon" type="image/x-icon" href="favicon.png">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,500,600,700,800" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Pacifico" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,600i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+  <link href="assets/jquery.bxslider.css" rel="stylesheet" type="text/css">
+  <link href="assets/css/owl.carousel.css" rel="stylesheet" type="text/css">
+  <link href="assets/css/owl.theme.default.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="assets/browser.js"></script>
+  <script src="assets/jquery.bxslider.js"></script>
+
+
+  <script async defer type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB7uyuFNDdRIbYCKPsQ47Ly0aVvDUfz56Y"> </script>
+  
+  
+
+  <script src="assets/owl.carousel.min.js"></script>
+
+  <script>
+ if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(displayLocationInfo);
+  }   
+    function displayLocationInfo(position) {
+      //let key1="AIzaSyBNxXuUbUsulfp10-CCFSdB4t3sM0kT2zY";
+      let lng = position.coords.longitude;
+      let lat = position.coords.latitude;
+      localStorage.setItem("lt20", lng);
+      localStorage.setItem("lg22", lat);
+      //let string="latlng="+lat+","+lng+"&key="+key1
+     // console.log(string);
+    console.log(`longitude: ${ lng } | latitude: ${ lat }`);
+    console.log("latitude and lngitude");
+    //this.bhaskarlat=localStorage.getItem('latitude')
+    console.log("basssss11111111111");
+    // console.log(this.bhaskarlat);
+      // this.cbOvc.getLocation(string).subscribe(result=>{
+      //   console.log(result)
+      // })
+    }  
+  </script>
+
+  
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114143981-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-114143981-1');
+  </script>
+  <script type="text/javascript" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+
+
+ 
+<link rel="stylesheet" href="styles.422393f9102f8dd9fff6.css"></head>
+
+
+
+<body>
+  
+  <app-root></app-root>
+<script type="text/javascript" src="runtime.b16398cd900acbb25e77.js"></script><script type="text/javascript" src="polyfills.52b95f784bf13dde610b.js"></script><script type="text/javascript" src="main.538c111ccc4b4268c619.js"></script></body>
+
+
+
+
+
+</html>

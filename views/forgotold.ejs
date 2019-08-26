@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;">
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+
+    <title>Forgot Password</title>
+
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
+        #outlook a {
+            padding: 0;
+        }
+
+        body {
+            width: 100% !important;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .ReadMsgBody {
+            width: 100%;
+        }
+
+        .ExternalClass {
+            width: 100%;
+        }
+
+        p a {
+            color: #4c85e6;
+        }
+
+        h1 {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        p {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .backgroundTable {
+            margin: 0 auto;
+            padding: 0;
+            width: 100% !important;
+        }
+
+        table td {
+            border-collapse: collapse;
+        }
+
+        .fgp_logo {
+            width: 200px;
+        }
+.shoud{ display: block;}
+
+
+        @media screen and (max-width: 639px) {
+
+            .cbtable {
+                width: 100% !important;
+            }
+            .c1r,
+            .c1r2 {
+                width: 100% !important;
+            }
+
+        }
+
+        @media screen and (max-width: 550px) {
+
+            .c1r2 {
+                width: 100% !important;
+                background-color: #4b8aeb;
+            }
+            .nospace_logo {
+                padding: 20px 20px 0px 0px !important;
+            }
+            .smlogo {
+                width: 80px !important;
+            }
+            .rsp_frm {
+                width: 70% !important;
+            }
+
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        function checkForm() {
+
+            var pass = document.getElementById("onepass").value;
+            var confirm = document.getElementById("twopass").value;
+
+            var errMes = document.getElementById("error");
+            var succesMes = document.getElementById("sucess");
+
+            if (pass != confirm) {
+                //alert("password not matching");
+                errMes.style.display = 'block';
+                succesMes.style.display = 'none';
+                return false;
+            } else {
+                //alert("password changed succesfully");
+                errMes.style.display = 'none';
+                succesMes.style.display = 'block';
+                return true;
+                window.location = "http://dev.celebkonect.com";
+            }
+        }
+
+    </script>
+
+
+</head>
+
+<body style="padding:0; margin:0">
+
+    <table border="0" cellpadding="0" cellspacing="0" style="margin: 0px auto; padding: 0; width:640px; " class="cbtable">
+        <tr style="width:640px;" class="c1r">
+            <td align="center" valign="top" style="padding-top:30px; padding-bottom:0px;" class="nospace_logo">
+                <img src="http://18.188.131.82:4300/uploads/emailTemplates/logo.png" class="fgp_logo" width="100%" alt="CelebKonect Logo"
+                    title="CelebKonect Logo">
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="width:640px; padding: 0px 20px;" class="c1r">
+                <h3 style="font-size:30px; text-align:center;">Change Password</h3>
+                <p style="position: relative; top: -10px; text-align: center;">Password must include 8 characters <span class="shoud">[ Should have 1 Capital Letter, 1 Special Character and 1 Number ]</span></p>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="c1r">
+                <form action="" name="pform" method="POST" style="width:380px; margin:0px auto; display:block;" class="rsp_frm" onsubmit="return checkForm();">
+                    <input type="password" style="width:100%; display:block; padding:8px 12px; margin-top:5px;" id="onepass" name="password"
+                        placeholder="Enter New Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[/\W|_/g]).{8,}" title="Password must include one lowercase character, one uppercase character, a number, a special character, and minimum 8 characters."
+                        required>
+
+                    <input type="password" style="width:100%; display:block; padding:8px 12px; margin-top:5px;" id="twopass" name="changepassword"
+                        placeholder="Confirm New Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[/\W|_/g]).{8,}" title="Password must include one lowercase character, one uppercase character, a number, a special character, and minimum 8 characters."
+                        required>
+
+                    <span id="error" style="color:red; display:none; font-size:13px;">Passwords do not match</span>
+
+                    <span id="sucess" style="color:green; display:none; font-size:13px;">Password Changed Successfully.</span>
+                    <input type="submit" style="width:120px; margin:20px auto; display:block; background-color:#4c85e6; color:#fff; border:none; padding:10px;"
+                        value="Reset Password"></input>
+                </form>
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+
+</html>

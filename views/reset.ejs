@@ -1,0 +1,59 @@
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+.myeye{ position: absolute; right: 10px; top: 1px; cursor: pointer; }
+.pass1{ position: relative; display: inline-block;}
+</style>
+<script type="text/javascript">
+    function changeEye(){
+        let closeEye = document.getElementById("cls");
+        let openEye = document.getElementById("opn");
+        let pshow = document.getElementById("passshow");
+       
+        if(pshow.type === "password"){
+            pshow.type = "text";
+            closeEye.style.display = "none";
+            openEye.style.display = "block";
+        }
+        else{
+            pshow.type = "password";
+            openEye.style.display = "none";
+            closeEye.style.display = "block";
+        } 
+    }
+
+    function changeEye2(){
+            
+            let pshow2 = document.getElementById("passshow2");
+            let closeEye2 = document.getElementById("cls2");
+            let openEye2 = document.getElementById("opn2");
+            if(pshow2.type === "password"){
+            pshow2.type = "text";
+            closeEye2.style.display = "none";
+            openEye2.style.display = "block";
+        }
+        else{
+            pshow2.type = "password";
+            openEye2.style.display = "none";
+            closeEye2.style.display = "block";
+        }
+        }
+</script>
+                <h3>Reset Password</h3>
+                <form action "" method="POST">
+                    <div class="pass1">
+                        <input type="password" id="passshow" name="password" placeholder="enter password">
+                        <i id="opn" class="fa fa-eye myeye" onclick="changeEye()" aria-hidden="true"></i>
+                        <i id="cls" class="fa fa-eye-slash myeye" onclick="changeEye()" aria-hidden="true"></i>
+                    </input>
+                    </div>
+                    
+                    <div class="pass1">
+                            <input type="password" id="passshow2" name="confirm" placeholder="confirm password">
+                            <i id="opn2" class="fa fa-eye myeye" onclick="changeEye2()" aria-hidden="true"></i>
+                            <i id="cls2" class="fa fa-eye-slash myeye" onclick="changeEye2()" aria-hidden="true"></i>
+                        </input>
+                    </div>
+                    
+                    
+                    <input type="submit" value="Reset Password"></input>
+                   </form>

@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+
+    <title>Verify Mobile Number</title>
+
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
+        #outlook a {
+            padding: 0;
+        }
+
+        body {
+           
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+            color: #000;
+        }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+-webkit-appearance: none;
+appearance: none; outline: none;
+margin: 0;
+}
+input[type="number"] {
+-moz-appearance: textfield;
+}
+
+        .ReadMsgBody {
+            width: 100%;
+        }
+
+        .ExternalClass {
+            width: 100%;
+        }
+
+        p a {
+            color: #4c85e6;
+        }
+
+        h1 {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        p {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .backgroundTable {
+            margin: 0 auto;
+            padding: 0;
+            width: 100% !important;
+        }
+
+        table td {
+            border-collapse: collapse;
+        }
+
+        .fgp_logo {
+            width: 200px;
+        }
+
+.inp_submit{ display: block; width: 48%; float: left; margin-left: 2%;}
+.inp_submit2{ display: block;  width: 48%; float: left; margin-right: 2%;}
+.mob_inp{ width: 100%; box-sizing: border-box; margin-bottom: 10px;}
+.mobup{width: 94%!important; margin: 0px auto!important; padding: 20px 0px!important;}
+  @media screen and (max-width: 639px) {
+
+.cbtable{ width: 100%!important;}
+.c1r,.c1r2{ width: 100%!important;}
+.mobup{width: 94%!important; margin: 0px auto!important; padding: 20px 0px!important;}
+
+}
+@media screen and (max-width: 550px) {
+
+.c1r2{ width: 100%!important; background-color: #4b8aeb;}
+.nospace_logo{ padding: 20px 20px 0px 0px!important;}
+.smlogo{ width: 80px!important;}
+
+
+}
+@media screen and (max-width: 480px) {
+.rsp_frm{ width: 90%!important; margin: 0px auto!important;}
+.vfmob{ font-size: 20px!important;}
+
+
+}
+
+        /* @media screen and (max-width: 639px) {
+
+            .cbtable{ width: 100%!important;}
+            .c1r,.c1r2{ width: 100%!important;}
+
+        }
+         @media screen and (max-width: 550px) {
+
+            .c1r2{ width: 100%!important; background-color: #4b8aeb;}
+            .nospace_logo{ padding: 20px 20px 0px 0px!important;}
+            .smlogo{ width: 80px!important;}
+            .rsp_frm{ width: 70%!important;}
+
+        } */
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+
+<body style="padding:0; margin:0">
+
+
+    
+
+    <div id="mobUp" style="margin: 0px auto; padding: 0; width:640px; " class="mobup">
+
+            <p style="text-align: center"><img src="https://devapi.celebkonect.com:4300/uploads/images/logo.png" class="fgp_logo" width="100%" alt="CelebKonect Logo"
+                title="CelebKonect Logo"></p>
+
+        <h3 style="font-size:30px; text-align:center;" class="vfmob">Verify Mobile Number</h3>
+        <form id="updateMobile" action="" name="pform" method="POST" style="width:265px; margin:0px auto; display:block;" class="rsp_frm">
+            <input type="number" id="pwd" style=" padding:8px 12px; margin-top:5px;" class="mob_inp" name="otp" placeholder="Enter OTP"
+                title="Enter OTP here..." required>
+            <button type="submit" style="background-color:#4c85e6; color:#fff; border:none; padding:10px;" value="Verify" class="inp_submit2">Verify</button>
+            <button id="mobDown" type="submit" style="background-color:#4c85e6; color:#fff; border:none; padding:10px;" value="Resend OTP" class="inp_submit">Resend OTP</button>
+            <div style="clear:both;"></div>
+        </form>
+    </div>
+    
+            
+
+
+    <script>
+      // $('#mobDown').hide();
+
+        // Verify OTP
+        $("#updateMobile").submit(function (event) {
+            event.preventDefault();
+            let otp = document.getElementById("pwd").value;
+            var request = $.ajax({
+                url: "<%= URL %>",
+                method: "PUT",
+                data: {
+                    "type": "mobile",
+                    "mobileNumber": "<%= mobileNumber %>",
+                    "verificationcode": otp
+                },
+                dataType: "json"
+            });
+
+            request.done(function (msg) {
+                if (msg.message == "OTP Verified successfully!") {
+                    alert(msg.message)
+                    $('#pwd').val('');
+                }
+                if (msg.error == "OTP Expired!!") {
+                    alert(msg.error)
+                    $('#pwd').val('');
+                    $('#mobDown').show();
+                }
+                if (msg.error == "Already verified!!") {
+                    alert(msg.error)
+                    $('#pwd').val('');
+                }
+                if (msg.error == "Invalid OTP not verified!!") {
+                    alert(msg.error)
+                    $('#pwd').val('');
+                    $('#mobDown').show();
+                }
+            });
+
+            request.fail(function (jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+            });
+        });
+        // Verify OTP
+
+        // reSEND OTP
+
+        $("#resendOTP").submit(function (event) {
+            event.preventDefault();
+            var request = $.ajax({
+                url: "<%= URL %>",
+                method: "PUT",
+                data: {
+                    "type": "resendMobileOTP",
+                    "mobileNumber": "<%= mobileNumber %>"
+                },
+                dataType: "json"
+            });
+
+            request.done(function (msg) {
+                console.log(msg)
+                if (msg.message == "otp sent successfully") {
+                    alert(msg.message)
+                }
+                if (msg.error == "OTP Expired!!") {
+                    alert(msg.error)
+                    $('#pwd').val('');
+                    $('#mobDown').show();
+                }
+                if (msg.error == "Already verified!!") {
+                    alert(msg.error)
+                    $('#pwd').val('');
+                }
+                if (msg.error == "Invalid OTP not verified!!") {
+                    alert(msg.error)
+                    $('#pwd').val('');
+                    $('#mobDown').show();
+                }
+            });
+
+            request.fail(function (jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+            });
+        });
+    </script>
+</body>
+
+</html>
