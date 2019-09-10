@@ -62,7 +62,7 @@ const generateReferalCode = (memberId, callback) => {
                 memberId: memberId,
                 memberCode: memberCode,
                 referralCreditValue: 150,
-                referreCreditValue: 0,
+                referreCreditValue: 100,
                 createdBy: memberId
             });
 

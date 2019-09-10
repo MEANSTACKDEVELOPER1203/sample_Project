@@ -711,8 +711,9 @@ let findFeedById = (feedId, memberId, callback) => {
                 "state": 1,
                 "countryCode": 1,
                 "updated_at": 1,
-                //"mediaStats": 1,
-                //"feedStats": 1,
+                isHide: {
+                    $cond: { if: { $and: [{ "$eq": ["$hideObj.hideById", ObjectId(memberId)] }, { "$eq": ["$hideObj.isHide", true] }] }, then: true, else: false }
+                },
                 feedByMemberDetails: {
                     _id: 1,
                     isCeleb: 1,

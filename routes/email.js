@@ -5,7 +5,7 @@ var nodemailer = require('nodemailer');
 
 var mandrillTransport = require('nodemailer-mandrill-transport');
 
-var mandrill = require('mandrill-api/mandrill');
+var mandrill = require('mandrill-api');
 var mandrill_client = new mandrill.Mandrill('b4gGeksBlAv54P_igkBH-w');
 
 var transport = nodemailer.createTransport(mandrillTransport({
@@ -37,8 +37,8 @@ var message = {
 
 */
 
-var async = false;
 var sendEmail = function sendEmail(message, callback) {
+  // console.log(message)
   // transport.sendMail({
   //   from: 'admin@celebkonect.com',
   //   to: 'prathmesh@indoztechsol.com',
@@ -52,6 +52,14 @@ var sendEmail = function sendEmail(message, callback) {
   //     callback(null, result);
   //   }
   // });
+
+
+
+
+
+
+
+  var async = false;
   mandrill_client.messages.send({
     "message": message,
     "async": async
@@ -62,7 +70,11 @@ var sendEmail = function sendEmail(message, callback) {
     console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
     // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
   });
+
 }
+
+
+
 
 ////// End of Email Sending
 

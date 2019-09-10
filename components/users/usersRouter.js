@@ -87,32 +87,6 @@ router.get("/login", function (req, res) {
   });
 });
 
-//End Login code
-// NotificationSetting.find({},(err,data)=>{
-//   console.log(data.length)
-//   if(!data.length)
-//   {
-//     User.find({},(err,users)=>{
-//       NotificationMaster.find({},(err,allSettings)=>{
-//         users.forEach((user)=>{
-//           let allSettingsForNewCreatedUser = allSettings.map((settingObj)=>{
-//             let dummyObj ={};
-//             dummyObj.memberId = user._id;
-//             dummyObj.notificationSettingId = settingObj._id;
-//             dummyObj.createdBy = "Admin";
-//             dummyObj.updatedBy = "Admin";
-//             dummyObj.isEnabled = true;
-//             return dummyObj;
-//           })
-//           NotificationSetting.insertMany(allSettingsForNewCreatedUser,(err,data)=>{
-
-//           })
-//         })
-//       }).lean()
-//     })
-//   }
-// })
-
 // Start MemberRegistrations  
 router.post("/memberRegistrations", upload.any(), (req, res) => {
   let email = (req.body.email).toLowerCase();
@@ -126,32 +100,6 @@ router.post("/memberRegistrations", upload.any(), (req, res) => {
   let loginType = req.body.loginType;
   let osType = req.body.osType;
 
-  // let profession = req.body.profession;
-  // let imageRatio = req.body.imageRatio;
-  // let celebRecommendations = req.body.celebRecommendations;
-  // let userCategory = req.body.userCategory;
-  // let gender = req.body.gender;
-  // let dateOfBirth = req.body.dateOfBirth;
-  // let address = req.body.address;
-  // let lastName = req.body.lastName;
-  // let firstName = req.body.firstName;
-  // let created_at = req.body.created_at;
-  // let updated_at = req.body.updated_at;
-  // let created_by = req.body.created_by;
-  // let updated_by = req.body.updated_by;
-  // let celebToManager = req.body.celebToManager;
-  // let isCeleb = req.body.isCeleb;
-  // let isDeleted = req.body.isDeleted;
-  // let isTrending = req.body.isTrending;
-  // let isOnline = req.body.isOnline;
-  // let isEditorChoice = req.body.isEditorChoice;
-  // let isPromoted = req.body.isPromoted;
-  // let prefix = req.body.prefix;
-  // let aboutMe = req.body.aboutMe;
-  // let country = req.body.country;
-  // let author_status = req.body.author_status;
-  // let referralCode = req.body.referralCode;
-  // let Dnd = req.body.Dnd;
   let mobile = country.concat(mobileNumber).substr(1);
   req.checkBody("email", "Email is required").notEmpty();
   req.checkBody("mobileNumber", "mobileNumber is required").notEmpty();
@@ -195,37 +143,6 @@ router.post("/memberRegistrations", upload.any(), (req, res) => {
             country: country,
             referralCode: referralCode,
             osType: osType,
-            // name: name,
-            // avtar_imgPath: avtar_imgPath,
-            // avtar_originalname: avtar_originalname,
-            // imageRatio: imageRatio,
-            // location: location,
-            // lastName: lastName,
-            // prefix: prefix,
-            // aboutMe: aboutMe,
-            // gender: gender,
-            // firstName: firstName,
-            // isCeleb: isCeleb,
-            // isDeleted: isDeleted,
-            // created_at: created_at,
-            // created_by: created_by,
-            // updated_at: updated_at,
-            // updated_by: updated_by,
-            // celebToManager: celebToManager,
-            // dateOfBirth: dateOfBirth,
-            // address: address,
-            // celebRecommendations: celebRecommendations,
-            // userCategory: userCategory,
-            // isTrending: isTrending,
-            // isOnline: isOnline,
-            // isEditorChoice: isEditorChoice,
-            // isPromoted: isPromoted,
-            // profession: profession,
-            // preferences: preferences,
-
-            // author_status: author_status,
-            // Dnd: Dnd,
-
           });
 
           User.createUser(newUser, function (err, userDetails) {
@@ -257,28 +174,6 @@ router.post("/memberRegistrations", upload.any(), (req, res) => {
                     gateway_response: req.body.gateway_response,
                     username: req.body.username
                   });
-                  // preferenceServices.findPreference([], (err, defaultPreferencesObj) => {
-                  //   if (err)
-                  //     throw err
-                  //   else {
-                  //     console.log(defaultPreferencesObj);
-                  //     let memberPreferenceJson = {};
-                  //       memberPreferenceJson.memberId = userDetails._id;
-                  //       memberPreferenceJson.preferences = defaultPreferencesObj;
-                  //     memberPreferenceServices.saveMemberPreference(memberPreferenceJson, (err, memberPreferenceObj)=>{
-                  //       if(err)
-                  //         throw err
-                  //         else{
-                  //           console.log(memberPreferenceObj);
-                  //         }
-                  //     });
-                  //   }
-                  // });
-
-
-
-
-
 
                   comLog.createComLog(newComLog, function (err, user) {
                     if (err) {
@@ -426,12 +321,6 @@ router.post("/memberRegistrations", upload.any(), (req, res) => {
                       });
                     }
                   });
-                  // if (req.body.loginType && req.body.loginType == "socialRegister") {
-                  // User.getUserByEmail(email,(err, userDetails)=>{
-                  //   if(err)
-                  //   {
-                  //     return res.status(501).json({ success:0,message: "Please try again",err:err});
-                  //   }
                   let rCode = userDetails.referralCode;
                   ReferralCode.findOne({ memberCode: rCode }, (err, refResult) => {
                     if (err) {
@@ -578,35 +467,6 @@ router.post("/memberRegistrations", upload.any(), (req, res) => {
             country: country,
             referralCode: referralCode,
             osType: osType,
-            // name: name,
-            // avtar_imgPath: avtar_imgPath,
-            // avtar_originalname: avtar_originalname,
-            // imageRatio: imageRatio,
-            // location: location,
-            // lastName: lastName,
-            // prefix: prefix,
-            // aboutMe: aboutMe,
-            // gender: gender,
-            // firstName: firstName,
-            // isCeleb: isCeleb,
-            // isDeleted: isDeleted,
-            // created_at: created_at,
-            // created_by: created_by,
-            // updated_at: updated_at,
-            // updated_by: updated_by,
-            // celebToManager: celebToManager,
-            // dateOfBirth: dateOfBirth,
-            // address: address,
-            // celebRecommendations: celebRecommendations,
-            // userCategory: userCategory,
-            // isTrending: isTrending,
-            // isOnline: isOnline,
-            // isEditorChoice: isEditorChoice,
-            // isPromoted: isPromoted,
-            // profession: profession,
-            // preferences: preferences,
-            // author_status: author_status,
-            // Dnd: Dnd,
           });
 
           User.createUser(newUser, function (err, userDetails) {
@@ -784,12 +644,7 @@ router.post("/memberRegistrations", upload.any(), (req, res) => {
                       });
                     }
                   });
-                  // if (req.body.loginType && req.body.loginType == "socialRegister") {
-                  //   // User.getUserByEmail(email,(err, userDetails)=>{
-                  //   //   if(err)
-                  //   //   {
-                  //   //     return res.status(501).json({ success:0,message: "Please try again",err:err});
-                  //   //   }
+                 
                   let rCode = userDetails.referralCode;
                   ReferralCode.findOne({ memberCode: rCode }, (err, refResult) => {
                     if (err) {
@@ -1223,19 +1078,6 @@ router.post("/socialRegister", upload.any(), function (req, res) {
                       newbody.updated_at = new Date();
                       newbody.emailVerificationCode = token;
                       newbody.mobileVerificationCode = token;
-                      // let reqBody1 = {};
-                      // reqBody1.mobileNumber = userDetails.mobileNumber.replace(/[^a-zA-Z0-9]/g, '');
-                      // reqBody1.regToken = token;
-
-                      // mySms.sendSms(reqBody1, function (err, result) {
-                      //     if (err) {
-                      //         console.log(err);
-                      //     } else {
-                      //         //console.log('OTP Sent');
-
-                      //     }
-                      // });
-
                       User.findByIdAndUpdate(id, newbody, function (err, result) { });
 
                       // End of Get LoginInfo By Email and Update Email Verification Code
@@ -1339,12 +1181,6 @@ router.post("/socialRegister", upload.any(), function (req, res) {
                     });
                   }
                 });
-                // if (reqbody.loginType && reqbody.loginType == "socialRegister") {
-                //   // User.getUserByEmail(email,(err, userDetails)=>{
-                //   //   if(err)
-                //   //   {
-                //   //     return res.json({ success:0,message: "Please try again",err:err});
-                //   //   }
                 let rCode = userDetails.referralCode;
                 console.log(rCode)
                 if (rCode != null && rCode != undefined) {
@@ -1571,19 +1407,6 @@ router.post("/socialRegister", upload.any(), function (req, res) {
                       newbody.updated_at = new Date();
                       newbody.emailVerificationCode = token;
                       newbody.mobileVerificationCode = token;
-                      // let reqBody1 = {};
-                      // reqBody1.mobileNumber = userDetails.mobileNumber.replace(/[^a-zA-Z0-9]/g, '');
-                      // reqBody1.regToken = token;
-
-                      // mySms.sendSms(reqBody1, function (err, result) {
-                      //     if (err) {
-                      //         console.log(err);
-                      //     } else {
-                      //         //console.log('OTP Sent');
-
-                      //     }
-                      // });
-
                       User.findByIdAndUpdate(id, newbody, function (err, result) { });
 
                       // End of Get LoginInfo By Email and Update Email Verification Code
@@ -1687,12 +1510,6 @@ router.post("/socialRegister", upload.any(), function (req, res) {
                     });
                   }
                 });
-                // if (reqbody.loginType && reqbody.loginType == "socialRegister") {
-                // User.getUserByEmail(email,(err, userDetails)=>{
-                //   if(err)
-                //   {
-                //     return res.json({ success:0,message: "Please try again",err:err});
-                //   }
                 let rCode = userDetails.referralCode;
                 ReferralCode.findOne({ memberCode: rCode }, (err, refResult) => {
                   if (err) {
@@ -2050,23 +1867,6 @@ router.get("/getOnlineCelebrities/:userID", (req, res, next) => {
                   listOfOnlineCelebraties.splice(j, 1);
                 }
               }
-              // listOfOnlineCelebraties.filter((user)=>{
-              //    return user._id != id
-              // })
-
-
-              // if (celebrities.length > 0) {
-              //   for (let k = 0; k < listOfOnlineCelebraties.length; k++) {
-              //     let userId = listOfOnlineCelebraties[k]._id;
-              //     userId = "" + userId;
-              //     let preferencesCelebId = listOfMyPreferences.memberId;
-              //     preferencesCelebId = "" + preferencesCelebId;
-              //     if (userId === preferencesCelebId) {
-              //       
-              //     }
-
-              //   }
-              // }
               for (let i = 0; i < listOfOnlineCelebraties.length; i++) {
                 onlineCelebritiesObj = {};
                 let onlineCelebrityObj = listOfOnlineCelebraties[i];
@@ -2109,17 +1909,6 @@ router.get("/getOnlineCelebrities/:userID", (req, res, next) => {
       });
     }
   })
-  // let query = { $and: [{ isCeleb: true }, { _id: { $ne: id } }, {isOnline : true}] };
-
-  // User.find(query, function (err, result) {
-  //   if (result == null) {
-  //     res.json({
-  //       error: "No Celebrities found"
-  //     });
-  //   } else {
-  //     res.send(result);
-  //   }
-  // });
 });
 // End of Get Online Celebrities List
 
@@ -2162,23 +1951,6 @@ router.put("/getOnlineCelebrities", function (req, res, next) {
                   listOfOnlineCelebraties.splice(j, 1);
                 }
               }
-              // listOfOnlineCelebraties.filter((user)=>{
-              //    return user._id != id
-              // })
-
-
-              // if (celebrities.length > 0) {
-              //   for (let k = 0; k < listOfOnlineCelebraties.length; k++) {
-              //     let userId = listOfOnlineCelebraties[k]._id;
-              //     userId = "" + userId;
-              //     let preferencesCelebId = listOfMyPreferences.memberId;
-              //     preferencesCelebId = "" + preferencesCelebId;
-              //     if (userId === preferencesCelebId) {
-              //       
-              //     }
-
-              //   }
-              // }
               for (let i = 0; i < listOfOnlineCelebraties.length; i++) {
                 onlineCelebritiesObj = {};
                 let onlineCelebrityObj = listOfOnlineCelebraties[i];
@@ -2223,15 +1995,6 @@ router.put("/getOnlineCelebrities", function (req, res, next) {
   })
   // let query = { $and: [{ isCeleb: true }, { _id: { $ne: id } }, {isOnline : true}] };
 
-  // User.find(query, function (err, result) {
-  //   if (result == null) {
-  //     res.json({
-  //       error: "No Celebrities found"
-  //     });
-  //   } else {
-  //     res.send(result);
-  //   }
-  // });
 });
 // End of Get Online Celebrities List
 // Get Online Celebrities List
@@ -2273,23 +2036,6 @@ router.post("/getOnlineCelebrities", function (req, res, next) {
                   listOfOnlineCelebraties.splice(j, 1);
                 }
               }
-              // listOfOnlineCelebraties.filter((user)=>{
-              //    return user._id != id
-              // })
-
-
-              // if (celebrities.length > 0) {
-              //   for (let k = 0; k < listOfOnlineCelebraties.length; k++) {
-              //     let userId = listOfOnlineCelebraties[k]._id;
-              //     userId = "" + userId;
-              //     let preferencesCelebId = listOfMyPreferences.memberId;
-              //     preferencesCelebId = "" + preferencesCelebId;
-              //     if (userId === preferencesCelebId) {
-              //       
-              //     }
-
-              //   }
-              // }
               for (let i = 0; i < listOfOnlineCelebraties.length; i++) {
                 onlineCelebritiesObj = {};
                 let onlineCelebrityObj = listOfOnlineCelebraties[i];
@@ -2332,17 +2078,6 @@ router.post("/getOnlineCelebrities", function (req, res, next) {
       });
     }
   })
-  // let query = { $and: [{ isCeleb: true }, { _id: { $ne: id } }, {isOnline : true}] };
-
-  // User.find(query, function (err, result) {
-  //   if (result == null) {
-  //     res.json({
-  //       error: "No Celebrities found"
-  //     });
-  //   } else {
-  //     res.send(result);
-  //   }
-  // });
 });
 // End of Get Online Celebrities List
 
@@ -2444,21 +2179,15 @@ router.post("/editUser", upload.any(), function (req, res) {
     let body = {
       memberId: id
     }
-    ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Profile", body, (err, newActivityLog) => {
-      if (err) {
-        // res.json({success: 0,message: "Please try again." + err});
-      } else {
+    // ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Profile", body, (err, newActivityLog) => {
+    //   if (err) {
+    //     // res.json({success: 0,message: "Please try again." + err});
+    //   } else {
 
-      }
-    })
+    //   }
+    // })
     return res.json({ token: req.headers['x-access-token'], success: 1, message: "Profile updated successfully", data: req.body });
-    // let fName = "", lName = "", userName = "";
-    // fName = result.firstName;
-    // lName = result.lastName;
-    // userName = fName + " " + lName;
-    // Feed.update({ memberId: id }, { '$set': { 'profilePicPath': result.avtar_imgPath, 'createdBy': userName, 'memberName': userName } }, { multi: true }, function (err, result) {
-    //   if (err) return res.json({token:req.headers['x-access-token'],success:0,message:err});
-    // });
+    // return res.json({token:req.headers['x-access-token'],success:0,message:err});
   });
   // }
 });
@@ -2550,167 +2279,167 @@ function escapeRegex(text) {
 
 
 //old service for serach celeb
-router.get("/getCelebSearch/:userID/:string", function (req, res, next) {
-  //console.log(req.params.string)
-  //let searchString = "^" + req.params.string;
-  //let searchString = req.params.string //+ "/";
-  //remove concurrent extra spaces
-  //console.log(searchString)
-  //const regex = new RegExp(escapeRegex(searchString), 'i');
-  //searchString = searchString.replace(/\s\s+/g, ' ');
-  let searchString = req.params.string.toLowerCase();
-  let id = req.params.userID;
-  let isCeleb = true;
-  celebrityContract.distinct("memberId", (err, contractsCelebArray) => {
-    if (err) {
-      res.json({ usersDetail: null, err: err })
-    }
-    else {
-      let objectIdArray = contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
-      User.aggregate(
-        [
-          {
-            $addFields: {
-              name: {
-                $concat: [
-                  '$firstName',
-                  ' ',
-                  '$lastName',
-                ]
-              },
-              fsize: { $strLenCP: '$firstName' },
-              lsize: { $strLenCP: '$lastName' },
-              frank: { $indexOfCP: [{ $toLower: '$firstName' }, searchString] },
-              fsrank: { $indexOfCP: [{ $toLower: '$firstName' }, " "] },
-              lrank: { $indexOfCP: [{ $toLower: '$lastName' }, searchString] },
-              lsrank: { $indexOfCP: [{ $toLower: '$lastName' }, " "] },
+// router.get("/getCelebSearch/:userID/:string", function (req, res, next) {
+//   //console.log(req.params.string)
+//   //let searchString = "^" + req.params.string;
+//   //let searchString = req.params.string //+ "/";
+//   //remove concurrent extra spaces
+//   //console.log(searchString)
+//   //const regex = new RegExp(escapeRegex(searchString), 'i');
+//   //searchString = searchString.replace(/\s\s+/g, ' ');
+//   let searchString = req.params.string.toLowerCase();
+//   let id = req.params.userID;
+//   let isCeleb = true;
+//   celebrityContract.distinct("memberId", (err, contractsCelebArray) => {
+//     if (err) {
+//       res.json({ usersDetail: null, err: err })
+//     }
+//     else {
+//       let objectIdArray = contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
+//       User.aggregate(
+//         [
+//           {
+//             $addFields: {
+//               name: {
+//                 $concat: [
+//                   '$firstName',
+//                   ' ',
+//                   '$lastName',
+//                 ]
+//               },
+//               fsize: { $strLenCP: '$firstName' },
+//               lsize: { $strLenCP: '$lastName' },
+//               frank: { $indexOfCP: [{ $toLower: '$firstName' }, searchString] },
+//               fsrank: { $indexOfCP: [{ $toLower: '$firstName' }, " "] },
+//               lrank: { $indexOfCP: [{ $toLower: '$lastName' }, searchString] },
+//               lsrank: { $indexOfCP: [{ $toLower: '$lastName' }, " "] },
 
-            }
-          },
-          {
-            "$facet": {
-              "c1": [
-                {
-                  "$match": {
-                    $and: [
-                      { _id: { $in: objectIdArray } },
-                      { _id: { $ne: id } },
-                      { firstName: { $regex: searchString, '$options': 'im' } },
-                      { isCeleb: true },
-                      { IsDeleted: false }
-                    ]
-                  }
-                }
-              ],
-              "c2": [
-                {
-                  "$match": {
-                    $and: [
-                      { _id: { $in: objectIdArray } },
-                      { _id: { $ne: id } },
-                      { lastName: { $regex: searchString, '$options': 'im' } },
-                      { isCeleb: true },
-                      { IsDeleted: false }
-                    ]
-                  }
-                }
-              ],
-              "c3": [
-                {
-                  "$match": {
-                    $and: [
-                      { _id: { $in: objectIdArray } },
-                      { _id: { $ne: id } },
-                      { name: { $regex: searchString, '$options': 'im' } },
-                      { isCeleb: true },
-                      { IsDeleted: false }
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "$project": {
-              "data": {
-                "$concatArrays": ["$c1", "$c2"]
-              }
-            }
-          },
-          { "$unwind": "$data" },
-          { "$replaceRoot": { "newRoot": "$data" } },
-          {
-            $project: {
-              _id: 1,
-              firstName: 1,
-              frank1: {
-                $cond: {
-                  if: { $eq: ["$frank", -1] }, then: 1000,
-                  else: "$frank"
-                }
-              },
-              lastName: 1,
-              avtar_imgPath: 1,
-              profession: 1,
-              isCeleb: 1,
-              isOnline: 1,
-              isPromoted: 1,
-              isTrending: 1,
-              aboutMe: 1,
-              email: 1,
-              isEditorChoice: 1,
-              username: 1,
-              frank: 1,
-              fsize: 1,
-              lrank: 1,
-              lsize: 1,
-              nrank: 1,
-              nrank: { $indexOfCP: [{ $toLower: '$name' }, searchString] },
-              nsize: { $strLenCP: '$name' },
-              rdiff: { $subtract: ["$frank", { $add: ["$fsrank", 1] }] },
-              ldiff: { $subtract: ["$lrank", { $add: ["$lsrank", 1] }] },
-            }
-          },
-          {
-            $match: {
-              $or: [{ nrank: 0 }, { rdiff: 0 }, { ldiff: 0 }, { frank: 0 }, { lrank: 0 }]
-            }
-          },
-          {
-            $sort: {
-              frank1: 1, fsize: 1, lrank: 1, lsize: 1
-            }
-          },
-        ],
-        function (err, data) {
-          // console.log("Original ==== ", data.length)
-          if (err) {
-            res.json({ err })
-          }
-          data = data.filter(function (obj) {
-            return obj.isCeleb !== false;
-          });
-          data.forEach((user) => {
-            for (i = 0; i < data.length; i++) {
-              if ((user._id.toString() == data[i]._id.toString()) && i != data.indexOf(user)) {
-                data.splice(i, 1);
-              }
-            }
-          })
-          for (var i = 0; i < data.length; i++) {
-            let currentCelebId = data[i]._id;
-            currentCelebId = "" + currentCelebId;
-            if (currentCelebId == id) {
-              data.splice(i, 1);
-              break;
-            }
-          }
-          // console.log("Original final==== ", data.length)
-          return res.status(200).json({ token: req.headers['x-access-token'], success: 1, data: data });
-        });
-    }
-  });
-});
+//             }
+//           },
+//           {
+//             "$facet": {
+//               "c1": [
+//                 {
+//                   "$match": {
+//                     $and: [
+//                       { _id: { $in: objectIdArray } },
+//                       { _id: { $ne: id } },
+//                       { firstName: { $regex: searchString, '$options': 'im' } },
+//                       { isCeleb: true },
+//                       { IsDeleted: false }
+//                     ]
+//                   }
+//                 }
+//               ],
+//               "c2": [
+//                 {
+//                   "$match": {
+//                     $and: [
+//                       { _id: { $in: objectIdArray } },
+//                       { _id: { $ne: id } },
+//                       { lastName: { $regex: searchString, '$options': 'im' } },
+//                       { isCeleb: true },
+//                       { IsDeleted: false }
+//                     ]
+//                   }
+//                 }
+//               ],
+//               "c3": [
+//                 {
+//                   "$match": {
+//                     $and: [
+//                       { _id: { $in: objectIdArray } },
+//                       { _id: { $ne: id } },
+//                       { name: { $regex: searchString, '$options': 'im' } },
+//                       { isCeleb: true },
+//                       { IsDeleted: false }
+//                     ]
+//                   }
+//                 }
+//               ]
+//             }
+//           },
+//           {
+//             "$project": {
+//               "data": {
+//                 "$concatArrays": ["$c1", "$c2"]
+//               }
+//             }
+//           },
+//           { "$unwind": "$data" },
+//           { "$replaceRoot": { "newRoot": "$data" } },
+//           {
+//             $project: {
+//               _id: 1,
+//               firstName: 1,
+//               frank1: {
+//                 $cond: {
+//                   if: { $eq: ["$frank", -1] }, then: 1000,
+//                   else: "$frank"
+//                 }
+//               },
+//               lastName: 1,
+//               avtar_imgPath: 1,
+//               profession: 1,
+//               isCeleb: 1,
+//               isOnline: 1,
+//               isPromoted: 1,
+//               isTrending: 1,
+//               aboutMe: 1,
+//               email: 1,
+//               isEditorChoice: 1,
+//               username: 1,
+//               frank: 1,
+//               fsize: 1,
+//               lrank: 1,
+//               lsize: 1,
+//               nrank: 1,
+//               nrank: { $indexOfCP: [{ $toLower: '$name' }, searchString] },
+//               nsize: { $strLenCP: '$name' },
+//               rdiff: { $subtract: ["$frank", { $add: ["$fsrank", 1] }] },
+//               ldiff: { $subtract: ["$lrank", { $add: ["$lsrank", 1] }] },
+//             }
+//           },
+//           {
+//             $match: {
+//               $or: [{ nrank: 0 }, { rdiff: 0 }, { ldiff: 0 }, { frank: 0 }, { lrank: 0 }]
+//             }
+//           },
+//           {
+//             $sort: {
+//               frank1: 1, fsize: 1, lrank: 1, lsize: 1
+//             }
+//           },
+//         ],
+//         function (err, data) {
+//           // console.log("Original ==== ", data.length)
+//           if (err) {
+//             res.json({ err })
+//           }
+//           data = data.filter(function (obj) {
+//             return obj.isCeleb !== false;
+//           });
+//           data.forEach((user) => {
+//             for (i = 0; i < data.length; i++) {
+//               if ((user._id.toString() == data[i]._id.toString()) && i != data.indexOf(user)) {
+//                 data.splice(i, 1);
+//               }
+//             }
+//           })
+//           for (var i = 0; i < data.length; i++) {
+//             let currentCelebId = data[i]._id;
+//             currentCelebId = "" + currentCelebId;
+//             if (currentCelebId == id) {
+//               data.splice(i, 1);
+//               break;
+//             }
+//           }
+//           // console.log("Original final==== ", data.length)
+//           return res.status(200).json({ token: req.headers['x-access-token'], success: 1, data: data });
+//         });
+//     }
+//   });
+// });
 //End getCelebSearch  
 
 
@@ -2911,86 +2640,13 @@ router.get("/getCelebSearch/:userID/:string/:createdAt", function (req, res, nex
             if (a.firstName.toLowerCase() > b.firstName.toLowerCase()) { return 1; }
             return 0;
           })
-          //  fArray.concat(lArray)
           const arr3 = [...fArray, ...lArray];
-          // console.log("Data L 2222 ==== ", data.length)
-          // console.log("F SIZE Final ==== ", arr3.length);
-          // console.log(Array.prototype.push.apply(fArray, lArray))
-          // data.sort(function (a, b) {
-          //   if (a.firstName < b.firstName) { return -1; }
-          //   if (a.firstName > b.firstName) { return 1; }
-          //   return 0;
-          // })
-          // console.log("Data L ==== ", arr3.length)
           return res.status(200).json({ token: req.headers['x-access-token'], success: 1, data: { celebSearchInfo: arr3, paginationDate: paginationDate } });
-
-          //return res.send(data);
         });
     }
   });
 });
-///////////// SEARCH MEMBERS ///////////////////
-// router.get("/membersearch/:userID/:string", function (req, res, next) {
-//   let searchString = "^" + req.params.string;
-//   let id = req.params.userID;
-//   let isCeleb = true;
-//   User.aggregate(
-//     [
-//       {
-//         $addFields: {
-//           name: {
-//             $concat: [
-//               '$firstName',
-//               ' ',
-//               '$lastName',
-//             ]
-//           }
-//         }
-//       },
-//       {
-//         $match: {
-//           name: { $regex: searchString, $options: 'im' }
-//           //  $or: [ { firstName: { $regex: searchString, $options: 'i' } }, { lastName: { $regex: searchString, $options: 'i' } },{firstName:{$in: searchStringArray}} , { lastName:{$in: searchStringArray}  }]
-//         },
 
-//       },
-//       {
-//         $project: {
-//           _id: 1,
-//           firstName: 1,
-//           lastName: 1,
-//           isCeleb: 1,
-//           isPromoter: 1,
-//           isManager: 1,
-//           aboutMe: 1
-//         }
-//       }
-
-//     ],
-//     function (err, data) {
-//       if (err) {
-//         res.send(err);
-//       }
-
-//       for (var i = 0; i < data.length; i++) {
-//         if (data[i]._id == id) {
-//           data.splice(i, 1);
-//           break;
-//         }
-//       }
-
-//       /*  data = data.filter(function (obj) {
-//          return obj.isCeleb !== false;
-//        }); */
-
-//       return res.send(data);
-//     }
-//   );
-
-// });
-//////////// END SEARCH MEMBERS ///////////////////
-
-// Edit a Schedule start
 
 router.put("/edit/:receiverId", function (req, res) {
   //receiver id nothing but celeb id any condition.
@@ -3001,16 +2657,6 @@ router.put("/edit/:receiverId", function (req, res) {
   reqbody.callStatus = req.body.callStatus;
   //reqbody.isOnline = true;
   reqbody.updatedAt = new Date();
-  //console.log("********** update member status ************", req.body)
-  //console.log("********** receiver ************", req.params.receiverId)
-  // User.updateOne(
-  //   {
-  //     _id: memberId
-  //   },
-  //   { isOnline: true, liveStatus: "onCall" },
-  //   function (err, result) {
-  //   }
-  // );
 
   User.findByIdAndUpdate(req.params.receiverId, { $set: { "callStatus": reqbody.callStatus } }, function (err, result) {
     if (err) {
@@ -3303,18 +2949,6 @@ router.get("/getAllDetailsOfCelebrity/:celebrityId", (req, res) => {
   }).sort({ createdAt: -1 }).limit(1)
 })
 //get details of own profile end
-
-
-// MemberPreferences.count( { "celebrities.CelebrityId": ObjectId("5b9b4e1d981b4f14f51b8024"), "celebrities.isFollower": true },(err,count)=>{
-//   console.log(count)
-// })
-
-// MemberPreferences.count( {$or: [
-//   { memberId: ObjectId("5b9b4e1d981b4f14f51b8024") },
-//   { "celebrities.CelebrityId": { $in: [ObjectId("5b9b4e1d981b4f14f51b8024")] } }
-// ]},(err,count)=>{
-//   console.log(count)
-// })
 
 
 //get deatils of other  progfile with isfollowing or not and isfanof or not

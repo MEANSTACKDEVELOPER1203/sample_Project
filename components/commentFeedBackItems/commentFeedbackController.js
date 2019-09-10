@@ -24,7 +24,7 @@ var updateCommentFeedback = function(req,res) {
     })
 }
 
-var getAllFeedbackItems = function(req,res) {
+var getAllFeedbackItems = (req,res)=> {
     CommentFeedBackService.getAllFeedbackItems((err, allcommentFeedBack) => {
         if(err)
         {

@@ -2,6 +2,7 @@ const CreditModel = require("./creditsModel");
 let paymentTransactionServices = require('../paymentTransaction/paymentTransactionServices');
 let logins = require('../loginInfo/loginInfoModel');
 let Notification = require('../notification/notificationModel');
+let notificationSetting = require("../notificationSettings/notificationSettingsModel");
 let otpService = require('../otp/otpRouter');
 let ObjectId = require("mongodb").ObjectID;
 
@@ -189,70 +190,70 @@ let updateCreditValue = function (body, callBack) {
                             //     else {
                             //   res.send({ success: 1, token: req.headers['x-access-token'], message: "Credits updated successfully", data: req.body });
                             //let query = { $and: [{ memberId: memberId }, { notificationSettingId: ObjectId("5b5ebd64fef3737e09fb3844") }, { isEnabled: true }] };
-                            // let query = { memberId: memberId, notificationSettingId: ObjectId("5b5ebd64fef3737e09fb3844") };
-                            // notificationSetting.find(query, (err, rest) => {
-                            //     if (err)
-                            //         return res.send(err);
-                            //     // if (rest.length)
-                            //     else {
-                            // Insert into Notfications Collection 
-                            let newNotification = new Notification({
-                                memberId: memberId,
-                                notificationFrom: memberId,
-                                notificationType: "Credit",
-                                activity: "PURCHASEDCREDITS",
-                                title: "You" + " " + "purchased" + " " + creditValue + " credits",
-                                body: "This is to notify you purchased " + creditValue + " Credits. Happy Konecting!!",
-                                status: "active"
-                            });
-                            // Insert Notification
-                            Notification.createNotification(newNotification, (err, createdNotiObj) => {
-                                if (err) {
-                                    callBack(err, null)
-                                } else {
-                                    callBack(null, credits)
-                                    // if (rest[0].isEnabled == true) {
-                                    //     if (memberDeviceDetailsObj.osType == "Android") {
-                                    //         let data = {
-                                    //             serviceType: "PURCHASEDCREDITS",
-                                    //             notificationType: "Credit",
-                                    //             title: 'Purchased Credits Alert!!',
-                                    //             memberId: memberId,
-                                    //             activity: "PURCHASEDCREDITS",
-                                    //             body: "Your account is credited by " + creditValue + " credits. Now credit Bal: " + newCumulativeCreditValue + " by UPI Ref No " + paymentTranRefId + ". T&C apply. Grab now:",
-                                    //             //body: "you have purchased " + creditValue + " credits. ",
-                                    //         }
-                                    //         otpService.sendAndriodPushNotification(memberDeviceDetailsObj.deviceToken, "", data, (err, successNotificationObj) => {
-                                    //             if (err)
-                                    //                 console.log(err)
-                                    //             else {
-                                    //                 console.log(successNotificationObj)
-                                    //             }
-                                    //         });
-                                    //     } else {
-                                    //         let notification = {
-                                    //             serviceType: "PURCHASEDCREDITS",
-                                    //             notificationType: "Credit",
-                                    //             title: 'Purchased Credits Alert!!',
-                                    //             memberId: memberId,
-                                    //             activity: "PURCHASEDCREDITS",
-                                    //             body: "Your account is credited by " + creditValue + " credits. Now credit Bal: " + newCumulativeCreditValue + " by UPI Ref No " + paymentTranRefId + ". T&C apply. Grab now:",
-                                    //             //body: "Greetings from CelebKonect, this is to notify you earned " + creditValue + " Credits. Happy Konecting!!",
-                                    //         }
-                                    //         otpService.sendIOSPushNotification(memberDeviceDetailsObj.deviceToken, notification, (err, successNotificationObj) => {
-                                    //             if (err)
-                                    //                 console.log(err)
-                                    //             else {
-                                    //                 console.log(successNotificationObj)
-                                    //             }
-                                    //         });
-                                    //     }
-                                    // }
+                            let query = { memberId: memberId, notificationSettingId: ObjectId("5b5ebd64fef3737e09fb3844") };
+                            notificationSetting.find(query, (err, rest) => {
+                                if (err)
+                                    return res.send(err);
+                                // if (rest.length)
+                                else {
+                                    // Insert into Notfications Collection 
+                                    let newNotification = new Notification({
+                                        memberId: memberId,
+                                        notificationFrom: memberId,
+                                        notificationType: "Credit",
+                                        activity: "PURCHASEDCREDITS",
+                                        title: "You" + " " + "purchased" + " " + creditValue + " credits",
+                                        body: "This is to notify you purchased " + creditValue + " Credits. Happy Konecting!!",
+                                        status: "active"
+                                    });
+                                    // Insert Notification
+                                    Notification.createNotification(newNotification, (err, createdNotiObj) => {
+                                        if (err) {
+                                            callBack(err, null)
+                                        } else {
+                                            callBack(null, credits)
+                                            if (rest.length <= 0 || rest[0].isEnabled == true) {
+                                                if (memberDeviceDetailsObj.osType == "Android") {
+                                                    let data = {
+                                                        serviceType: "PURCHASEDCREDITS",
+                                                        notificationType: "Credit",
+                                                        title: 'Purchased Credits Alert!!',
+                                                        memberId: memberId,
+                                                        activity: "PURCHASEDCREDITS",
+                                                        body: "Your account is credited by " + creditValue + " credits. Now credit Bal: " + newCumulativeCreditValue + " by UPI Ref No " + paymentTranRefId + ". T&C apply. Grab now:",
+                                                        //body: "you have purchased " + creditValue + " credits. ",
+                                                    }
+                                                    otpService.sendAndriodPushNotification(memberDeviceDetailsObj.deviceToken, "", data, (err, successNotificationObj) => {
+                                                        if (err)
+                                                            console.log(err)
+                                                        else {
+                                                            console.log(successNotificationObj)
+                                                        }
+                                                    });
+                                                } else {
+                                                    let notification = {
+                                                        serviceType: "PURCHASEDCREDITS",
+                                                        notificationType: "Credit",
+                                                        title: 'Purchased Credits Alert!!',
+                                                        memberId: memberId,
+                                                        activity: "PURCHASEDCREDITS",
+                                                        body: "Your account is credited by " + creditValue + " credits. Now credit Bal: " + newCumulativeCreditValue + " by UPI Ref No " + paymentTranRefId + ". T&C apply. Grab now:",
+                                                        //body: "Greetings from CelebKonect, this is to notify you earned " + creditValue + " Credits. Happy Konecting!!",
+                                                    }
+                                                    otpService.sendIOSPushNotification(memberDeviceDetailsObj.deviceToken, notification, (err, successNotificationObj) => {
+                                                        if (err)
+                                                            console.log(err)
+                                                        else {
+                                                            console.log(successNotificationObj)
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // End of Inset Notification
                                 }
                             });
-                            // End of Inset Notification
-                            //     }
-                            // });
                             //     }
                             // })
 

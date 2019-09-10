@@ -21,6 +21,6 @@ var commentFeedbackSchema = new mongoose.Schema({
     versionKey:false
 });
 
-let collName = "commentFeedback";
-let commentFeedback = mongoose.model('commentFeedback', commentFeedbackSchema, collName);
-module.exports = commentFeedback;
+let collName = "reportFeedbacks";
+let reportFeedbacks = mongoose.model('reportFeedbacks', commentFeedbackSchema, collName);
+module.exports = reportFeedbacks;

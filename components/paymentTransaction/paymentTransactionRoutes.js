@@ -63,6 +63,7 @@ router.post("/createPaymentTransaction", function (req, res) {
 // End Create a paymentTransaction item
 
 // Edit a paymentTransaction start
+router.post('/generalCheckout', PaymentTransactionController.checkoutPaytmAndIntamojo)
 
 router.put("/editPaymentTransaction/:id", function (req, res) {
   // console.log("************* editPaymentTransaction ******************************")

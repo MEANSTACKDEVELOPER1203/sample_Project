@@ -723,9 +723,10 @@ router.put("/serviceTransaction/:id", function (req, res) {
                       to: userDeviceInfoObj.deviceToken,
                       collapse_key: 'Service-alerts',
                       data: {
-                        serviceType: "Call",
+                        serviceType: "Service",
                         title: title,
-                        body: body
+                        body: body,
+                        activity: reqbody.callRemarks,
                         //memberId: senderId,
                         //isCeleb: req.body.isCeleb,
                         //senderFirstName: req.body.senderFirstName,
@@ -733,9 +734,10 @@ router.put("/serviceTransaction/:id", function (req, res) {
                         //senderAvatar: req.body.senderAvatar
                       },
                       notification: {
-                        serviceType: "Call",
+                        serviceType: "Service",
                         title: title,
                         body: body,
+                        activity: "Call",
                         //memberId: senderId,
                         // isCeleb: req.body.isCeleb,
                         // senderFirstName: req.body.senderFirstName,

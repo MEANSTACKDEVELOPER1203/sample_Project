@@ -8,6 +8,7 @@ let async = require('async');
 let ViewFeedHistory = require('./viewFeedHistoryModel');
 let feedMapping = require('./feedMappingModel');
 let advertisementServices = require('../advertisement/advertisementServices');
+let CelebContractsModel = require('../celebrityContract/celebrityContractsModel');
 let isPlainTextAdded;
 let getFeedsNew = (req, res) => {
     let memberId = (req.params.member_Id) ? req.params.member_Id : '';
@@ -737,8 +738,11 @@ let getFeedById = (req, res) => {
     feedServices.findFeedById(feedId, memberId, (err, feedObj) => {
         if (err)
             return res.status(404).json({ success: 0, message: "Error while feching feed Id ", err });
-        else if (!feedObj || feedObj == null) {
-            return res.status(200).json({ success: 0, message: "This content isn't available right now." })
+        else if (!feedObj || feedObj == null || feedObj.isHide == true) {
+            let message = "This content isn't available right now.";
+            if (feedObj && feedObj.isHide == true)
+                message = "This post is hidden by you.";
+            return res.status(200).json({ success: 0, message: message })
         }
         else {
             return res.status(200).json({ success: 1, data: feedObj })

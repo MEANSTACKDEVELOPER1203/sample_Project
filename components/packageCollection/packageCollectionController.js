@@ -64,13 +64,19 @@ let calculatePrice = (req, res) => {
             let currencyValue = currencyTypeObj.currencyValue;
             let finalPrice = creditValue / currencyValue;
             // console.log(finalPrice)
-            finalPrice = finalPrice.toFixed(2)
+            finalPrice = parseFloat(finalPrice).toFixed(2)
             priceObj.totalPrice = finalPrice
             priceObj.currencySymbol = currencyTypeObj.currencySymbol;
             res.json({ success: 1, data: { creditPrice: priceObj } })
         }
     })
 }
+// Number.prototype.countDecimals = function () {
+//     if(Math.floor(this.valueOf()) === this.valueOf()) return 0;
+//     let count = this.toString().split(".")[1].length || 0;
+//     console.log(count, "count")
+//     return this.toString().split(".")[1].length || 0; 
+// }
 
 let calculateFinalCreditPriceWithGST = (req, res) => {
 

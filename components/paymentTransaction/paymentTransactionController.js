@@ -16,6 +16,93 @@ const getAll = (req, res) => {
         }
     })
 }
+
+let checkoutPaytmAndIntamojo = (req, res) => {
+    // console.log(req.body);
+    let orderId = req.body.orderId;
+    let customerId = req.body.customerId;
+    let countryCode = req.body.countryCode;
+    let transactionRefId = req.body.paymentId;
+    let paymentMode = req.body.paymentMode;
+    let gatewayResponse = req.body.gatewayResponse;
+    let paymentStatus = req.body.paymentStatus
+    // console.log(paymentStatus);
+    if (paymentStatus == "Failed") {
+        PaymentTransactionServices.updateCreditStatus(ObjectId(orderId), { status: false, creditUpdateStatus: false, paymentStatus: paymentStatus }, (err, updatePayTransactionObj) => {
+            if (err) {
+                return res.status(200).json({ success: 0, message: "Order Id not recieved", err })
+            } else {
+                let orderObj = {}
+                orderObj.paymentStatus = paymentStatus
+                return res.status(200).json({ token: req.headers['x-access-token'], success: 0, message: "Payment faild", data: orderObj });
+            }
+        })
+
+    } else {
+        PaymentTransactionServices.getPaymentTransactionById(ObjectId(req.body.orderId), (err, transactionObj) => {
+            if (err) {
+                return res.status(200).json({ success: 0, message: "Order Id not recieved", err })
+            } else {
+                creditServices.updateCreditValue({
+                    memberId: customerId,
+                    creditValue: transactionObj.creditValue,
+                    paymentTranRefId: orderId,
+                    creditType: "credit",
+                }, (err, updatedCreditObj) => {
+                    if (err)
+                        console.log(err)
+                    else {
+                        transactionRefId = transactionRefId;
+                        gatewayResponse = gatewayResponse;
+                        countryCode = countryCode;
+                        paymentMode = paymentMode;
+                        paymentStatus = "Success";
+                        PaymentTransactionServices.updateCreditStatus(ObjectId(orderId), { transactionRefId: transactionRefId, gatewayResponse: gatewayResponse, status: true, creditUpdateStatus: true, paymentStatus: paymentStatus }, (err, updatePayTransactionObj) => {
+                            if (err)
+                                console.log(err)
+                            else {
+                                let orderBody = {
+                                    memberId: customerId,
+                                    orderType: "payment",
+                                    refPaymentTransactionId: orderId,
+                                    refCreditTransactionId: updatedCreditObj._id,
+                                    refCartIds: [],
+                                    paymentAmount: transactionObj.equivalentAmount,
+                                    credits: transactionObj.creditValue,
+                                    countryCode: countryCode,
+                                    paymentMode: paymentMode,
+                                }
+                                ordersServices.saveOrder(orderBody, (err, orderObj) => {
+                                    if (err)
+                                        console.log(err)
+                                    else {
+                                        orderObj.orderInfo.cumulativeCreditValue = updatedCreditObj.cumulativeCreditValue;
+                                        orderObj.orderInfo.referralCreditValue = updatedCreditObj.referralCreditValue;
+                                        orderObj.orderInfo.paymentGateway = updatePayTransactionObj.paymentGateway;
+                                        orderObj.orderInfo.gatewayResponse = updatePayTransactionObj.gatewayResponse;
+                                        orderObj.orderInfo.ordersStatus = "completed";//orderObj.ordersStatus;
+                                        orderObj.orderInfo.status = updatePayTransactionObj.status;
+                                        orderObj.orderInfo.credits = updatePayTransactionObj.creditValue;
+                                        orderObj.orderInfo.totalAmount = updatePayTransactionObj.equivalentAmount;
+                                        orderObj.orderInfo.actualAmount = updatePayTransactionObj.actualAmount;
+                                        orderObj.orderInfo.gstAmount = updatePayTransactionObj.gstAmount;
+                                        orderObj.orderInfo.orderId = updatePayTransactionObj.transactionRefId;
+                                        orderObj.orderInfo.transactionId = updatePayTransactionObj._id;
+                                        orderObj.creditInfo = updatedCreditObj;
+                                        orderObj.paymentStatus = paymentStatus;
+                                        return res.status(200).json({ token: req.headers['x-access-token'], success: 1, message: "orders saved successfully", data: orderObj });
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+        });
+    }
+
+}
+
 /************************* start PAYPAL Intergrationj**********************************/
 var TRANSACTION_SUCCESS_STATUSES = [
     braintree.Transaction.Status.Authorizing,
@@ -211,5 +298,6 @@ module.exports = {
     getAll: getAll,
     generateClientToken: generateClientToken,
     createBraintreeMultiCurrency: createBraintreeMultiCurrency,
-    checkout: checkout
+    checkout: checkout,
+    checkoutPaytmAndIntamojo: checkoutPaytmAndIntamojo
 }

@@ -5,7 +5,7 @@ let credit;
 let debit;
 let netBanking;
 let active;
-let inActive;
+let inActive, Success = "Success", Pending = "Pending", Failed = "Failed";
 
 let paymentTransactionSchema = new mongoose.Schema({
     memberId: {
@@ -30,17 +30,22 @@ let paymentTransactionSchema = new mongoose.Schema({
         type: Number,
         default: 0.0
     },
-    actualAmount:{
-        type:Number,
-        default:0.0,
+    actualAmount: {
+        type: Number,
+        default: 0.0,
     },
-    gstAmount:{
-        type:Number,
-        default:0.0,
+    gstAmount: {
+        type: Number,
+        default: 0.0,
     },
-    paymentGateway:{
-        type:String
+    paymentGateway: {
+        type: String
         //enum:[],
+    },
+    paymentStatus: {
+        type: String,
+        enum: [Pending, Success, Failed],
+        default: Pending
     },
     paymentType: {
         type: String,

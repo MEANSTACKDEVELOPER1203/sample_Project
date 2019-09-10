@@ -24,9 +24,6 @@ var fs = require('fs');
 var jwt = require('./jwt/jwt');
 // Establish Mongoose Connection, useNewUrlParser: true, useCreateIndex:true
 mongoose.Promise = global.Promise;
-mongoose.set("useCreateIndex", true);
-mongoose.set("useNewUrlParser", true);
-// mongoose.set("useCreateIndex", true);
 mongoose.connect('mongodb://localhost/celebKonect', {useMongoClient:true}, (err, sucess) => {
     if (sucess) {
         console.log("db connected successfully")
@@ -160,9 +157,10 @@ let dummyServiceNew = require('./dummyServices/dummyRouter');
 let advertisementRouter = require('./components/advertisement/advertisementRouter');
 let ientertainRouter = require('./components/ientertain/ientertainRouter');
 let storyRouter =require('./components/story/storyRouter');
+let storyTrackingRouter = require('./components/storyTracking/storyTrackingRouter')
+let report =require('./components/reports/reportRoutes');
 
-
-
+let reportFeedbackItems =require('./components/reportFeedback/reportFeedbackRoutes');
 // End of Import Contest Routes
 
 
@@ -380,7 +378,10 @@ app.use('/activityLogType', activityLogTypeRouter);
 app.use('/activityLog', activityLogRouter);
 app.use('/searchHistory', searchHistoryRouter);
 app.use('/ientertain', ientertainRouter);
-app.use('/api/story', storyRouter);
+app.use('/story', storyRouter);
+app.use('/storyTracking', storyTrackingRouter);
+app.use('/report', report);
+app.use('/reportFeedbackItems', reportFeedbackItems);
 // app.use('/otpRouter', otpRouter);
 
 // End of Contest Routes Usage

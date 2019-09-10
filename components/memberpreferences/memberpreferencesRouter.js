@@ -1242,101 +1242,108 @@ router.put("/blockUser/:memberId", function (req, res) {
   let now = new Date();
   let lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
   // console.log("last month === ", lastMonthDate)
-  Feedback.findOne({ memberId: memberId, celebrityId: CelebrityId, reason: "Unblock", lastTimeUnBlocked: { $gt: lastMonthDate } }, (err, blockedObject) => {
+  User.findById(memberId, (err, userObj) => {
     if (err) {
       res.json({ success: 0, message: err })
-    } else if (blockedObject) {
-      // console.log("Blocking Date === ", blockedObject.lastTimeUnBlocked)
-      // let remaining = new Date(lastMonthDate.getTime() - blockedObject.lastTimeUnBlocked.getTime());
-      // remaining = parseInt(remaining)
-      let remaining = validateReBlockingDate(lastMonthDate, blockedObject.lastTimeUnBlocked);
-      return res.json({ success: 0, message: "You cannot block Username for next " + remaining + " days" });
     } else {
-      Feedback.findOne({ memberId: memberId, celebrityId: CelebrityId, reason: "Block/Report" }, (err, blockedObject) => {
+      Feedback.findOne({ memberId: memberId, celebrityId: CelebrityId, reason: "Unblock", lastTimeUnBlocked: { $gt: lastMonthDate } }, (err, blockedObject) => {
         if (err) {
           res.json({ success: 0, message: err })
         } else if (blockedObject) {
-          return res.json({ success: 0, message: "Already block.Please Unblock" })
+          // console.log("Blocking Date === ", blockedObject.lastTimeUnBlocked)
+          // let remaining = new Date(lastMonthDate.getTime() - blockedObject.lastTimeUnBlocked.getTime());
+          // remaining = parseInt(remaining)
+          let remaining = validateReBlockingDate(lastMonthDate, blockedObject.lastTimeUnBlocked);
+          return res.json({ success: 0, message: "You cannot block " + userObj.firstName + " " + userObj.lastName + " for next " + remaining + " days" });
         } else {
-          let feedbackInfo = new Feedback({
-            memberId: memberId,
-            celebrityId: CelebrityId,
-            reason: "Block/Report",
-            feedback: req.body.feedback,
-          });
-          Feedback.create(feedbackInfo, (err, createdFeedbackObj) => {
+          Feedback.findOne({ memberId: memberId, celebrityId: CelebrityId, reason: "Block/Report" }, (err, blockedObject) => {
             if (err) {
-              console.log(err)
-            }
-            MemberPreferences.aggregate([
-              {
-                $match: {
-                  memberId: memberId
+              res.json({ success: 0, message: err })
+            } else if (blockedObject) {
+              return res.json({ success: 0, message: "Already block.Please Unblock" })
+            } else {
+              let feedbackInfo = new Feedback({
+                memberId: memberId,
+                celebrityId: CelebrityId,
+                reason: "Block/Report",
+                feedback: req.body.feedback,
+              });
+              Feedback.create(feedbackInfo, (err, createdFeedbackObj) => {
+                if (err) {
+                  console.log(err)
                 }
-              },
-              {
-                $unwind: "$celebrities"
-              },
-              {
-                $match: {
-                  "celebrities.CelebrityId": CelebrityId,
-                  // "celebrities.isFan": true,
-                  // "celebrities.isFollower": true,
-                }
-              }
-            ], (err, memberPreferencesObj) => {
-              if (err) {
-                res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
-              }
-              else if (memberPreferencesObj.length) {
-                MemberPreferences.update({ memberId: memberId },
+                MemberPreferences.aggregate([
                   {
-                    $pull: {
-                      celebrities: { CelebrityId: CelebrityId },
+                    $match: {
+                      memberId: memberId
                     }
-                  }, { multi: true }, (err, updatedresult) => {
-                    if (err) {
-                      res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
-                    } else {
-                      if (updatedresult.nModified == 1) {
-                        let body = {
-                          memberId: memberId,
-                          activityOn: CelebrityId
-                        }
-                        ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Block", body, (err, newActivityLog) => {
-                          if (err) {
-                            // res.json({success: 0,message: "Please try again." + err});
-                          } else {
-
-                          }
-                        })
-                        res.json({ success: 1, token: req.headers['x-access-token'], message: "User blocked" });
-                      } else {
-                        res.json({ success: 0, message: "Operation Failed", token: req.headers['x-access-token'] });
-                      }
+                  },
+                  {
+                    $unwind: "$celebrities"
+                  },
+                  {
+                    $match: {
+                      "celebrities.CelebrityId": CelebrityId,
+                      // "celebrities.isFan": true,
+                      // "celebrities.isFollower": true,
                     }
-                  });
-              }
-              else {
-                let body = {
-                  memberId: memberId,
-                  activityOn: CelebrityId
-                }
-                ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Block", body, (err, newActivityLog) => {
-                  if (err) {
-                    // res.json({success: 0,message: "Please try again." + err});
-                  } else {
-
                   }
-                })
-                res.json({ success: 1, token: req.headers['x-access-token'], message: "User blocked" });
-              }
-            });
-          });
+                ], (err, memberPreferencesObj) => {
+                  if (err) {
+                    res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
+                  }
+                  else if (memberPreferencesObj.length) {
+                    MemberPreferences.update({ memberId: memberId },
+                      {
+                        $pull: {
+                          celebrities: { CelebrityId: CelebrityId },
+                        }
+                      }, { multi: true }, (err, updatedresult) => {
+                        if (err) {
+                          res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
+                        } else {
+                          if (updatedresult.nModified == 1) {
+                            let body = {
+                              memberId: memberId,
+                              activityOn: CelebrityId
+                            }
+                            ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Block", body, (err, newActivityLog) => {
+                              if (err) {
+                                // res.json({success: 0,message: "Please try again." + err});
+                              } else {
+
+                              }
+                            })
+                            res.json({ success: 1, token: req.headers['x-access-token'], message: "User blocked" });
+                          } else {
+                            res.json({ success: 0, message: "Operation Failed", token: req.headers['x-access-token'] });
+                          }
+                        }
+                      });
+                  }
+                  else {
+                    let body = {
+                      memberId: memberId,
+                      activityOn: CelebrityId
+                    }
+                    ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Block", body, (err, newActivityLog) => {
+                      if (err) {
+                        // res.json({success: 0,message: "Please try again." + err});
+                      } else {
+
+                      }
+                    })
+                    res.json({ success: 1, token: req.headers['x-access-token'], message: "User blocked" });
+                  }
+                });
+              });
+            }
+          })
         }
       })
     }
   })
+
 });
 // End of UnFan a User
 function validateReBlockingDate(lastDate, unBlockingDate) {

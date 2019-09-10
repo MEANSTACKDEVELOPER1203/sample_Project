@@ -1,5 +1,5 @@
 let mongoose = require('mongoose');
-// let mongoose_Timestamp = require('mongoose-timestamp');
+var Float = require('mongoose-float').loadType(mongoose, 3);
 let storySchema = new mongoose.Schema({
     memberId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -15,9 +15,9 @@ let storySchema = new mongoose.Schema({
     mediaType: {
         type: String
     },
-
-    mediaSize: {
-        type: String
+    mediaRatio: {
+        type: Float,
+        default: 0.000
     },
     faceFeatures: {
         type: Array
@@ -36,23 +36,6 @@ let storySchema = new mongoose.Schema({
             type: String
         },
     },
-    // media: [
-    //     {
-    //         _id: false,
-
-    //     }
-    // ],
-    isSeen: {
-        type: Boolean,
-        default: false
-    },
-    seenTime: {
-        type: Date,
-    },
-    seenTimeTS: {
-        type: Number,
-        // default: new Date().getTime()
-    },
     startTime: {
         type: Date,
         default: Date.now
@@ -61,14 +44,6 @@ let storySchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    startTimeTS: {
-        type: Number,
-        // default: new Date().getTime()
-    },
-    endTimeTS: {
-        type: Number,
-        // default: new Date().getTime()
-    },
     location: {
         type: String
     },
@@ -76,19 +51,15 @@ let storySchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    createdAT: {
+    createdAt: {
         type: Date,
         default: Date.now
     },
-    createdAtTS: {
-        type: Number,
-        default: new Date().getTime()
-    },
 }, {
-        versionKey: false,
-        autoIndex: true,
-        timestamps: true
-    });
+    versionKey: false,
+    autoIndex: true,
+    timestamps: true
+});
 storySchema.index({ memberId: 1 }, { unique: true });
 let collName = "story";
 let Story = mongoose.model("Story", storySchema, collName);

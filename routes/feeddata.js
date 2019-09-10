@@ -47,14 +47,14 @@ let upload = multer({
 
 router.post('/createFeed_PK', upload.any(), (req, res) => {
   //var baseUrl = "uploads/feeds/"
-  //console.log(req.body);
+  // console.log(req.body);
   let feed = req.body.feed;
   let feedObj = JSON.parse(feed);
   let files = req.files;
-  //console.log(feedObj);
-  let fileType;
+  // console.log(feedObj);
+  let fileType, mediaRatio;
   let fileExtension;
-  //console.log(files);
+  // console.log(files);
   var mediaArray = [];
 
 
@@ -65,13 +65,15 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
       var srcObj = {} //0 1 
       var mediaObj = {};
       mediaObj = feedObj.media[i];
+      mediaRatio = parseFloat(mediaObj.mediaRatio);
+      // console.log("mediaRatio ============= ", mediaRatio)
       // FILE NAME AND EXTENSION.
       fileType = files[i].mimetype;
       let videoUrl;
       let mediaUrl;
       let mediaName;
       let thumbnail = "";
-      if (fileType === "video/mp4" || fileType === "image/gif") {
+      if (fileType === "video/mp4" || fileType == "video/3gpp" || fileType === "image/gif") {
         videoUrl = files[i].path;
         //videoUrl = baseUrl.concat(videoUrl);
         mediaUrl = files[i + 1].path;
@@ -117,7 +119,7 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
         async function main() {
 
           width = 500;
-          height = feedObj.media[i].mediaRatio * width;
+          height = mediaRatio * width;
 
 
           await convert(thumbNailPath, destThumbnailPath, height, width);
@@ -207,7 +209,7 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
         async function main() {
 
           width = 500;
-          height = feedObj.media[i].mediaRatio * width;
+          height = mediaRatio * width;
 
 
           await convert(thumbNailPath, destThumbnailPath, height, width);
@@ -226,7 +228,7 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
     }
   }
   feedObj.mediaArray = mediaArray;
-
+  // console.log("saved data ========= ", feedObj)
   async.waterfall([function (callback) {
     User.getUserById(ObjectId(feedObj.memberId), (err, userDetailObj) => {
       if (err) {
@@ -707,8 +709,10 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
   var fileName, fileExtension, fileSize, fileType, dateModified;
   let feedId = (req.params.feed_Id) ? req.params.feed_Id : '';
   let files = req.files;
+  // console.log(files)
   let feed = req.body.feed;
   let feedObj = JSON.parse(feed);
+  // console.log("TTTTTTTTTTTT ", feedObj)
   feedObj.updated_at = new Date();
   feedObj.updatedBy = feedObj.updatedBy;
   var updateMediaArray = [];
@@ -771,6 +775,9 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
           var srcObj = {}
           mediaObj = {};
           var newMediaObj = newMediaArray[i];
+          // console.log("PPPPPPPPP", newMediaObj);
+          mediaRatio = parseFloat(newMediaObj.mediaRatio);
+          // console.log("mediaRatio", mediaRatio);
           var newMediaObjForVideo = newMediaArray[i + 1];
           fileType = files[i].mimetype;
 
@@ -830,7 +837,7 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
           // mediaObj.mediaSize = newMediaObj.mediaSize;
           // mediaObj.mediaType = newMediaObj.mediaType;
           // mediaObj.mediaCaption = newMediaObj.mediaCaption;
-          if (fileType === "video/mp4" || fileType === "image/gif") {
+          if (fileType === "video/mp4" || fileType == "video/3gpp" || fileType === "image/gif") {
             videoUrl = files[i].path;
             //videoUrl = baseUrl.concat(videoUrl);
             mediaUrl = files[i + 1].path;
@@ -876,7 +883,7 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
             async function main() {
 
               width = 500;
-              height = newMediaObjForVideo.mediaRatio * width;
+              height = mediaRatio * width;
 
               // console.log(newMediaObj)
               // console.log(thumbNailPath)
@@ -926,7 +933,7 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
             async function main() {
 
               width = 500;
-              height = newMediaObj.mediaRatio * width;
+              height = mediaRatio * width;
 
               // console.log(newMediaObj)
               // console.log(thumbNailPath)
@@ -1215,6 +1222,9 @@ router.get("/getFeedByMemberId/:memberId/:currentUserId", function (req, res) {
         "created_at": 1,
         "state": 1,
         "countryCode": 1,
+        isHide: {
+          $cond: { if: { $and: [{ "$eq": ["$hideObj.hideById", ObjectId(currentUserId)] }, { "$eq": ["$hideObj.isHide", true] }] }, then: true, else: false }
+        },
         feedByMemberDetails: {
           _id: 1,
           isCeleb: 1,
@@ -1317,8 +1327,9 @@ router.get("/getFeedByMemberId/:memberId", function (req, res) {
         "created_at": 1,
         "state": 1,
         "countryCode": 1,
-        //"mediaStats": 1,
-        //"feedStats": 1,
+        isHide: {
+          $cond: { if: { $and: [{ "$eq": ["$hideObj.hideById", ObjectId(memberId)] }, { "$eq": ["$hideObj.isHide", true] }] }, then: true, else: false }
+        },
         feedByMemberDetails: {
           _id: 1,
           isCeleb: 1,
@@ -1432,8 +1443,9 @@ router.get("/getFeedByMemberId/:memberId/:createdAt/:limit", function (req, res)
         "created_at": 1,
         "state": 1,
         "countryCode": 1,
-        //"mediaStats": 1,
-        //"feedStats": 1,
+        isHide: {
+          $cond: { if: { $and: [{ "$eq": ["$hideObj.hideById", ObjectId(memberId)] }, { "$eq": ["$hideObj.isHide", true] }] }, then: true, else: false }
+        },
         feedByMemberDetails: {
           _id: 1,
           isCeleb: 1,
@@ -1551,8 +1563,9 @@ router.get("/getFeedByMemberId/:memberId/:currentUserId/:createdAt/:limit", (req
         "created_at": 1,
         "state": 1,
         "countryCode": 1,
-        //"mediaStats": 1,
-        //"feedStats": 1,
+        isHide: {
+          $cond: { if: { $and: [{ "$eq": ["$hideObj.hideById", ObjectId(currentUserId)] }, { "$eq": ["$hideObj.isHide", true] }] }, then: true, else: false }
+        },
         feedByMemberDetails: {
           _id: 1,
           isCeleb: 1,
@@ -2218,34 +2231,34 @@ router.post('/feedLikeByRandomUser', (req, res) => {
 // End of Get All feed (All Users)
 
 // Get All feed (All Users)
-// router.get("/allFeed/:pageNo/:limit", (req, res) => {
-//   let params = req.params;
-//   let pageNo = parseInt(params.pageNo);
-//   let startFrom = params.limit * (pageNo - 1);
-//   let limit = parseInt(params.limit);
-//   Feed.count({}, (err, count) => {
-//     if (err) {
-//       res.json({ token: req.headers['x-access-token'], success: 0, message: err })
-//     } else {
-//       Feed.find({}, (err, feed) => {
-//         if (err) {
-//           res.json({ token: req.headers['x-access-token'], success: 0, message: err })
-//         } else {
-//           let data = {};
-//           data.feed = feed
-//           let total_pages = count / limit
-//           data.pagination = {
-//             "total_count": count,
-//             "total_pages": total_pages == 0 ? total_pages : parseInt(total_pages) + 1,
-//             "current_page": pageNo,
-//             "limit": limit
-//           }
-//           res.json({ token: req.headers['x-access-token'], success: 1, data: data })
-//         }
-//       }).sort({ created_at: -1 }).skip(startFrom).limit(limit).lean();
-//     }
-//   })
-// });
+router.get("/allFeed/:pageNo/:limit", (req, res) => {
+  let params = req.params;
+  let pageNo = parseInt(params.pageNo);
+  let startFrom = params.limit * (pageNo - 1);
+  let limit = parseInt(params.limit);
+  Feed.count({}, (err, count) => {
+    if (err) {
+      res.json({ token: req.headers['x-access-token'], success: 0, message: err })
+    } else {
+      Feed.find({}, (err, feed) => {
+        if (err) {
+          res.json({ token: req.headers['x-access-token'], success: 0, message: err })
+        } else {
+          let data = {};
+          data.feed = feed
+          let total_pages = count / limit
+          data.pagination = {
+            "total_count": count,
+            "total_pages": total_pages == 0 ? total_pages : parseInt(total_pages) + 1,
+            "current_page": pageNo,
+            "limit": limit
+          }
+          res.json({ token: req.headers['x-access-token'], success: 1, data: data })
+        }
+      }).sort({ created_at: -1 }).skip(startFrom).limit(limit).lean();
+    }
+  })
+});
 // End of Get All feed (All Users)
 
 // Get Feed by FeedID

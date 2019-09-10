@@ -94,10 +94,10 @@ let getOTP = (medium, mobileNumber, email, reason, callback) => {
             "type": "to"
           }],
         };
-        //   console.log(message)
+        // console.log(message)
         emailServices.sendEmail(message, (err, result) => {
           // console.log(result)
-          if (result[0].status == "sent") {
+          if (result[0].status == "sent" || result[0].status == "queued") {
             callback(null, 'OTP sent successfully')
           } else {
             return callback(`OTP sending failed, please try again after sometime`, null);

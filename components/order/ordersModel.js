@@ -3,7 +3,6 @@ let ObjectId = require("mongodb").ObjectID;
 
 let pending;
 let inProgress;
-let completed;
 let image;
 let video;
 let audio;
@@ -14,28 +13,28 @@ let creditCard;
 let debitCard;
 let credits;
 let Payment;
-
+let Success = "Success", Pending = "Pending", Failed = "Failed", completed = "completed";
 let ordersSchema = new mongoose.Schema({
     memberId: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
     orderId: {
         type: String
     },
-    orderType: { 
-        type: String, 
-        enum: [ecommerce, service,Payment], 
-        required: true 
+    orderType: {
+        type: String,
+        enum: [ecommerce, service, Payment],
+        required: true
     },
     refCreditTransactionId: {
-        type:mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId
     },
-    refPaymentTransactionId:  {
-        type:mongoose.Schema.Types.ObjectId
+    refPaymentTransactionId: {
+        type: mongoose.Schema.Types.ObjectId
     },
-    refCartIds:[{
-        type:mongoose.Schema.Types.ObjectId
+    refCartIds: [{
+        type: mongoose.Schema.Types.ObjectId
     }],
     paymentAmount: {
         type: Number,
@@ -54,28 +53,28 @@ let ordersSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    createdAt: { 
-        type: Date, 
-        default: Date.now 
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
     updatedBy: {
         type: String,
         default: ""
     },
-    updatedAt:  { 
-        type: Date, 
-        default: Date.now 
+    updatedAt: {
+        type: Date,
+        default: Date.now
     },
     ordersStatus: {
         type: String,
-        enum: [pending, inProgress, completed],
-        default: "completed"
+        enum: [Pending, Success, Failed, completed],
+        default: Success
     }
 }, {
         versionKey: false
     });
 
-let orders =  mongoose.model("orders", ordersSchema);
+let orders = mongoose.model("orders", ordersSchema);
 module.exports = orders
 // module.exports.createOrders = function (newOrders, callback) {
 //     newOrders.save(callback);

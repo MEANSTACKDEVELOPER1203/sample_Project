@@ -950,16 +950,16 @@ const findByIdAndUpdateUserDetails = (id, updateDoc, reqbody, callback) => {
             if (err) {
 
             } else if (loginUpdate) {
-              let body = {
-                memberId: id
-              }
-              ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Profile", body, (err, newActivityLog) => {
-                if (err) {
-                  // res.json({success: 0,message: "Please try again." + err});
-                } else {
+              // let body = {
+              //   memberId: id
+              // }
+              // ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Profile", body, (err, newActivityLog) => {
+              //   if (err) {
+              //     // res.json({success: 0,message: "Please try again." + err});
+              //   } else {
 
-                }
-              })
+              //   }
+              // })
               callback(null, uresult, "Profile updated successfully")
             }
           })
@@ -2577,7 +2577,21 @@ const getAllDetailsOfCelebrity = (params, callback) => {
 
 
 let getCelebDetailsById = function (memberId, callback) {
-  User.findOne({ _id: ObjectId(memberId) }, { password: 0, pastProfileImages: 0, languages: 0 }, (err, userObj) => {
+  let Obj = {
+    _id: 1,
+    isCeleb: 1,
+    isManager: 1,
+    isOnline: 1,
+    avtar_imgPath: 1,
+    firstName: 1,
+    lastName: 1,
+    profession: 1,
+    gender: 1,
+    username: 1,
+    country: 1,
+    cover_imgPath: 1
+  }
+  User.findOne({ _id: ObjectId(memberId) }, Obj, (err, userObj) => {
     if (!err)
       callback(null, userObj);
     else

@@ -21,6 +21,7 @@ let managerPermissionsMaster = require("../managerPermissionsMaster/managerPermi
 const AdminController = require("./adminController");
 let referralCodeService = require('../referralCode/referralCodeService');
 const jwt = require('../../jwt/jwt');
+let MemberPreferences = require('../memberpreferences/memberpreferencesModel');
 
 // Multer Plugin Settings (Images Upload)
 let storage = multer.diskStorage({
@@ -764,8 +765,9 @@ router.get("/getManagerSearch/:string", function (req, res, next) {
 router.get("/getCelebSearch/:string", function (req, res, next) {
   let searchString = req.params.string;
   //let id = req.body.userID;
+  console.log("searchString",searchString);
   let isCeleb = true;
-  if ((searchString == "") || (searchString == null) || (searchString == "undefined")) {
+  if ((searchString == "") || (searchString == null) || (searchString == "null")|| (searchString == "undefined")) {
     User.aggregate(
       [
         {
@@ -842,6 +844,43 @@ router.get("/getCelebSearch/:string", function (req, res, next) {
     );
   }
 
+});
+
+//End  getCelebSearch
+
+//@admin reports
+//@methos Get
+//@access Admin
+//Start getCelebs for admin
+router.get("/getCelebs", function (req, res, next) {
+  
+  let isCeleb = true;
+
+    User.aggregate(
+      [
+        {
+          $match: {
+            isCeleb: true,
+          },
+
+        },
+        {
+          $project: {
+            _id: 1,
+            firstName: 1,
+            lastName: 1,
+            name: { $concat: [ "$firstName", " ", "$lastName" ] } 
+          }
+        }
+
+      ],
+      function (err, data) {
+        if (err) {
+          res.send(err);
+        }
+        return res.send(data);
+      }
+    );
 });
 
 //End  getCelebSearch
@@ -1313,8 +1352,14 @@ router.get("/getListOfPermissions/:celebrityId/:managerId", function (req, res) 
 // End of  Get list of Permissions for a Manager granted by Celebrity
 
 
+router.get("/getMemberByisCelebAdmin/:pageNo/:limit",AdminController.getMemberByisCelebAdmin);
+router.get("/getMemberByisManager/:pageNo/:limit",AdminController.getMemberByisManager);
+router.get("/getAll/:pageNo/:limit", AdminController.getAll);
+router.get("/fanCount/:pageNo/:limit", AdminController.getFanCount);
 router.get("/getMemberByisCelebAdmin/:pageNo/:limit", AdminController.getMemberByisCelebAdmin);
 router.get("/getMemberByisManager/:pageNo/:limit", AdminController.getMemberByisManager);
 router.get("/getAll/:pageNo/:limit", AdminController.getAll);
+router.get("/getTransaction/:pageNo/:limit/:sDate/:eDate", AdminController.getTransaction);
+router.post("/getTransactionSearch", AdminController.getTransactionSearch);
 
 module.exports = router;

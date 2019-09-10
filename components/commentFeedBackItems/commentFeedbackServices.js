@@ -24,7 +24,7 @@ var updateCommentFeedback = function(commentFeedbackId, commentFeedbackObj, call
 }
 
 var getAllFeedbackItems = function(callback) {
-    CommentFeedBack.find({},{feedbackItem:1,_id:1},(err,allFeedbackComment) => {
+    CommentFeedBack.find((err,allFeedbackComment) => {
         if (!err)
             callback(null, allFeedbackComment);
         else

@@ -4,8 +4,8 @@ let ObjectId = require("mongodb").ObjectID;
 let Preferences = require("./preferencesModel");
 let MemberPreferences = require("../memberpreferences/memberpreferencesModel");
 let preferenceController = require('./preferenceController');
-
-
+var cron = require('node-cron');
+//let preferenceList = [];
 
 router.get("/getAllPreferances/:userId", function (req, res) {
   MemberPreferences.findOne({ memberId: ObjectId(req.params.userId) }, (err, MemberPreference) => {
@@ -13,131 +13,148 @@ router.get("/getAllPreferances/:userId", function (req, res) {
       res.json({ token: req.headers['x-access-token'], success: 0, message: err });
     }
     else {
-      Preferences.aggregate(
-        [
-          {
-            $match: { parentPreferenceId: null }
-          },
-          {
-            $lookup: {
-              from: "preferences",
-              localField: "_id",
-              foreignField: "parentPreferenceId",
-              as: "Categories"
-            }
-          },
-          { $unwind: { path: "$Categories", preserveNullAndEmptyArrays: true } },
-          {
-            $lookup: {
-              from: "users",
-              localField: "Categories._id",
-              foreignField: "preferenceId",
-              as: "Categories.celebsByPreferences"
-            }
-          },
-          { $sort: { "Categories.preferenceName": 1 } },
-          {
-            $group: {
-              "_id": "$_id",
-              "preferenceName": { $first: "$preferenceName" },
-              "updated_at": { $first: "$updated_at" },
-              "created_at": { $first: "$created_at" },
-              "countries": { $first: "$countries" },
-              "professions": { $first: "$professions" },
-              "logoURL": { $first: "$logoURL" },
-              "parentPreferenceId": { $first: "$parentPreferenceId" },
-              "Categories": { $push: "$Categories" },
-              //"Categories": { $push: { Categories : "$Categories", quantity: "$Categories.celebsByPreferences" } },
-              // "celebsByPreferences":{$push:"$Categories.celebsByPreferences"},
-
-              //itemsSold: { $push:  { item: "$Categories", quantity: "$Categories.celebsByPreferences" } }
-            }
-          },
-          {
-            $project: {
-              _id: 1,
-              preferenceName: 1,
-              updated_at: 1,
-              created_at: 1,
-              countries: 1,
-              professions: 1,
-              logoURL: 1,
-              parentPreferenceId: 1,
-              Categories: {
-                _id: 1,
-                preferenceName: 1,
-                updated_at: 1,
-                created_at: 1,
-                countries: 1,
-                logoURL: 1,
-                parentPreferenceId: 1,
-                celebsByPreferences: {
-                  preferenceId: 1,
-                  firstName: 1,
-                  lastName: 1,
-                  isCeleb: 1
-                }
-              },
-            }
-          },
-          { $sort: { "preferenceName": 1 } },
-        ],
-        function (err, preferenceList) {
-          if (err) {
-            res.json({ token: req.headers['x-access-token'], success: 0, message: err });
-          }
-          //console.log(" ====================== @@@@@@@ ",preferenceList)
-          // let arr = [];
-          // for (let i = 0; i < preferenceList.length; i++) {
-          //   let catObjArr = [];
-          //   for (let j = 0; j < preferenceList[i].Categories.length; j++) {
-          //     let catObjObj = null;
-          //     if (preferenceList[i].Categories[j].celebsByPreferences.length > 0) {
-          //       catObjObj = preferenceList[i].Categories[j];
-          //       catObjObj.celebsByPreferences = [];
-          //     }
-          //     if (catObjObj)
-          //       catObjArr.push(catObjObj);
-          //   }
-          //   preferenceList[i].Categories = [];
-          //   preferenceList[i].Categories.push(catObjArr);
-          // }
-          // console.log(" =======CHILL =============== @@@@@@@ ", preferenceList)
-          // arr = preferenceList
-
-          preferenceList.map((parentPreferenceObj) => {
-            let Categories = parentPreferenceObj.Categories.filter((catagoryObj) => {
-              if (catagoryObj.celebsByPreferences.length > 0) {
-                catagoryObj.celebsByPreferences = [];
-                return catagoryObj;
-              }
-            })
-            parentPreferenceObj.Categories = Categories.map((catagoryObj) => {
-              if (MemberPreference) {
-                catagoryObj.isSelected = MemberPreference.preferences.some((userPrefernceId) => {
-                  return userPrefernceId.toString() == catagoryObj._id.toString();
-                })
-              }
-              else {
-                catagoryObj.isSelected = false;
-              }
-              return catagoryObj;
-            });
-            parentPreferenceObj.isSelectedAll = !(parentPreferenceObj.Categories.some((catagoryObj) => {
-              return catagoryObj.isSelected == false
-            }))
+      //console.log("preferenceList",preferenceList);
+      preferenceList.map((parentPreferenceObj) => { 
+        let Categories = parentPreferenceObj.Categories.filter((catagoryObj) => {
+         //console.log("catagoryObj",catagoryObj.celebsByPreferences);
+          if (catagoryObj.celebsByPreferences.length > 0) {
+            catagoryObj.celebsByPreferences = [];
             return parentPreferenceObj;
-          });
-          let prefernceList = preferenceList.filter((preferenceObj) => {
-            if (preferenceObj.Categories.length > 0) {
-              return preferenceObj
-            }
-          })
-          res.json({ token: req.headers['x-access-token'], success: 1, data: prefernceList });
+          }
+        })
+        parentPreferenceObj.Categories = Categories.map((catagoryObj) => {
+          if (MemberPreference) {
+            catagoryObj.isSelected = MemberPreference.preferences.some((userPrefernceId) => {
+              //console.log("test")
+              return userPrefernceId.toString() == catagoryObj._id.toString();
+            })
+          }
+          else {
+            catagoryObj.isSelected = false;
+          }
+          return catagoryObj;
         });
+        parentPreferenceObj.isSelectedAll = !(parentPreferenceObj.Categories.some((catagoryObj) => {
+          return catagoryObj.isSelected == false
+        }))
+        return parentPreferenceObj;
+      });
+      let prefernceListUser = preferenceList.filter((preferenceObj) => {
+        // console.log("preferenceObj",preferenceObj);
+        if (preferenceObj.Categories.length > 0) {
+          return preferenceObj
+        }
+      })
+      res.json({ token: req.headers['x-access-token'], success: 1, data: prefernceListUser });
+      //console.log(globalString);
     }
   });
 });
+
+var newPreferences = cron.schedule('*/10 * * * * *', function (req, res) {
+  //console.log("preferenceList",global.preferenceList);
+//console.log(globalString); // Output: "This can be accessed anywhere!"
+
+  Preferences.aggregate(
+    [
+      {
+        $match: { parentPreferenceId: null }
+      },
+      {
+        $lookup: {
+          from: "preferences",
+          localField: "_id",
+          foreignField: "parentPreferenceId",
+          as: "Categories"
+        }
+      },
+      { $unwind: { path: "$Categories", preserveNullAndEmptyArrays: true } },
+      { $sort: { "Categories.preferenceName": 1 } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "Categories._id",
+          foreignField: "preferenceId",
+          as: "Categories.celebsByPreferences"
+        }
+      },
+      {
+        $group: {
+          "_id": "$_id",
+          "preferenceName": { $first: "$preferenceName" },
+          "updated_at": { $first: "$updated_at" },
+          "created_at": { $first: "$created_at" },
+          "countries": { $first: "$countries" },
+          "professions": { $first: "$professions" },
+          "logoURL": { $first: "$logoURL" },
+          "parentPreferenceId": { $first: "$parentPreferenceId" },
+          "Categories": { $push: "$Categories" },
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          preferenceName: 1,
+          updated_at: 1,
+          created_at: 1,
+          countries: 1,
+          professions: 1,
+          logoURL: 1,
+          parentPreferenceId: 1,
+          Categories: {
+            _id: 1,
+            preferenceName: 1,
+            updated_at: 1,
+            created_at: 1,
+            countries: 1,
+            logoURL: 1,
+            parentPreferenceId: 1,
+            celebsByPreferences: {
+              preferenceId: 1,
+              firstName: 1,
+              lastName: 1,
+              isCeleb: 1
+            }
+          },
+        }
+      },
+      { $sort: { "preferenceName": 1 } },
+    ],
+    function (err, preferenceList) {
+      if (err) {
+        console.log(err);
+        //res.json({ token: req.headers['x-access-token'], success: 0, message: err });
+      }
+     
+      //console.log(" ====================== @@@@@@@ ",preferenceList)
+      // let arr = [];
+      // for (let i = 0; i < preferenceList.length; i++) {
+      //   let catObjArr = [];
+      //   for (let j = 0; j < preferenceList[i].Categories.length; j++) {
+      //     let catObjObj = null;
+      //     if (preferenceList[i].Categories[j].celebsByPreferences.length > 0) {
+      //       catObjObj = preferenceList[i].Categories[j];
+      //       catObjObj.celebsByPreferences = [];
+      //     }
+      //     if (catObjObj)
+      //       catObjArr.push(catObjObj);
+      //   }
+      //   preferenceList[i].Categories = [];
+      //   preferenceList[i].Categories.push(catObjArr);
+      // }
+      // console.log(" =======CHILL =============== @@@@@@@ ", preferenceList)
+      // arr = preferenceList
+
+
+      //console.log("prefernceList",prefernceList);
+      global.preferenceList = preferenceList;
+      //global.preferenceList;
+      //res.json({ token: req.headers['x-access-token'], success: 1, data: prefernceList });
+    });
+
+ }, false);
+ newPreferences.start();
+
 // createPreferences start
 router.post('/createPreferences', preferenceController.createPreferences)
 // End createPreferences
@@ -170,14 +187,14 @@ router.get("/getPreferencesByParentlist", function (req, res, next) {
         }
       },
       { $unwind: { path: "$categories", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "categories._id",
-          foreignField: "preferenceId",
-          as: "categories.celebsByPreferences"
-        }
-      },
+      // {
+      //   $lookup: {
+      //     from: "users",
+      //     localField: "categories._id",
+      //     foreignField: "preferenceId",
+      //     as: "categories.celebsByPreferences"
+      //   }
+      // },
       { $sort: { "categories.preferenceName": 1 } },
       {
         $group: {
