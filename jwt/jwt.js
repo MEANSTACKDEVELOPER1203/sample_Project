@@ -9,7 +9,7 @@ var nonSecurePaths = ['/', 'logininfo/verifyotp',
     '/appCms/getfaqs', '/appCms/contactuspage', '/appCms/aboutuspage',
     '/countries/getAll/', '/notification/getNotificationsCount/', '/comLog/contactUs',
     '/appupdate/appupdateinfo', '/logininfo/resetPasswordByEmail', '/livetimelog/updateLiveLogStatus',
-    '/users/memberRegistrations', '/users/socialRegister', '/logininfo/logout/', '/logininfo/login', 'admin/login'];
+    '/users/memberRegistrations', '/users/socialRegister', '/logininfo/logout/', '/logininfo/login', 'admin/login', '/payments/paywithpaytmresponse', "/paymentTransaction/generalCheckout_web"];
 
 var jwtAuth = {
     createToken: (userId) => {
@@ -29,17 +29,22 @@ var jwtAuth = {
         // console.log(req.headers)
         // console.log("**********************************************************")
         return next();
-
         // if (req.path.search('splashscreen/splashscreenbycountry') != -1) {
         //     next();
         // }
-        // else if (req.path.search('users/memberRegistrationAndProfileUpdate') != -1 && req.body.loginType !="socialLogin") {
+        // else if (req.path.search('/payments/paywithpaytm') != -1) {
+        //     //console.log("test")
         //     next();
         // }
-        // else if(req.path.search('users/memberRegistrationAndProfileUpdate') != -1 && req.body.loginType =="socialLogin"){
-        //     if(req.body.secureNewLogin == false)
-        //     {
-        //         Logins.findOne({email:req.body.email}, { deviceToken: 1 }, (err, loginInfo) => {
+        // else if (req.path.search('/payments/paywithpaytmresponse') != -1) {
+        //     next();
+        // }
+        // else if (req.path.search('users/memberRegistrationAndProfileUpdate') != -1 && req.body.loginType != "socialLogin") {
+        //     next();
+        // }
+        // else if (req.path.search('users/memberRegistrationAndProfileUpdate') != -1 && req.body.loginType == "socialLogin") {
+        //     if (req.body.secureNewLogin == false) {
+        //         Logins.findOne({ email: req.body.email }, { deviceToken: 1 }, (err, loginInfo) => {
         //             if (err)
         //                 return res.json({ success: 0, message: `Please try again ${err}`, "token": token })
         //             else if (loginInfo) {
@@ -63,7 +68,7 @@ var jwtAuth = {
         //                 next();
         //             }
         //         })
-        //     }else{
+        //     } else {
         //         next();
         //     }
         // }
@@ -97,8 +102,8 @@ var jwtAuth = {
         // else if (req.path.search('/ientertain/editIentertain/') != -1) {
         //     next();
         // }
-        // //*********Dummy Services********* 
-        //  else if (req.path.search('/dummy/api/deleteMembershipAccount/') != -1) {
+        // //*********Dummy Services*********
+        // else if (req.path.search('/dummy/api/deleteMembershipAccount/') != -1) {
         //     next();
         // }
         // else if (req.path.search('/dummy/api/removeFanFollow/') != -1) {
@@ -107,7 +112,10 @@ var jwtAuth = {
         // else if (req.path.search('/dummy/api/addCredits/') != -1) {
         //     next();
         // }
-        // //********* End Dummy Services********* 
+        // else if (req.path.search('/dummy/api/removeSeenStatus/') != -1) {
+        //     next();
+        // }
+        // //********* End Dummy Services*********
         // // else if (req.path.search('/feed/getFeedsNew/5c6aa6dc250d3114ffe670c0/') != -1) {
         // //     next();
         // // }
@@ -118,10 +126,10 @@ var jwtAuth = {
         //     var token = req.headers['x-access-token'];
         //     let query = {
         //         $or: [
-        //           { email: req.body.email.toLowerCase() },
-        //           { mobileNumber: { $regex: req.body.email } }
+        //             { email: req.body.email.toLowerCase() },
+        //             { mobileNumber: { $regex: req.body.email } }
         //         ]
-        //       }
+        //     }
         //     Logins.findOne(query, { deviceToken: 1 }, (err, loginInfo) => {
         //         if (err)
         //             return res.json({ success: 0, message: `Please try again ${err}`, "token": token })
@@ -186,7 +194,7 @@ var jwtAuth = {
         //                 jwt.verify(token, config.secret, function (err, decoded) {
         //                     if (err) {
         //                         if (err.name && err.name == "TokenExpiredError" || err.name == "JsonWebTokenError") {
-        //                             return res.json({ success: 4, auth: false, message: 'Token Expired' });
+        //                             return res.json({ success: 4, auth: false, message: 'Looks like you have logged in on another device.' });
         //                         }
         //                         else {
         //                             return res.json({ success: 5, auth: false, message: 'Failed to authenticate token.', err: err });

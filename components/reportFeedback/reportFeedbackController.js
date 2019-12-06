@@ -20,7 +20,7 @@ var getAllFeedbackItems = function(req,res) {
             res.json({success:0,err:err})
         }
         else{
-            res.json({success:1,token:req.headers['x-access-token'],data123:allreportFeedBack})
+            res.json({success:1,token:req.headers['x-access-token'],data:allreportFeedBack})
         }
     })
 }

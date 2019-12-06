@@ -39,7 +39,8 @@ module.exports.saveFeedMapping = function (memberId, callback) {
     let feedMappingInfo = new FeedMapping({
         memberId: memberId,
         currentSeenFeedDate: curreTime,
-        lastSeenFeedDate: curreTime
+        lastSeenFeedDate: curreTime,
+        createdAt: curreTime
     });
     FeedMapping.create(feedMappingInfo, (err, createdFeedMappingObj) => {
         if (!err)
@@ -54,7 +55,10 @@ module.exports.findOneAndDeleteObject = function (memberId, callback) {
         if (err)
             callback(err, null)
         else {
-            let createdFeedMappingDate = new Date(feedMappingObj.createdAt)
+            console.log("feedMappingObj", feedMappingObj)
+            let createdFeedMappingDate = new Date()
+            if (feedMappingObj)
+                createdFeedMappingDate = feedMappingObj.createdAt
             FeedMapping.updateOne({ memberId: memberId }, { $set: { lastSeenFeedDate: createdFeedMappingDate, currentSeenFeedDate: createdFeedMappingDate } }, (err, deletedObj) => {
                 if (!err)
                     callback(null, deletedObj);

@@ -207,7 +207,7 @@ router.get("/getAll/:pageNo/:limit", (req, res)=> {
     let pageNo = parseInt(params.pageNo);
     let startFrom =  params.limit*(pageNo-1);
     let limit = parseInt(params.limit);
-    charitySettings.count({ },(err, count)=>{
+    charitySettings.countDocuments({ },(err, count)=>{
         if (err){
           return res.json({token:req.headers['x-access-token'],success:0,message:err});
         }

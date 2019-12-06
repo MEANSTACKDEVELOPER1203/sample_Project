@@ -7,16 +7,17 @@ let multer = require("multer");
 let fs = require('fs');
 const CelebManagerService = require("../components/CelebManager/celebManagerService");
 let MemberPreferences = require("../components/memberpreferences/memberpreferencesModel");
-let MemberPreferenceServices = require('../components/memberpreferences/memberPreferenceServices');
+let feedSettings = require("../components/feedSettings/feedSettingsModel");
+// let MemberPreferenceServices = require('../components/memberpreferences/memberPreferenceServices');
 let memberMedia = require("../components/memberMedia1/memberMediaModel");
-let mediaTracking = require("../components/mediaTracking/mediaTrackingModel");
-let CelebrityContracts = require('../components/celebrityContract/celebrityContractsModel');
+// let mediaTracking = require("../components/mediaTracking/mediaTrackingModel");
+// let CelebrityContracts = require('../components/celebrityContract/celebrityContractsModel');
 let Country = require('../components/country/countrysModel');
-const LoginInfo = require('../components/loginInfo/loginInfoModel');
-const cloudconvert = new (require('cloudconvert'))('mbTkzBrmgkgaqI98MuyBqs6QfdtABldIw6xnvwANW9VzdPcfCDNMTR3tHQ8c0XIW');
-const ActivityLog = require("../components/activityLog/activityLogService");
+// const LoginInfo = require('../components/loginInfo/loginInfoModel');
+// const cloudconvert = new (require('cloudconvert'))('mbTkzBrmgkgaqI98MuyBqs6QfdtABldIw6xnvwANW9VzdPcfCDNMTR3tHQ8c0XIW');
+// const ActivityLog = require("../components/activityLog/activityLogService");
 
-let logins = require("../components/loginInfo/loginInfoModel");
+// let logins = require("../components/loginInfo/loginInfoModel");
 let notificationSetting = require("../components/notificationSettings/notificationSettingsModel");
 let Notification = require("../components/notification/notificationModel");
 var FCM = require('fcm-push');
@@ -25,8 +26,6 @@ var fcm = new FCM(serverkey);
 let async = require('async');
 var Jimp = require('jimp');
 let otpService = require('../components/otp/otpRouter');
-
-
 
 // Multer Plugin Settings (Images Upload)
 let storage = multer.diskStorage({
@@ -46,28 +45,19 @@ let upload = multer({
 // End of Multer Plugin Settings (Images Upload)
 
 router.post('/createFeed_PK', upload.any(), (req, res) => {
-  //var baseUrl = "uploads/feeds/"
-  // console.log(req.body);
   let feed = req.body.feed;
   let feedObj = JSON.parse(feed);
   let files = req.files;
-  // console.log(feedObj);
   let fileType, mediaRatio;
   let fileExtension;
-  // console.log(files);
   var mediaArray = [];
-
-
   if (files.length > 0) {
     let i = 0;
     for (i = 0; i < files.length; i++) {
-      //let createdAt = new Date()
-      var srcObj = {} //0 1 
+      var srcObj = {}
       var mediaObj = {};
       mediaObj = feedObj.media[i];
       mediaRatio = parseFloat(mediaObj.mediaRatio);
-      // console.log("mediaRatio ============= ", mediaRatio)
-      // FILE NAME AND EXTENSION.
       fileType = files[i].mimetype;
       let videoUrl;
       let mediaUrl;
@@ -87,19 +77,14 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
         // thumbnail = mediaUrl.replace("feeds","FeedThumbnails");
         // var thumbNailPath = mediaUrl;
         // var destThumbnailPath = thumbnail;
-
-
         function convert(thumbNailPath, destThumbnailPath, height, width) {
 
-          //console.log(thumbNailPath,destThumbnailPath,height,width)
           return new Promise(function (resolve, reject) {
             Jimp.read(thumbNailPath, (err, lenna) => {
               if (err) {
                 Feed.update({ "memberId": ObjectId(feedObj.memberId), 'media.src.thumbnail': destThumbnailPath }, { 'media.$.src.thumbnail': thumbNailPath }, (err, updated) => {
-                  //console.log(updated)
                 });
                 memberMedia.update({ "memberId": ObjectId(feedObj.memberId), 'media.src.thumbnail': destThumbnailPath }, { 'media.$.src.thumbnail': thumbNailPath }, (err, updated) => {
-                  //console.log(updated)
                 });
               }
               else {
@@ -120,8 +105,6 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
 
           width = 500;
           height = mediaRatio * width;
-
-
           await convert(thumbNailPath, destThumbnailPath, height, width);
         }
         main();
@@ -136,53 +119,14 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
         var thumbNailPath = "uploads/feeds/" + mediaName;
         var destThumbnailPath = 'uploads/FeedThumbnails/' + mediaName;
 
-
-
         function convert(thumbNailPath, destThumbnailPath, height, width) {
-
-          //console.log(thumbNailPath,destThumbnailPath,height,width)
           return new Promise(function (resolve, reject) {
 
             Jimp.read(thumbNailPath, (err, lenna) => {
               if (err) {
-                // let src = thumbNailPath
-                // fs.createReadStream(src)
-                // .pipe(cloudconvert.convert({
-                //     "inputformat": "heic",
-                //     "outputformat": "jpg",
-                //     "input": "upload"
-                // }))
-                // .pipe(fs.createWriteStream(destThumbnailPath));
-
-
-                // fs.rename(src,src+"_chnaged", function (err) {
-                //   if (err) throw err;
-                //   console.log('renamed complete');
-                // });
-
-                // fs.createReadStream(destThumbnailPath)
-                // .pipe(cloudconvert.convert({
-                //     "inputformat": "heic",
-                //     "outputformat": "jpg",
-                //     "input": "upload"
-                // }))
-                // .pipe(fs.createWriteStream(src));
-
-                // fs.renameSync(thumbNailPath)
-
-                // let src = thumbNailPath
-                // fs.createReadStream(destThumbnailPath)
-                // .pipe(cloudconvert.convert({
-                //     "inputformat": "heic",
-                //     "outputformat": "jpg",
-                //     "input": "upload"
-                // }))
-                // .pipe(fs.createWriteStream(src));
                 Feed.update({ "memberId": ObjectId(feedObj.memberId), 'media.src.thumbnail': destThumbnailPath }, { 'media.$.src.thumbnail': thumbNailPath }, (err, updated) => {
-                  //console.log(updated)
                 })
                 memberMedia.update({ "memberId": ObjectId(feedObj.memberId), 'media.src.thumbnail': destThumbnailPath }, { 'media.$.src.thumbnail': thumbNailPath }, (err, updated) => {
-                  //console.log(updated)
                 })
               }
               else {
@@ -192,43 +136,33 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
                   // .greyscale() // set greyscale
                   .write(destThumbnailPath, (err, data) => {
                     if (!err) {
-                      console.log("saved")
                       resolve(destThumbnailPath);
                     }
                     else {
-                      console.log("err")
                     }
 
                   }); // save
               }
             });
-
           })
-
         }
         async function main() {
-
           width = 500;
           height = mediaRatio * width;
-
-
           await convert(thumbNailPath, destThumbnailPath, height, width);
         }
         main();
       }
-      //console.log("saved2")
       srcObj.mediaUrl = mediaUrl;
       srcObj.mediaName = mediaName;
       srcObj.videoUrl = videoUrl;
       srcObj.thumbnail = thumbnail;
       mediaObj.src = srcObj;
       mediaObj.mediaId = new ObjectId();
-      //mediaObj.createdAt = createdAt; //this for member media file
       mediaArray.push(mediaObj);
     }
   }
   feedObj.mediaArray = mediaArray;
-  // console.log("saved data ========= ", feedObj)
   async.waterfall([function (callback) {
     User.getUserById(ObjectId(feedObj.memberId), (err, userDetailObj) => {
       if (err) {
@@ -245,25 +179,24 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
     , function (userDetailObj, callback) {
       feedObj.createdBy = feedObj.createdBy;
       feedObj.memberName = userDetailObj.fileName;
-      let hasNumber = /\d/;
-      if (feedObj.state == "0" && hasNumber.test(feedObj.countryCode)) {
-        Country.findOne({ dialCode: feedObj.countryCode }, (err, countryObj) => {
-          if (err)
-            console.log("****** Error while fetching the country code ******");
-          else {
-            //console.log(countryObj)
-            feedObj.countryCode = countryObj.countryCode;
-            feedObj.state = "";
-            Feed.saveFeed_PK(feedObj, (err, createdFeedObj) => {
-              if (err) {
-                return callback(new Error(`Error while creating the feed! : ${err} `), null, null);
-              } else {
-                return callback(null, createdFeedObj, userDetailObj);
-              }
-            });
-          }
-        })
-      } else {
+      // let hasNumber = /\d/;
+      // if (feedObj.state == "0" && hasNumber.test(feedObj.countryCode)) {
+      //   Country.findOne({ dialCode: feedObj.countryCode }, (err, countryObj) => {
+      //     if (err)
+      //       console.log("****** Error while fetching the country code ******");
+      //     else {
+      //       feedObj.countryCode = countryObj.countryCode;
+      //       feedObj.state = "";
+      //       Feed.saveFeed_PK(feedObj, (err, createdFeedObj) => {
+      //         if (err) {
+      //           return callback(new Error(`Error while creating the feed! : ${err} `), null, null);
+      //         } else {
+      //           return callback(null, createdFeedObj, userDetailObj);
+      //         }
+      //       });
+      //     }
+      //   })
+      // } else {
         Feed.saveFeed_PK(feedObj, (err, createdFeedObj) => {
           if (err) {
             return callback(new Error(`Error while creating the feed! : ${err} `), null, null);
@@ -271,8 +204,7 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
             return callback(null, createdFeedObj, userDetailObj);
           }
         });
-      }
-
+      // }
     }, function (createdFeedObj, userDetailObj, callback) {
       let obj = {}
       Object.assign(createdFeedObj, {
@@ -286,7 +218,8 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
           lastName: userDetailObj.lastName,
           profession: userDetailObj.profession,
           gender: userDetailObj.gender,
-          username: userDetailObj.username
+          category: userDetailObj.category
+
         }
       })
       let memberId = createdFeedObj.memberId;
@@ -330,7 +263,6 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
           }
         }
       });
-
     }
   ], function (err, createdFeedObj, userDetailObj) {
     if (err) {
@@ -355,7 +287,7 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
         "state": createdFeedObj.state,
       }
 
-      ////////////feed Notification/////////////////
+      /************** feed Notification ********************* */
       MemberPreferences.aggregate([
         {
           $match: { celebrities: { $elemMatch: { CelebrityId: createdFeedObj.memberId } } }
@@ -384,8 +316,6 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
           }
         }
       ], (err, users) => {
-        // console.log(users)
-        // console.log("FFFFFFFFFFFFFF", users.length)
         if (err) {
           console.log(err)
         } else if (users.length > 0) {
@@ -394,10 +324,8 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
             for (let index = 0; index < users.length; index++) {
               let user = {};
               user = users[index];
-              //console.log(user.memberLoginInfo.memberId);
               let dToken = user.memberLoginInfo.deviceToken;
               let osType = user.memberLoginInfo.osType;
-              //console.log(user.memberLoginInfo.osType);
               let time1 = createdFeedObj.created_at;
               let newNotification = new Notification({
                 memberId: user.memberLoginInfo.memberId,
@@ -422,297 +350,104 @@ router.post('/createFeed_PK', upload.any(), (req, res) => {
                       notificationSettingId: ObjectId("5cac6893839a52126c21f2f7")
                     }]
                   };
-                  notificationSetting.find(query, function (err, rest) {
-                    if (err) return res.send(err);
-                    //console.log("t1", rest);
-                    if (rest.length <= 0 || rest[0].isEnabled == true) {
-                      if (osType == "Android") {
-                        //console.log("************* AAAAAAAAAAAAa ********************")
-                        let data = {
-                          serviceType: "Feed",
-                          title: 'Feed Alert!!',
-                          body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
-                          feedId: createdFeedObj._id,
-                          firstName: SMresult.firstName,
-                          avtar_imgPath: SMresult.avtar_imgPath
-                        }
-                        otpService.sendAndriodPushNotification(dToken, "Feed Alert!!", data, (err, successNotificationObj) => {
-                          if (err)
-                            console.log(err)
-                          else {
-                            console.log(successNotificationObj)
+                  let query1 = { memberId: user.memberLoginInfo.memberId, celebId: SMresult._id }
+                  feedSettings.findOne(query1, function (err, feedseetingsObj) {
+                    if ((feedseetingsObj == null) || (feedseetingsObj == "null") || (!feedseetingsObj) || (feedseetingsObj.isEnabled == true)) {
+                      notificationSetting.find(query, function (err, rest) {
+                        if (err) return res.send(err);
+                        if (rest.length <= 0 || rest[0].isEnabled == true) {
+                          if (osType == "Android") {
+                            let data = {
+                              serviceType: "Feed",
+                              title: 'Feed Alert!!',
+                              body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
+                              feedId: createdFeedObj._id,
+                              firstName: SMresult.firstName,
+                              avtar_imgPath: SMresult.avtar_imgPath
+                            }
+                            otpService.sendAndriodPushNotification(dToken, "Feed Alert!!", data, (err, successNotificationObj) => {
+                              if (err)
+                                console.log(err)
+                              else {
+                                // console.log(successNotificationObj)
+                              }
+                            });
+                          } else if (osType == "IOS") {
+                            //console.log("************* BBBBBBBBBBBBB ********************")
+                            let notification = {
+                              serviceType: "FEED",
+                              body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
+                              feedId: createdFeedObj._id,
+                              firstName: SMresult.firstName,
+                              avtar_imgPath: SMresult.avtar_imgPath
+                            }
+                            otpService.sendIOSPushNotification(dToken, notification, (err, successNotificationObj) => {
+                              if (err)
+                                console.log(err)
+                              else {
+                                // console.log(successNotificationObj)
+                              }
+                            });
                           }
-                        });
-                      } else if (osType == "IOS") {
-                        //console.log("************* BBBBBBBBBBBBB ********************")
-                        let notification = {
-                          serviceType: "FEED",
-                          body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
-                          feedId: createdFeedObj._id,
-                          firstName: SMresult.firstName,
-                          avtar_imgPath: SMresult.avtar_imgPath
+                          let message = {
+                            collapse_key: 'Feed Alert!!',
+                            serviceType: "FEED",
+                            feedId: createdFeedObj._id,
+                            data: {
+                              title: 'Feed Alert!!',
+                              serviceType: "FEED",
+                              notificationType: "Feed",
+                              memberId: SMresult._id,
+                              body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
+                            },
+                            notification: {
+                              memberId: createdFeedObj.memberId,
+                              feedId: createdFeedObj._id,
+                              activity: "FEED",
+                              title: "Feed Alert!!",
+                              notificationFrom: createdFeedObj.memberId,
+                              body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
+                              notificationType: "Feed",
+                              notificationSettingsId: ObjectId("5cac6893839a52126c21f2f7"),
+                            }
+                          };
+                          CelebManagerService.sendNotificationToAllSwitchedManager(createdFeedObj.memberId, message, (err, data) => {
+                            if (err) {
+                              console.log(err)
+                            } else {
+                              // console.log(data)
+                            }
+                          })
                         }
-                        otpService.sendIOSPushNotification(dToken, notification, (err, successNotificationObj) => {
-                          if (err)
-                            console.log(err)
-                          else {
-                            console.log(successNotificationObj)
-                          }
-                        });
-                      }
+                      });
+                    } else if (feedseetingsObj.isEnabled == false) {
+                      //console.log("feedseetingsObj", feedseetingsObj);
                     }
+
                   });
+
                 }
               });
             };
-            let message = {
-              collapse_key: 'Feed Alert!!',
-              serviceType: "FEED",
-              feedId: createdFeedObj._id,
-              data: {
-                title: 'Feed Alert!!',
-                serviceType: "FEED",
-                notificationType: "Feed",
-                memberId: SMresult._id,
-                body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
-              },
-              notification: {
-                memberId: createdFeedObj.memberId,
-                feedId: createdFeedObj._id,
-                activity: "FEED",
-                title: "Feed Alert!!",
-                notificationFrom: createdFeedObj.memberId,
-                body: SMresult.firstName + " " + SMresult.lastName + " posted an update.",
-                notificationType: "Feed",
-                notificationSettingsId: ObjectId("5cac6893839a52126c21f2f7"),
-              }
-            };
-            CelebManagerService.sendNotificationToAllSwitchedManager(createdFeedObj.memberId, message, (err, data) => {
-              if (err) {
-                console.log(err)
-              } else {
-                console.log(data)
-              }
-            })
+
           });
         }
       })
-
-      ///////feed Notification End /////////////////////////////
-      // let body = {
-      //   memberId: desiredResponce.memberId,
-      //   feedId: desiredResponce._id
-      // }
-      // ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Feed", body, (err, newActivityLog) => {
-      //   if (err) {
-      //     // res.json({success: 0,message: "Please try again." + err});
-      //   } else {
-
-      //   }
-      // })
+      /**************** feed Notification End ******************* */
       return res.status(200).json({ token: req.headers['x-access-token'], data: desiredResponce, success: 1, message: "Post uploaded successfully." });
     }
   });
 })
 
 
-router.get('/getFeeds_PK/:member_Id/:creation_Date/:country_Code/:state', (req, res, next) => {
-  ///:skip/:limit
-  let query = {};
-  let memberId = (req.params.member_Id) ? req.params.member_Id : '';
-  let creationDate = (req.params.creation_Date) ? req.params.creation_Date : '';
-  let countryCode = (req.params.country_Code) ? req.params.country_Code : '';
-  countryCode = countryCode.toUpperCase();
-  let state = (req.params.state) ? req.params.state : '';
-  state = state.toUpperCase();
-  // let skip = (req.params.skip) ? req.params.skip : '';
-  // let limit = (req.params.limit) ? req.params.limit : '';
-  query.memberId = memberId;
-  query.created_at = creationDate;
-  query.countryCode = countryCode;
-  query.state = state;
-  // query.skip = skip;
-  // query.limit = limit;
-  var feedArray = [];
-  //let celebrities = [];
-  var feedObj = {};
-  let hasNumber = /\d/;
-  Country.findOne({ $or: [{ dialCode: countryCode }, { countryCode: countryCode }] }, (err, countryCodeObj) => {
-    if (err)
-      console.log("******************Error while fetching the country details***********************", err);
-    else {
-      // console.log("********* Remove Console after testing IN Feed Creating*************")
-      // console.log(countryCode);
-      // console.log(countryCodeObj);
-      // console.log("********* Remove Console after testing IN Feed Creating*************")
-      if (hasNumber.test(countryCode) && countryCodeObj) {
-        countryCode = countryCodeObj.countryCode;
-        query.countryCode = countryCode
-      }
-      Feed.findAllFeed(query, (err, listOfFeedsObj) => {
-        if (err) {
-          console.log(err.message);
-          return res.json({ token: req.headers['x-access-token'], success: 0, message: "Errror while retrieving the feeds." });
-        } else if (listOfFeedsObj.length <= 0) {
-          return res.json({ token: req.headers['x-access-token'], success: 1, message: "record not found", data: [] });
-        }
-        else {
-          //console.log(listOfFeedsObj.length)
-          //console.log(listOfFeedsObj)
-          function foo(cb) {
-            var results = [];
-            listOfFeedsObj.map(feedDataObj => {
-              let feedJsonObj = {};
-              feedJsonObj = feedDataObj
-              //console.log(feedJsonObj._id)
-              let memberIdForContract = feedJsonObj.memberId;
-              memberIdForContract = "" + memberIdForContract;
-              //console.log(memberIdForContract);
-              //feedJsonObj.feedStats = [];
-              //feedJsonObj.mediaStats = [];
-              let queryForContract = {
-                memberId: memberIdForContract, $or: [{ serviceType: 'fan' }, { serviceType: 'video' }, { serviceType: 'audio' }]
-
-              }
-              CelebrityContracts.find(queryForContract, function callback(err, celebContractObj) {
-                if (err)
-                  console.log("********Error while feching celeb contract ********** ", err)
-                else {
-                  if (celebContractObj.length > 2) {
-                    Object.assign(feedDataObj, { "celeAudioCharge": celebContractObj.length ? celebContractObj[0].serviceCredits : 0 });
-                    Object.assign(feedDataObj, { "celeFanCharge": celebContractObj.length ? celebContractObj[1].serviceCredits : 0 });
-                    Object.assign(feedDataObj, { "celeVideoCharge": celebContractObj.length ? celebContractObj[2].serviceCredits : 0 });
-                  }
-                  else {
-                    Object.assign(feedDataObj, { "celeAudioCharge": 0 });
-                    Object.assign(feedDataObj, { "celeFanCharge": 0 });
-                    Object.assign(feedDataObj, { "celeVideoCharge": 0 });
-                  }
-                  // results.push(feedDataObj);
-                  results[results.length] = feedDataObj;
-                  if (results.length === listOfFeedsObj.length) {
-                    cb(null, listOfFeedsObj);
-                  }
-                }
-              }).sort({ serviceType: 1 })
-            });
-          }
-          foo(function (err, resultArr) {
-            if (err)
-              return res.json({ token: req.headers['x-access-token'], success: 0, message: `Fail to fetch Feeds ${err}` });
-            // resultArr.sort(function (x, y) {
-            //   var dateA = new Date(x.created_at), dateB = new Date(y.created_at);
-            //   return dateB - dateA;
-            // });
-            return res.json({ token: req.headers['x-access-token'], success: 1, data: resultArr });
-          });
-          //return res.status(200).json({ success: 1, data: listOfFeedsObj  });
-        }
-      });
-    }
-  })
-
-  // async.waterfall([
-  //   function (callback) {
-  //     Feed.findAllFeed(query, (err, listOfFeedsObj) => {
-  //       if (err) {
-  //         return callback(new Error(`Errror while retrieving the feed. : ${err}`), null)
-  //       } else {
-  //         return callback(null, listOfFeedsObj);
-  //       }
-  //     });
-  //   }
-  /*, function (listOfFeedsObj, callback) {
-    if (creationDate !== "0") {
-      let listOfOnlineCelebraty = [];
-      return callback(null, listOfFeedsObj, listOfOnlineCelebraty);
-    }
-    User.findOnlineCelebrities((err, listOfOnlineCelebraties) => {
-      if (err) {
-        return callback(new Error(`Error while fetching online celebraties! : ${err} `), null, null);
-      } else {
-        MemberPreferences.findOne({ memberId: ObjectId(memberId) }, {}, (err, listOfMyPreferences) => {
-          if (err) {
-            return callback(new Error(`Error while fetching member preference! : ${err} `), null, null);
-          } else {
-            if (listOfMyPreferences) {
-              celebrities = listOfMyPreferences.celebrities;
-            }
-            let _id, username, isOnline, isCeleb, lastName, firstName, imageRatio, avtar_imgPath, aboutMe, profession;
-            let onlineCelebritiesObj = {};
-            let onlineCelebritiesArray = [];
-            let isFan = false
-            let isFollower = false;
-            if (celebrities.length > 0) {
-              for (let k = 0; k < listOfOnlineCelebraties.length; k++) {
-                let userId = listOfOnlineCelebraties[k]._id;
-                userId = "" + userId;
-                let preferencesCelebId = listOfMyPreferences.memberId;
-                preferencesCelebId = "" + preferencesCelebId;
-                if (userId === preferencesCelebId) {
-                  listOfOnlineCelebraties.splice(k, 1);
-                }
-
-              }
-            }
-            for (let i = 0; i < listOfOnlineCelebraties.length; i++) {
-              onlineCelebritiesObj = {};
-              let onlineCelebrityObj = listOfOnlineCelebraties[i];
-              let userId = listOfOnlineCelebraties[i]._id;
-              userId = "" + userId;
-              for (var j = 0; j < celebrities.length; j++) {
-                let preferencesCelebId = celebrities[j].CelebrityId;
-                preferencesCelebId = "" + preferencesCelebId
-                if (userId === preferencesCelebId && celebrities[j].isFan) {
-                  isFan = true;
-                }
-                if (userId === preferencesCelebId && celebrities[j].isFollower) {
-                  isFollower = true;
-                }
-              }
-              onlineCelebritiesObj.isFan = isFan;
-              onlineCelebritiesObj.isFollower = isFollower;
-              onlineCelebritiesObj._id = onlineCelebrityObj._id;
-              onlineCelebritiesObj.username = onlineCelebrityObj.username;
-              onlineCelebritiesObj.isCeleb = onlineCelebrityObj.isCeleb;
-              onlineCelebritiesObj.isOnline = onlineCelebrityObj.isOnline;
-              onlineCelebritiesObj.lastName = onlineCelebrityObj.lastName;
-              onlineCelebritiesObj.firstName = onlineCelebrityObj.firstName;
-              onlineCelebritiesObj.imageRatio = onlineCelebrityObj.imageRatio;
-              onlineCelebritiesObj.aboutMe = onlineCelebrityObj.aboutMe;
-              onlineCelebritiesObj.profession = onlineCelebrityObj.profession;
-              onlineCelebritiesObj.avtar_imgPath = onlineCelebrityObj.avtar_imgPath;
-              listOfOnlineCelebraties[i] = onlineCelebritiesObj;
-              isFollower = false;
-              isFan = false;
-            }
-            return callback(null, listOfFeedsObj, listOfOnlineCelebraties);
-          }
-        });
-      }
-    });
-  }*/
-  // ], function (err, listOfFeedsObj) {
-  //   if (err) {
-  //     console.log(err.message);
-  //     return res.status(404).json({ success: 0, message: `${err}` });
-  //   } else {
-  //     return res.status(200).json({ success: 1, data: listOfFeedsObj});
-  //   }
-  // });
-
-});
 
 //update feeds
 router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
-  //var baseUrl = "uploads/feeds/";
   var fileName, fileExtension, fileSize, fileType, dateModified;
   let feedId = (req.params.feed_Id) ? req.params.feed_Id : '';
   let files = req.files;
-  // console.log(files)
   let feed = req.body.feed;
   let feedObj = JSON.parse(feed);
-  // console.log("TTTTTTTTTTTT ", feedObj)
   feedObj.updated_at = new Date();
   feedObj.updatedBy = feedObj.updatedBy;
   var updateMediaArray = [];
@@ -728,6 +463,7 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
   let mediaSize;
   let faceFeatures = [];
   let newMediaArray = [];
+  let memberMediaArr = [];
 
   var mediaArray = feedObj.media;
   let query = { feedId: req.params.feed_Id, memberId: feedObj.memberId }
@@ -769,89 +505,23 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
           }
         }
       }
-      // console.log(newMediaArray)
       if (files.length > 0) {
         for (let i = 0; i < newMediaArray.length; i++) {
           var srcObj = {}
           mediaObj = {};
           var newMediaObj = newMediaArray[i];
-          // console.log("PPPPPPPPP", newMediaObj);
           mediaRatio = parseFloat(newMediaObj.mediaRatio);
-          // console.log("mediaRatio", mediaRatio);
           var newMediaObjForVideo = newMediaArray[i + 1];
           fileType = files[i].mimetype;
-
-          // if (fileType === "video/mp4" || fileType === "image/gif") {
-          //   videoUrl = files[i].path;
-          //   //videoUrl = baseUrl.concat(videoUrl);
-          //   mediaUrl = files[i + 1].path;
-          //   //mediaUrl = baseUrl.concat(mediaUrl);
-          //   mediaName = files[i].filename;
-          //   files.splice(i + 1, 1);
-          // } else {
-          //   videoUrl = "";
-          //   mediaUrl = files[i].path;
-          //   //mediaUrl = baseUrl.concat(mediaUrl);
-          //   mediaName = files[i].filename;
-
-          // }
-          // thumbnail = 'uploads/FeedThumbnails/'+mediaName;
-          // var thumbNailPath = "uploads/feeds/"+mediaName;
-          // var destThumbnailPath = 'uploads/FeedThumbnails/'+mediaName;
-
-          // function convert(thumbNailPath,destThumbnailPath,height,width){
-
-          //   //console.log(thumbNailPath,destThumbnailPath,height,width)
-          //   return new Promise(function(resolve,reject){
-          //     Jimp.read(thumbNailPath, (err, lenna) => {
-          //     if (err) throw err;
-          //     lenna
-          //       .resize(width, height) // resize
-          //       .quality(60) // set JPEG quality
-          //       // .greyscale() // set greyscale
-          //       .write(destThumbnailPath,(err,data)=>{
-          //         if(!err)
-          //           resolve(destThumbnailPath);
-          //       }); // save
-          //   });
-          // })
-
-          // }
-          // async function main(){
-
-          //   width =  500;
-          //   height = feedObj.media[i].mediaRatio * width;
-
-
-          //   await convert(thumbNailPath,destThumbnailPath,height,width);
-          // }
-          // main();
-          // srcObj.mediaUrl = mediaUrl;
-          // srcObj.mediaName = mediaName;
-          // srcObj.videoUrl = videoUrl;
-          // srcObj.thumbnail = thumbnail;
-          // mediaObj.src = srcObj;
-          // mediaObj.mediaId = new ObjectId();
-          // mediaObj.faceFeatures = newMediaObj.faceFeatures;
-          // mediaObj.mediaRatio = newMediaObj.mediaRatio;
-          // mediaObj.mediaSize = newMediaObj.mediaSize;
-          // mediaObj.mediaType = newMediaObj.mediaType;
-          // mediaObj.mediaCaption = newMediaObj.mediaCaption;
           if (fileType === "video/mp4" || fileType == "video/3gpp" || fileType === "image/gif") {
             videoUrl = files[i].path;
-            //videoUrl = baseUrl.concat(videoUrl);
             mediaUrl = files[i + 1].path;
-            //mediaUrl = baseUrl.concat(mediaUrl);
             mediaName = files[i].filename;
             mediaName1 = files[i + 1].filename;
             thumbnail = 'uploads/FeedThumbnails/' + mediaName1;
             var thumbNailPath = "uploads/feeds/" + mediaName1;
             var destThumbnailPath = 'uploads/FeedThumbnails/' + mediaName1;
             files.splice(i + 1, 1);
-            // thumbnail = mediaUrl.replace("feeds","FeedThumbnails");
-            // var thumbNailPath = mediaUrl;
-            // var destThumbnailPath = thumbnail;
-
 
             function convert(thumbNailPath, destThumbnailPath, height, width) {
 
@@ -878,18 +548,10 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
                   }
                 });
               })
-
             }
             async function main() {
-
               width = 500;
               height = mediaRatio * width;
-
-              // console.log(newMediaObj)
-              // console.log(thumbNailPath)
-              // console.log(destThumbnailPath)
-              // console.log(height)
-              // console.log(width)
               await convert(thumbNailPath, destThumbnailPath, height, width);
             }
             main();
@@ -897,7 +559,6 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
           } else {
             videoUrl = "";
             mediaUrl = files[i].path;
-            //mediaUrl = baseUrl.concat(mediaUrl);
             mediaName = files[i].filename;
             thumbnail = 'uploads/FeedThumbnails/' + mediaName;
             var thumbNailPath = "uploads/feeds/" + mediaName;
@@ -934,12 +595,6 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
 
               width = 500;
               height = mediaRatio * width;
-
-              // console.log(newMediaObj)
-              // console.log(thumbNailPath)
-              // console.log(destThumbnailPath)
-              // console.log(height)
-              // console.log(width)
               await convert(thumbNailPath, destThumbnailPath, height, width);
             }
             main();
@@ -955,13 +610,24 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
           mediaObj.mediaSize = newMediaObj.mediaSize;
           mediaObj.mediaType = newMediaObj.mediaType;
           mediaObj.mediaCaption = newMediaObj.mediaCaption;
-          // mediaArray.push(mediaObj);
           updateMediaArray.push(mediaObj);
           updateMemberMediaProfile.push(mediaObj)
         }
       }
       feedDetailObj.media = deleteMediaArray;
       feedObj.media = updateMediaArray;
+      memberMediaArr = [];
+      for (let k = 0; k < updateMediaArray.length; k++) {
+        if (updateMediaArray[k]._id == "" || updateMediaArray[k]._id == undefined) {
+          let obj = updateMediaArray[k]
+          let createdAt = new Date();
+          let milliseconds = new Date(createdAt.getFullYear(), createdAt.getMonth(), createdAt.getDate(), createdAt.getHours(), createdAt.getMinutes(), createdAt.getSeconds(), createdAt.getMilliseconds() + k + 1)
+          obj.createdAt = milliseconds;
+          obj.feedId = ObjectId(feedId);
+          memberMediaArr.push(obj);
+        } else {
+        }
+      }
       Feed.updateFeedById(ObjectId(feedId), feedObj, (err, updateFeedObj) => {
         if (err) {
           return callback(new Error(`Error While updating Feed by Id : ${err}`), null)
@@ -987,18 +653,21 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
               }
             }
           }
-          memberMediaObj.media = currentMemberMediaProfile;
+          const latestMemberMedia = [...currentMemberMediaProfile, ...memberMediaArr];
+          memberMediaObj.media = latestMemberMedia;
+
           memberMedia.findByIdAndUpdate(memberMediaObj._id, memberMediaObj, (err, updateMemberMediaObj) => {
             if (err) {
               return callback(new Error(`Error while deleting member media profile! : ${err} `), null, null);
             } else {
-              memberMedia.findByIdAndUpdate(memberMediaObj._id, { $push: { media: { $each: mMedia } } }, (err, updateMemberObj) => {
-                if (err) {
-                  return callback(new Error(`Error while creating member media! : ${err} `), null, null);
-                } else {
-                  return callback(null, updateFeedObj, feedDetailObj);
-                }
-              });
+              return callback(null, updateFeedObj, feedDetailObj);
+              // memberMedia.findByIdAndUpdate(memberMediaObj._id, { $push: { media: { $each: memberMedia } } }, (err, updateMemberObj) => {
+              //   if (err) {
+              //     return callback(new Error(`Error while creating member media! : ${err} `), null, null);
+              //   } else {
+              //     return callback(null, updateFeedObj, feedDetailObj);
+              //   }
+              // });
             }
           })
         }
@@ -1006,21 +675,13 @@ router.put('/editFeedById_PK/:feed_Id', upload.any(), (req, res, next) => {
     }
   ], function (err, updatedFeedObj, feedDetailObj) {
     if (err) {
-      //console.log(err.message);
+      console.log(err);
       return res.status(404).json({ token: req.headers['x-access-token'], success: 0, message: `${err}` });
     } else {
       updatedFeedObj.isFeedLikedByCurrentUser = feedDetailObj.isFeedLikedByCurrentUser;
       updatedFeedObj.feedLikesCount = feedDetailObj.feedLikesCount;
       updatedFeedObj.feedCommentsCount = feedDetailObj.feedCommentsCount;
       updatedFeedObj.feedByMemberDetails = feedDetailObj.feedByMemberDetails;
-      // if (!updatedFeedObj.media.length) {
-      //   mediaArray = [{
-      //     "mediaId": ObjectId(updatedFeedObj._id)
-      //   }]
-      //   Feed.updateOne({ _id: updatedFeedObj._id }, { $set: { media: mediaArray } }, (err, data) => {
-      //     console.log(data)
-      //   })
-      // }
       return res.status(200).json({ token: req.headers['x-access-token'], success: 1, message: "Post updated successfully", data: updatedFeedObj });
     }
   });
@@ -1055,28 +716,30 @@ router.get('/getFeedLikesById_PK/:feed_Id/:createdAt', (req, res) => {
 });
 
 //get media like by id with pagination
-router.get('/getMediaLikesById_PK/:media_Id/:createdAt', (req, res) => {
-  let mediaId = (req.params.media_Id) ? req.params.media_Id : '';
-  let createdAt = (req.params.createdAt) ? req.params.createdAt : '';
-  Feed.findMediaLikesById(mediaId, createdAt, (err, mediaLikesByMemberObj) => {
-    if (err) {
-      res.status(404).json({ token: req.headers['x-access-token'], success: 0, message: "Error while retrieving the Media like details by Id " + feedId + "" + err.message });
-    } else {
-      let fName = "", lName, username = "";
-      for (let i = 0; i < mediaLikesByMemberObj.length; i++) {
-        let mediaLikeObj = {};
-        mediaLikeObj = mediaLikesByMemberObj[i];
-        fName = mediaLikeObj.memberProfile.firstName;
-        lName = mediaLikeObj.memberProfile.lastName;
-        username = fName + " " + lName;
-        mediaLikeObj.memberProfile.username = username;
-        mediaLikesByMemberObj[i] = mediaLikeObj;
+// router.get('/getMediaLikesById_PK/:media_Id/:createdAt', (req, res) => {
+//   let mediaId = (req.params.media_Id) ? req.params.media_Id : '';
+//   let createdAt = (req.params.createdAt) ? req.params.createdAt : '';
+//   Feed.findMediaLikesById(mediaId, createdAt, (err, mediaLikesByMemberObj) => {
+//     if (err) {
+//       res.status(404).json({ token: req.headers['x-access-token'], success: 0, message: "Error while retrieving the Media like details by Id " + feedId + "" + err.message });
+//     } else {
+//       console.log("mediaLikesByMemberObj", mediaLikesByMemberObj)
+//       let fName = "", lName, username = "";
+//       for (let i = 0; i < mediaLikesByMemberObj.length; i++) {
+//         let mediaLikeObj = {};
+//         mediaLikeObj = mediaLikesByMemberObj[i];
+//         fName = mediaLikeObj.memberProfile.firstName;
+//         lName = mediaLikeObj.memberProfile.lastName;
+//         username = fName + " " + lName;
+//         mediaLikeObj.memberProfile.username = username;
+//         mediaLikesByMemberObj[i] = mediaLikeObj;
 
-      }
-      res.status(200).json({ success: 1, data: mediaLikesByMemberObj, token: req.headers['x-access-token'] });
-    }
-  });
-});
+//       }
+//       console.log("mediaLikesByMemberObj result ", mediaLikesByMemberObj)
+//       res.status(200).json({ success: 1, data: mediaLikesByMemberObj, token: req.headers['x-access-token'] });
+//     }
+//   });
+// });
 
 
 //get feed comments by id pagination
@@ -1102,7 +765,7 @@ router.get('/getFeedCommentsById_PK/:feed_Id/:createdAt', (req, res) => {
 
 
 //get media comments by id with pagination
-router.get('/getMediaCommentsById_PK/:mediaId/:createdAt/', (req, res) => {
+router.get('/getMediaCommentsById_PK/:mediaId/:feedId/:createdAt/', (req, res) => {
   Feed.findMediaCommentsByMediaId(req.params, (err, mediaCommentsByMemberObj) => {
     if (err) {
       res.status(404).json({ token: req.headers['x-access-token'], success: 0, message: "Error while retrieving the Media Comments details by Id " + feedId + "" + err.message });
@@ -1116,7 +779,6 @@ router.get('/getMediaCommentsById_PK/:mediaId/:createdAt/', (req, res) => {
         username = fName + " " + lName;
         mediaCommentObj.memberProfile.username = username;
         mediaCommentsByMemberObj[i] = mediaCommentObj;
-
       }
       res.status(200).json({ token: req.headers['x-access-token'], success: 1, data: mediaCommentsByMemberObj });
     }
@@ -1163,17 +825,6 @@ router.delete('/deleteFeed/:feed_Id', (req, res, next) => {
     }
   });
 });
-
-
-
-
-
-
-
-
-
-
-
 
 
 /********************************************************* Political Konnect Feeds Integration End************************************************************************************************************************** */
@@ -1269,6 +920,7 @@ router.get("/getFeedByMemberId/:memberId/:currentUserId", function (req, res) {
       }
     }
     ], function (err, listOfFeedObj) {
+      console.log("listOfFeedObj", listOfFeedObj)
       if (err) {
         res.json({ token: req.headers['x-access-token'], success: 0, message: err });
       }
@@ -1546,6 +1198,14 @@ router.get("/getFeedByMemberId/:memberId/:currentUserId/:createdAt/:limit", (req
       "$unwind": "$feedByMemberDetails"
     },
     {
+      $lookup: {
+        from: "feedsettings",
+        localField: "memberId",
+        foreignField: "celebId",
+        as: "feedSettingsDetails"
+      }
+    },
+    {
       $limit: limit
     },
     {
@@ -1577,6 +1237,17 @@ router.get("/getFeedByMemberId/:memberId/:currentUserId/:createdAt/:limit", (req
           profession: 1,
           gender: 1,
           username: 1
+        },
+        feedSettingsDetails: {
+          $size: {
+            $filter: {
+              input: "$feedSettingsDetails",
+              cond: {
+                $and: [{ $or: [{ "$eq": ["$$this.memberId", currentUserId] }] },
+                { "$eq": ["$$this.isEnabled", true] }]
+              }
+            }
+          }
         },
         feedLikesCount: {
           $size: {
@@ -1621,644 +1292,493 @@ router.get("/getFeedByMemberId/:memberId/:currentUserId/:createdAt/:limit", (req
     });
 });
 
+// router.get('/getFeeds_PK/:member_Id/:creation_Date/:country_Code/:state', (req, res, next) => {
+//   ///:skip/:limit
+//   let query = {};
+//   let memberId = (req.params.member_Id) ? req.params.member_Id : '';
+//   let creationDate = (req.params.creation_Date) ? req.params.creation_Date : '';
+//   let countryCode = (req.params.country_Code) ? req.params.country_Code : '';
+//   countryCode = countryCode.toUpperCase();
+//   let state = (req.params.state) ? req.params.state : '';
+//   state = state.toUpperCase();
+//   // let skip = (req.params.skip) ? req.params.skip : '';
+//   // let limit = (req.params.limit) ? req.params.limit : '';
+//   query.memberId = memberId;
+//   query.created_at = creationDate;
+//   query.countryCode = countryCode;
+//   query.state = state;
+//   // query.skip = skip;
+//   // query.limit = limit;
+//   var feedArray = [];
+//   //let celebrities = [];
+//   var feedObj = {};
+//   let hasNumber = /\d/;
+//   Country.findOne({ $or: [{ dialCode: countryCode }, { countryCode: countryCode }] }, (err, countryCodeObj) => {
+//     if (err)
+//       console.log("******************Error while fetching the country details***********************", err);
+//     else {
+//       if (hasNumber.test(countryCode) && countryCodeObj) {
+//         countryCode = countryCodeObj.countryCode;
+//         query.countryCode = countryCode
+//       }
+//       Feed.findAllFeed(query, (err, listOfFeedsObj) => {
+//         if (err) {
+//           console.log(err.message);
+//           return res.json({ token: req.headers['x-access-token'], success: 0, message: "Errror while retrieving the feeds." });
+//         } else if (listOfFeedsObj.length <= 0) {
+//           return res.json({ token: req.headers['x-access-token'], success: 1, message: "record not found", data: [] });
+//         }
+//         else {
+//           function foo(cb) {
+//             var results = [];
+//             listOfFeedsObj.map(feedDataObj => {
+//               let feedJsonObj = {};
+//               feedJsonObj = feedDataObj
+//               //console.log(feedJsonObj._id)
+//               let memberIdForContract = feedJsonObj.memberId;
+//               memberIdForContract = "" + memberIdForContract;
+//               let queryForContract = {
+//                 memberId: memberIdForContract, $or: [{ serviceType: 'fan' }, { serviceType: 'video' }, { serviceType: 'audio' }]
+
+//               }
+//               CelebrityContracts.find(queryForContract, function callback(err, celebContractObj) {
+//                 if (err)
+//                   console.log("********Error while feching celeb contract ********** ", err)
+//                 else {
+//                   if (celebContractObj.length > 2) {
+//                     Object.assign(feedDataObj, { "celeAudioCharge": celebContractObj.length ? celebContractObj[0].serviceCredits : 0 });
+//                     Object.assign(feedDataObj, { "celeFanCharge": celebContractObj.length ? celebContractObj[1].serviceCredits : 0 });
+//                     Object.assign(feedDataObj, { "celeVideoCharge": celebContractObj.length ? celebContractObj[2].serviceCredits : 0 });
+//                   }
+//                   else {
+//                     Object.assign(feedDataObj, { "celeAudioCharge": 0 });
+//                     Object.assign(feedDataObj, { "celeFanCharge": 0 });
+//                     Object.assign(feedDataObj, { "celeVideoCharge": 0 });
+//                   }
+//                   // results.push(feedDataObj);
+//                   results[results.length] = feedDataObj;
+//                   if (results.length === listOfFeedsObj.length) {
+//                     cb(null, listOfFeedsObj);
+//                   }
+//                 }
+//               }).sort({ serviceType: 1 })
+//             });
+//           }
+//           foo(function (err, resultArr) {
+//             if (err)
+//               return res.json({ token: req.headers['x-access-token'], success: 0, message: `Fail to fetch Feeds ${err}` });
+//             // resultArr.sort(function (x, y) {
+//             //   var dateA = new Date(x.created_at), dateB = new Date(y.created_at);
+//             //   return dateB - dateA;
+//             // });
+//             return res.json({ token: req.headers['x-access-token'], success: 1, data: resultArr });
+//           });
+//           //return res.status(200).json({ success: 1, data: listOfFeedsObj  });
+//         }
+//       });
+//     }
+//   })
+// });
+
+
 // Get Feed likes count by mediaId ONLY admin side
-router.get("/getMediaStatsCountByMediaId/:feedId/:memberId", function (req, res) {
-  let id = req.params.memberId;
-  let feedId = ObjectId(req.params.feedId);
-  Feed.aggregate(
-    [
-      {
-        $match: { $and: [{ _id: ObjectId(feedId) }] }
-      },
-      { "$unwind": "$mediaArray" },
-      {
-        $lookup: {
-          from: "mediatrackings",
-          localField: "mediaArray.media_id",
-          foreignField: "mediaId",
-          as: "mediaStats" // to get all the views, comments, shares count
-        }
-      },
-      {
-        $project: {
-          title: 1,
-          content: 1,
-          mediaSrc: 1,
-          memberId: 1,
-          mediaFile: "$mediaArray",
-          mediaStats: 1
-        }
-      }
-    ],
-    function (err, data) {
-      if (err || data.length == 0) {
-        res.send({ "error": "Not found / invalid feedId" });
-      } else {
-        // Filter FeedStats to get views, shares, follow and comment count
-        for (let i = 0; i < data.length; i++) {
-          let likesCount = 0;
-          let sharesCount = 0;
-          let commentsCount = 0;
-          let followCount = 0;
-          let likeStatus = false;
-          let viewStatus = false;
-          let bookmarkStatus = false;
-
-          for (let j = 0; j < data[i].mediaStats.length; j++) {
-            if (data[i].mediaStats[j].activities == "views") {
-              if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "views")) {
-                likeStatus = true;
-              }
-              likesCount = likesCount + 1;
-            }
-            if (data[i].mediaStats[j].activities == "bookmark") {
-              if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "bookmark")) {
-                bookmarkStatus = true;
-              }
-            }
-            if (data[i].mediaStats[j].activities == "share") {
-              sharesCount = sharesCount + 1;
-            }
-            if (data[i].mediaStats[j].activities == "follow") {
-              if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "follow")) {
-                viewStatus = true;
-              }
-              followCount = followCount + 1;
-            }
-            if (data[i].mediaStats[j].activities == "comment") {
-              commentsCount = data[i].mediaStats[j].source.length + commentsCount;
-            }
-          }
-          // Append the counts to main object
-          data[i].likesCount = likesCount;
-          data[i].sharesCount = sharesCount;
-          data[i].commentsCount = commentsCount;
-          data[i].followCount = followCount;
-          data[i].likeStatus = likeStatus;
-          data[i].viewStatus = viewStatus;
-          data[i].bookmarkStatus = bookmarkStatus;
-        }
-        // End of Filter mediaStats to get views, shares, follow and comment count
-        return res.json({
-          "title": data[0].title,
-          "content": data[0].content,
-          "mediaArray": data
-        });
-      }
-
-    }
-  );
-});
-//only admin side
-router.post('/postFeedLikeByNumber', (req, res) => {
-  req.body.numberOfLikes = parseInt(req.body.numberOfLikes)
-  if (req.body.feedId == undefined || !req.body.feedId.length) {
-    res.json({ success: 0, message: "Please Provide Feed Deatails" })
-  }
-  else if (parseInt(req.body.numberOfLikes) < 0 || req.body.numberOfLikes == "0") {
-    res.json({ success: 0, message: "Please provide positive integer value more than 0" })
-  }
-  else if (req.body.numberOfLikes == undefined || !req.body.numberOfLikes) {
-    res.json({ success: 0, message: "Please Provide likes count" })
-  }
-  else {
-    let now = new Date();
-    let todayMinut = now.getMinutes()
-    Feed.aggregate([
-      {
-        $match: {
-          _id: ObjectId(req.body.feedId)
-        }
-      },
-      {
-        $lookup: {
-          from: "mediatrackings",
-          localField: "_id",
-          foreignField: "feedId",
-          as: "feedLike"
-        }
-      },
-      {
-        $unwind: {
-          "path": "$feedLike",
-          "preserveNullAndEmptyArrays": true
-        },
-      },
-      {
-        $sort: { 'feedLike.created_at': -1 }
-      },
-      {
-        $group: {
-          '_id': "$_id",
-          created_at: {
-            $push: {
-              "created_at": "$created_at",
-            }
-          },
-          feedLike: {
-            $push: {
-              "_id": "$feedLike._id",
-              "feedId": "$feedLike.feedId",
-              "memberId": "$feedLike.memberId",
-              "isLike": "$feedLike.isLike",
-              "activities": "$feedLike.ctivities",
-              "status": "$feedLike.status",
-              "updatedBy": "$feedLike.updatedBy",
-              "createdBy": "$feedLike.createdBy",
-              "updated_at": "$feedLike.updated_at",
-              "created_at": "$feedLike.created_at"
-            }
-          }
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          feedLike: 1,
-          created_at: 1
-        }
-      }
-    ], (err, feedDetails) => {
-      if (err) {
-        res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-      } else {
-        let startTime = feedDetails[0].created_at[0].created_at;
-        if (feedDetails[0] && feedDetails[0].feedLike.length && feedDetails[0].feedLike[0].created_at) {
-          startTime = feedDetails[0].feedLike[0].created_at;
-        }
-        if (feedDetails.length) {
-          let likedArray = feedDetails[0].feedLike.map((feedLikeObj) => {
-            if (feedLikeObj.isLike)
-              return ObjectId(feedLikeObj.memberId);
-          })
-          let startMinut = todayMinut;
-          let randomNumber = parseInt(req.body.numberOfLikes)
-          User.aggregate([
-            {
-              $match: {
-                IsDeleted: false,
-                dua: true,
-                _id: { $nin: likedArray }
-              }
-            },
-            {
-              $sample:
-              {
-                size: randomNumber
-              }
-            },
-            {
-              $project: {
-                _id: 1,
-                email: 1
-              }
-            }], (err, usersList) => {
-              if (err) {
-                res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-              }
-              else {
-                let insertManyLike = usersList.map((userde) => {
-                  randomDate = generateRandom(Date.now(), startTime.setMinutes(startMinut))
-                  user = {
-                    "feedId": req.body.feedId,
-                    "memberId": userde._id,
-                    "isLike": true,
-                    "activities": "views",
-                    "status": "Active",
-                    "updatedBy": "Admin",
-                    "createdBy": "Admin",
-                    "updated_at": randomDate,
-                    "created_at": randomDate
-                  }
-                  return user;
-                })
-                mediaTracking.insertMany(insertManyLike, (err, likedArray) => {
-                  if (err) {
-                    res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-                  }
-                  else {
-                    res.json({ success: 1, insertManyLike: insertManyLike, users: usersList, feedDetails: feedDetails, likedArray: likedArray, numberOfLikes: randomNumber })
-                    updateLoginTime(usersList)
-                  }
-                })
-              }
-            })
-        }
-        else {
-          res.json({ success: 0, token: req.headers['x-access-token'], message: "Feed details not found id " + req.body.feedId });
-        }
-      }
-    })
-  }
-})
-//only admin side
-router.post('/feedLikeByRandomUser', (req, res) => {
-  if (req.body.feedId == undefined || !req.body.feedId.length) {
-    res.json({ success: 0, message: "Please Provide Feed Deatails" })
-  }
-  else {
-    let now = new Date();
-    let todayMinut = now.getMinutes()
-    Feed.aggregate([
-      {
-        $match: {
-          _id: ObjectId(req.body.feedId)
-        }
-      },
-      {
-        $lookup: {
-          from: "mediatrackings",
-          localField: "_id",
-          foreignField: "feedId",
-          as: "feedLike"
-        }
-      },
-      {
-        $unwind: {
-          "path": "$feedLike",
-          "preserveNullAndEmptyArrays": true
-        },
-      },
-      {
-        $sort: { 'feedLike.created_at': -1 }
-      },
-      {
-        $group: {
-          '_id': "$_id",
-          created_at: {
-            $push: {
-              "created_at": "$created_at",
-            }
-          },
-          feedLike: {
-            $push: {
-              "_id": "$feedLike._id",
-              "feedId": "$feedLike.feedId",
-              "memberId": "$feedLike.memberId",
-              "isLike": "$feedLike.isLike",
-              "activities": "$feedLike.ctivities",
-              "status": "$feedLike.status",
-              "updatedBy": "$feedLike.updatedBy",
-              "createdBy": "$feedLike.createdBy",
-              "updated_at": "$feedLike.updated_at",
-              "created_at": "$feedLike.created_at"
-            }
-          }
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          feedLike: 1,
-          created_at: 1
-        }
-      }
-    ], (err, feedDetails) => {
-      if (err) {
-        res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-      } else {
-        let startMinut = todayMinut;
-        let startTime = feedDetails[0].created_at[0].created_at;
-        if (feedDetails[0] && feedDetails[0].feedLike.length && feedDetails[0].feedLike[0].created_at) {
-          startTime = feedDetails[0].feedLike[0].created_at
-        }
-        if (feedDetails.length) {
-          let likedArray = feedDetails[0].feedLike.map((feedLikeObj) => {
-            if (feedLikeObj.isLike)
-              return ObjectId(feedLikeObj.memberId);
-          })
-          let randomNumber = Math.floor(Math.random() * 20) + 1
-          User.aggregate([
-            {
-              $match: {
-                IsDeleted: false,
-                dua: true,
-                _id: { $nin: likedArray }
-              }
-            },
-            {
-              $sample:
-              {
-                size: randomNumber
-              }
-            },
-            {
-              $project: {
-                _id: 1,
-                email: 1
-              }
-            }], (err, usersList) => {
-              if (err) {
-                res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-              }
-              else {
-                let insertManyLike = usersList.map((userde) => {
-                  // let randomDate = randomTime(startTime)
-                  randomDate = generateRandom(Date.now(), startTime.setMinutes(startMinut))
-                  user = {
-                    "feedId": req.body.feedId,
-                    "memberId": userde._id,
-                    "isLike": true,
-                    "activities": "views",
-                    "status": "Active",
-                    "updatedBy": "Admin",
-                    "createdBy": "Admin",
-                    "updated_at": randomDate,
-                    "created_at": randomDate
-                  }
-                  return user;
-                })
-                mediaTracking.insertMany(insertManyLike, (err, likedArray) => {
-                  if (err) {
-                    res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-                  }
-                  else {
-                    res.json({ success: 1, insertManyLike: insertManyLike, users: usersList, feedDetails: feedDetails, likedArray: likedArray, numberOfLikes: randomNumber })
-                    updateLoginTime(usersList)
-                  }
-                })
-              }
-            })
-        }
-        else {
-          res.json({ success: 0, token: req.headers['x-access-token'], message: "Feed details not found id " + req.body.feedId });
-        }
-      }
-    })
-  }
-})
-
-// Get Feed By Celebrities in Order
-// router.get("/getFeedByCelebritiesInOrder/:userId", function (req, res) {
-//   id = req.params.userId;
-//   // Fetch Feed By Recent Order
+// router.get("/getMediaStatsCountByMediaId/:feedId/:memberId", function (req, res) {
+//   let id = req.params.memberId;
+//   let feedId = ObjectId(req.params.feedId);
 //   Feed.aggregate(
-//     [{
-//       $lookup: {
-//         from: "feedlogs",
-//         localField: "_id",
-//         foreignField: "feedId",
-//         as: "feedStats" // to get all the views, comments, shares count
+//     [
+//       {
+//         $match: { $and: [{ _id: ObjectId(feedId) }] }
+//       },
+//       { "$unwind": "$mediaArray" },
+//       {
+//         $lookup: {
+//           from: "mediatrackings",
+//           localField: "mediaArray.media_id",
+//           foreignField: "mediaId",
+//           as: "mediaStats" // to get all the views, comments, shares count
+//         }
+//       },
+//       {
+//         $project: {
+//           title: 1,
+//           content: 1,
+//           mediaSrc: 1,
+//           memberId: 1,
+//           mediaFile: "$mediaArray",
+//           mediaStats: 1
+//         }
 //       }
-//     },
-
-//     {
-//       $lookup: {
-//         from: "users",
-//         localField: "memberId",
-//         foreignField: "_id",
-//         as: "memberProfile" // to get all the views, comments, shares count
-//       }
-//     },
-//     {
-//       $lookup: {
-//         from: "mediaTracking",
-//         localField: "activityMemberID",
-//         foreignField: "mediaId",
-//         as: "mediaStats" // to get all the views, comments, shares count
-//       }
-//     },
-//     {
-//       $sort: {
-//         created_at: -1
-//       }
-//     },
-//     {
-//       $limit: 50
-//     },
 //     ],
-
 //     function (err, data) {
-//       if (err) {
-//         res.send(err);
-//       }
-//       //console.log(data);
+//       if (err || data.length == 0) {
+//         res.send({ "error": "Not found / invalid feedId" });
+//       } else {
+//         // Filter FeedStats to get views, shares, follow and comment count
+//         for (let i = 0; i < data.length; i++) {
+//           let likesCount = 0;
+//           let sharesCount = 0;
+//           let commentsCount = 0;
+//           let followCount = 0;
+//           let likeStatus = false;
+//           let viewStatus = false;
+//           let bookmarkStatus = false;
 
-//       // Filter FeedStats to get views, shares, follow and comment count
-//       for (let i = 0; i < data.length; i++) {
-
-//         let likesCount = 0;
-//         let sharesCount = 0;
-//         let commentsCount = 0;
-//         let followCount = 0;
-//         let mlikesCount = 0;
-//         let msharesCount = 0;
-//         let mcommentsCount = 0;
-//         let likeStatus = false;
-//         let viewStatus = false;
-//         let bookmarkStatus = false;
-//         let mlikeStatus = false;
-//         let mviewStatus = false;
-
-//         for (let j = 0; j < data[i].feedStats.length; j++) {
-//           if (data[i].feedStats[j].activities == "views") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "views")) {
-//               likeStatus = true;
+//           for (let j = 0; j < data[i].mediaStats.length; j++) {
+//             if (data[i].mediaStats[j].activities == "views") {
+//               if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "views")) {
+//                 likeStatus = true;
+//               }
+//               likesCount = likesCount + 1;
 //             }
-//             likesCount = likesCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "bookmark") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "bookmark")) {
-//               bookmarkStatus = true;
+//             if (data[i].mediaStats[j].activities == "bookmark") {
+//               if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "bookmark")) {
+//                 bookmarkStatus = true;
+//               }
+//             }
+//             if (data[i].mediaStats[j].activities == "share") {
+//               sharesCount = sharesCount + 1;
+//             }
+//             if (data[i].mediaStats[j].activities == "follow") {
+//               if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "follow")) {
+//                 viewStatus = true;
+//               }
+//               followCount = followCount + 1;
+//             }
+//             if (data[i].mediaStats[j].activities == "comment") {
+//               commentsCount = data[i].mediaStats[j].source.length + commentsCount;
 //             }
 //           }
-//           if (data[i].feedStats[j].activities == "share") {
-//             sharesCount = sharesCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "follow") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "follow")) {
-//               viewStatus = true;
-//             }
-//             followCount = followCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "comment") {
-//             commentsCount = data[i].feedStats[j].source.length + commentsCount;
-//           }
+//           // Append the counts to main object
+//           data[i].likesCount = likesCount;
+//           data[i].sharesCount = sharesCount;
+//           data[i].commentsCount = commentsCount;
+//           data[i].followCount = followCount;
+//           data[i].likeStatus = likeStatus;
+//           data[i].viewStatus = viewStatus;
+//           data[i].bookmarkStatus = bookmarkStatus;
 //         }
-
-//         for (let j = 0; j < data[i].mediaStats.length; j++) {
-//           if (data[i].mediaStats[j].activities == "views") {
-//             if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "views")) {
-//               mlikeStatus = true;
-//             }
-//             mlikesCount = likesCount + 1;
-//           }
-//           if (data[i].mediaStats[j].activities == "share") {
-//             msharesCount = sharesCount + 1;
-//           }
-//           if (data[i].mediaStats[j].activities == "comment") {
-//             mcommentsCount = data[i].mediaStats[j].source.length + commentsCount;
-//           }
-//         }
-//         // Append the counts to main object
-//         data[i].likesCount = likesCount;
-//         data[i].sharesCount = sharesCount;
-//         data[i].commentsCount = commentsCount;
-//         data[i].followCount = followCount;
-//         data[i].likeStatus = likeStatus;
-//         data[i].viewStatus = viewStatus;
-//         data[i].bookmarkStatus = bookmarkStatus;
-//         data[i].mlikesCount = mlikesCount;
-//         data[i].msharesCount = msharesCount;
-//         data[i].mcommentsCount = mcommentsCount;
-//         data[i].mlikeStatus = mlikeStatus;
-//         data[i].mviewStatus = mviewStatus;
+//         // End of Filter mediaStats to get views, shares, follow and comment count
+//         return res.json({
+//           "title": data[0].title,
+//           "content": data[0].content,
+//           "mediaArray": data
+//         });
 //       }
-//       return res.send(data);
+
 //     }
 //   );
-//   // End of Fetch By Recent Order
 // });
-// End of Get Feed By Celebrities in Order
-
-// Get Feed By Celebrities By Created Date
-// router.get("/getFeedByCelebritiesByCreatedDate/:userId", function (req, res) {
-//   id = req.params.userId;
-
-//   User.findById(id, function (err, result) {
-//     if (err) return res.send(err);
-//     if (result) {
-//       MemberPreferences.findOne({
-//         memberId: result._id
-//       }, function (
-//         err,
-//         newresult
-//       ) {
-//           if (err) return res.send(err);
-//           if (newresult.preferences.length == 0) {
-//             Feed.aggregate(
-//               [{
-//                 $lookup: {
-//                   from: "feedlogs",
-//                   localField: "_id",
-//                   foreignField: "feedId",
-//                   as: "feedStats"
-//                 }
-//               },
-//               {
-//                 $sort: {
-//                   created_at: -1
-//                 }
-//               }
-//               ],
-//               function (err, data) {
-//                 if (err) {
-//                   res.send(err);
-//                 }
-//                 return res.send(data);
-//               }
-//             );
-//           } else {
-//             // Aggregate Memberpreferences MemberIds with User collection's UserIds
-//             Feed.aggregate(
-//               [{
-//                 $lookup: {
-//                   from: "feedlogs",
-//                   localField: "_id",
-//                   foreignField: "feedId",
-//                   as: "feedStats"
-//                 }
-//               },
-//               {
-//                 $lookup: {
-//                   from: "memberpreferences",
-//                   localField: "memberId",
-//                   foreignField: "memberId",
-//                   as: "feedData"
-//                 }
-//               },
-//               {
-//                 $match: {
-//                   $and: [{
-//                     "feedData.preferences": {
-//                       $in: newresult.preferences
-//                     }
-//                   }]
-//                 }
-//               },
-//               {
-//                 $sort: {
-//                   created_at: -1
-//                 }
-//               }
-//               ],
-//               function (err, data) {
-//                 if (err) {
-//                   res.send(err);
-//                 }
-//                 return res.send(data);
-//               }
-//             );
+//only admin side
+// router.post('/postFeedLikeByNumber', (req, res) => {
+//   req.body.numberOfLikes = parseInt(req.body.numberOfLikes)
+//   if (req.body.feedId == undefined || !req.body.feedId.length) {
+//     res.json({ success: 0, message: "Please Provide Feed Deatails" })
+//   }
+//   else if (parseInt(req.body.numberOfLikes) < 0 || req.body.numberOfLikes == "0") {
+//     res.json({ success: 0, message: "Please provide positive integer value more than 0" })
+//   }
+//   else if (req.body.numberOfLikes == undefined || !req.body.numberOfLikes) {
+//     res.json({ success: 0, message: "Please Provide likes count" })
+//   }
+//   else {
+//     let now = new Date();
+//     let todayMinut = now.getMinutes()
+//     Feed.aggregate([
+//       {
+//         $match: {
+//           _id: ObjectId(req.body.feedId)
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: "mediatrackings",
+//           localField: "_id",
+//           foreignField: "feedId",
+//           as: "feedLike"
+//         }
+//       },
+//       {
+//         $unwind: {
+//           "path": "$feedLike",
+//           "preserveNullAndEmptyArrays": true
+//         },
+//       },
+//       {
+//         $sort: { 'feedLike.created_at': -1 }
+//       },
+//       {
+//         $group: {
+//           '_id': "$_id",
+//           created_at: {
+//             $push: {
+//               "created_at": "$created_at",
+//             }
+//           },
+//           feedLike: {
+//             $push: {
+//               "_id": "$feedLike._id",
+//               "feedId": "$feedLike.feedId",
+//               "memberId": "$feedLike.memberId",
+//               "isLike": "$feedLike.isLike",
+//               "activities": "$feedLike.ctivities",
+//               "status": "$feedLike.status",
+//               "updatedBy": "$feedLike.updatedBy",
+//               "createdBy": "$feedLike.createdBy",
+//               "updated_at": "$feedLike.updated_at",
+//               "created_at": "$feedLike.created_at"
+//             }
 //           }
-//         });
-//     } else {
-//       res.json({
-//         error: "User Not Exists / Send a valid UserID"
-//       });
-//     }
-//   });
-// });
-// End of Get Feed By Celebrities By Created Date
-
-// Get Celebrity by Feed ID
-// router.get("/getCelebrityIdByFeedID/:feedID", function (req, res) {
-//   let feedID = ObjectId(req.params.feedID);
-//   Feed.findById(feedID, function (err, result) {
-//     if (err) return res.send(err);
-
-//     if (result) {
-//       res.json({
-//         CelebrityID: result.memberId
-//       });
-//     } else {
-//       res.json({
-//         error: "FeedID not found / Invalid"
-//       });
-//     }
-//   });
-// });
-// End of Get Celebrity by Feed ID
+//         }
+//       },
+//       {
+//         $project: {
+//           _id: 1,
+//           feedLike: 1,
+//           created_at: 1
+//         }
+//       }
+//     ], (err, feedDetails) => {
+//       if (err) {
+//         res.json({ success: 0, token: req.headers['x-access-token'], message: err });
+//       } else {
+//         let startTime = feedDetails[0].created_at[0].created_at;
+//         if (feedDetails[0] && feedDetails[0].feedLike.length && feedDetails[0].feedLike[0].created_at) {
+//           startTime = feedDetails[0].feedLike[0].created_at;
+//         }
+//         if (feedDetails.length) {
+//           let likedArray = feedDetails[0].feedLike.map((feedLikeObj) => {
+//             if (feedLikeObj.isLike)
+//               return ObjectId(feedLikeObj.memberId);
+//           })
+//           let startMinut = todayMinut;
+//           let randomNumber = parseInt(req.body.numberOfLikes)
+//           User.aggregate([
+//             {
+//               $match: {
+//                 IsDeleted: false,
+//                 dua: true,
+//                 _id: { $nin: likedArray }
+//               }
+//             },
+//             {
+//               $sample:
+//               {
+//                 size: randomNumber
+//               }
+//             },
+//             {
+//               $project: {
+//                 _id: 1,
+//                 email: 1
+//               }
+//             }], (err, usersList) => {
+//               if (err) {
+//                 res.json({ success: 0, token: req.headers['x-access-token'], message: err });
+//               }
+//               else {
+//                 let insertManyLike = usersList.map((userde) => {
+//                   randomDate = generateRandom(Date.now(), startTime.setMinutes(startMinut))
+//                   user = {
+//                     "feedId": req.body.feedId,
+//                     "memberId": userde._id,
+//                     "isLike": true,
+//                     "activities": "views",
+//                     "status": "Active",
+//                     "updatedBy": "Admin",
+//                     "createdBy": "Admin",
+//                     "updated_at": randomDate,
+//                     "created_at": randomDate
+//                   }
+//                   return user;
+//                 })
+//                 mediaTracking.insertMany(insertManyLike, (err, likedArray) => {
+//                   if (err) {
+//                     res.json({ success: 0, token: req.headers['x-access-token'], message: err });
+//                   }
+//                   else {
+//                     res.json({ success: 1, insertManyLike: insertManyLike, users: usersList, feedDetails: feedDetails, likedArray: likedArray, numberOfLikes: randomNumber })
+//                     //updateLoginTime(usersList)
+//                   }
+//                 })
+//               }
+//             })
+//         }
+//         else {
+//           res.json({ success: 0, token: req.headers['x-access-token'], message: "Feed details not found id " + req.body.feedId });
+//         }
+//       }
+//     })
+//   }
+// })
+//only admin side
+// router.post('/feedLikeByRandomUser', (req, res) => {
+//   if (req.body.feedId == undefined || !req.body.feedId.length) {
+//     res.json({ success: 0, message: "Please Provide Feed Deatails" })
+//   }
+//   else {
+//     let now = new Date();
+//     let todayMinut = now.getMinutes()
+//     Feed.aggregate([
+//       {
+//         $match: {
+//           _id: ObjectId(req.body.feedId)
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: "mediatrackings",
+//           localField: "_id",
+//           foreignField: "feedId",
+//           as: "feedLike"
+//         }
+//       },
+//       {
+//         $unwind: {
+//           "path": "$feedLike",
+//           "preserveNullAndEmptyArrays": true
+//         },
+//       },
+//       {
+//         $sort: { 'feedLike.created_at': -1 }
+//       },
+//       {
+//         $group: {
+//           '_id': "$_id",
+//           created_at: {
+//             $push: {
+//               "created_at": "$created_at",
+//             }
+//           },
+//           feedLike: {
+//             $push: {
+//               "_id": "$feedLike._id",
+//               "feedId": "$feedLike.feedId",
+//               "memberId": "$feedLike.memberId",
+//               "isLike": "$feedLike.isLike",
+//               "activities": "$feedLike.ctivities",
+//               "status": "$feedLike.status",
+//               "updatedBy": "$feedLike.updatedBy",
+//               "createdBy": "$feedLike.createdBy",
+//               "updated_at": "$feedLike.updated_at",
+//               "created_at": "$feedLike.created_at"
+//             }
+//           }
+//         }
+//       },
+//       {
+//         $project: {
+//           _id: 1,
+//           feedLike: 1,
+//           created_at: 1
+//         }
+//       }
+//     ], (err, feedDetails) => {
+//       if (err) {
+//         res.json({ success: 0, token: req.headers['x-access-token'], message: err });
+//       } else {
+//         let startMinut = todayMinut;
+//         let startTime = feedDetails[0].created_at[0].created_at;
+//         if (feedDetails[0] && feedDetails[0].feedLike.length && feedDetails[0].feedLike[0].created_at) {
+//           startTime = feedDetails[0].feedLike[0].created_at
+//         }
+//         if (feedDetails.length) {
+//           let likedArray = feedDetails[0].feedLike.map((feedLikeObj) => {
+//             if (feedLikeObj.isLike)
+//               return ObjectId(feedLikeObj.memberId);
+//           })
+//           let randomNumber = Math.floor(Math.random() * 20) + 1
+//           User.aggregate([
+//             {
+//               $match: {
+//                 IsDeleted: false,
+//                 dua: true,
+//                 _id: { $nin: likedArray }
+//               }
+//             },
+//             {
+//               $sample:
+//               {
+//                 size: randomNumber
+//               }
+//             },
+//             {
+//               $project: {
+//                 _id: 1,
+//                 email: 1
+//               }
+//             }], (err, usersList) => {
+//               if (err) {
+//                 res.json({ success: 0, token: req.headers['x-access-token'], message: err });
+//               }
+//               else {
+//                 let insertManyLike = usersList.map((userde) => {
+//                   // let randomDate = randomTime(startTime)
+//                   randomDate = generateRandom(Date.now(), startTime.setMinutes(startMinut))
+//                   user = {
+//                     "feedId": req.body.feedId,
+//                     "memberId": userde._id,
+//                     "isLike": true,
+//                     "activities": "views",
+//                     "status": "Active",
+//                     "updatedBy": "Admin",
+//                     "createdBy": "Admin",
+//                     "updated_at": randomDate,
+//                     "created_at": randomDate
+//                   }
+//                   return user;
+//                 })
+//                 mediaTracking.insertMany(insertManyLike, (err, likedArray) => {
+//                   if (err) {
+//                     res.json({ success: 0, token: req.headers['x-access-token'], message: err });
+//                   }
+//                   else {
+//                     res.json({ success: 1, insertManyLike: insertManyLike, users: usersList, feedDetails: feedDetails, likedArray: likedArray, numberOfLikes: randomNumber })
+//                     //updateLoginTime(usersList)
+//                   }
+//                 })
+//               }
+//             })
+//         }
+//         else {
+//           res.json({ success: 0, token: req.headers['x-access-token'], message: "Feed details not found id " + req.body.feedId });
+//         }
+//       }
+//     })
+//   }
+// })
 
 
 
 // Get All feed (All Users)
-// router.get("/allFeed", function (req, res) {
-//   Feed.find({}, null, { sort: { createdAt: -1 } }, function (err, feed) {
-//     if (err) return next(err);
-//     res.json(feed);
-//   }).sort({ created_at: -1 });
+// router.get("/allFeed/:pageNo/:limit", (req, res) => {
+//   let params = req.params;
+//   let pageNo = parseInt(params.pageNo);
+//   let startFrom = params.limit * (pageNo - 1);
+//   let limit = parseInt(params.limit);
+//   Feed.count({}, (err, count) => {
+//     if (err) {
+//       res.json({ token: req.headers['x-access-token'], success: 0, message: err })
+//     } else {
+//       Feed.find({}, (err, feed) => {
+//         if (err) {
+//           res.json({ token: req.headers['x-access-token'], success: 0, message: err })
+//         } else {
+//           let data = {};
+//           data.feed = feed
+//           let total_pages = count / limit
+//           data.pagination = {
+//             "total_count": count,
+//             "total_pages": total_pages == 0 ? total_pages : parseInt(total_pages) + 1,
+//             "current_page": pageNo,
+//             "limit": limit
+//           }
+//           res.json({ token: req.headers['x-access-token'], success: 1, data: data })
+//         }
+//       }).sort({ created_at: -1 }).skip(startFrom).limit(limit).lean();
+//     }
+//   })
 // });
-// End of Get All feed (All Users)
-
-// Get All feed (All Users)
-router.get("/allFeed/:pageNo/:limit", (req, res) => {
-  let params = req.params;
-  let pageNo = parseInt(params.pageNo);
-  let startFrom = params.limit * (pageNo - 1);
-  let limit = parseInt(params.limit);
-  Feed.count({}, (err, count) => {
-    if (err) {
-      res.json({ token: req.headers['x-access-token'], success: 0, message: err })
-    } else {
-      Feed.find({}, (err, feed) => {
-        if (err) {
-          res.json({ token: req.headers['x-access-token'], success: 0, message: err })
-        } else {
-          let data = {};
-          data.feed = feed
-          let total_pages = count / limit
-          data.pagination = {
-            "total_count": count,
-            "total_pages": total_pages == 0 ? total_pages : parseInt(total_pages) + 1,
-            "current_page": pageNo,
-            "limit": limit
-          }
-          res.json({ token: req.headers['x-access-token'], success: 1, data: data })
-        }
-      }).sort({ created_at: -1 }).skip(startFrom).limit(limit).lean();
-    }
-  })
-});
 // End of Get All feed (All Users)
 
 // Get Feed by FeedID
@@ -2312,8 +1832,6 @@ router.get("/allFeed/:pageNo/:limit", (req, res) => {
 //         let mediaCommentsCount = 0;
 //         let isMediaLikedByCurrentUser = false;
 //         let mediaCommentsStatus = false;
-
-
 //         //this for loop for feed count
 //         for (let j = 0; j < listOfFeedObj[i].feedStats.length; j++) {
 //           if (listOfFeedObj[i].feedStats[j].activities == "views" && listOfFeedObj[i].feedStats[j].isLike === true) {
@@ -2364,777 +1882,6 @@ router.get("/allFeed/:pageNo/:limit", (req, res) => {
 //   );
 // });
 // End of // Get Feed by FeedID
-
-// Edit a Feed
-// router.put("/edit/:feedID", function (req, res) {
-//   let id = req.params.feedID;
-//   let reqbody = req.body;
-//   reqbody.updated_at = new Date();
-
-//   Feed.findById(id, function (err, newresult) {
-//     if (err) res.send(err);
-//     let fid = newresult._id;
-//     if (newresult) {
-//       Feed.findOneAndUpdate({ _id: ObjectId(fid) }, reqbody, function (
-//         err,
-//         result
-//       ) {
-//         if (err) {
-//           res.send(err);
-//         } else {
-//           res.json({ message: "Post updated successfully" });
-//         }
-//       });
-//     } else {
-//       res.json({
-//         error: "Feed Not Exists / Send a valid ID"
-//       });
-//     }
-//   });
-// });
-// End of Edit a Feed
-
-// Delete feed
-// router.delete("/deleteFeed/:id", function (req, res, next) {
-//   let id = req.params.id;
-//   Feed.findById(id, function (err, result) {
-//     if (result) {
-//       Feed.findByIdAndRemove(id, function (err, post) {
-//         if (err) return next(err);
-//         res.json({ token: req.headers['x-access-token'], success: 1, message: "Deleted Feed Successfully" })
-//       });
-//     } else {
-//       res.json({ token: req.headers['x-access-token'], success: 0, message: "FeedID not found / Invalid" })
-//     }
-//   });
-// });
-// End of Delete feed
-
-
-//////// FEED SEARCH //////////////////
-// router.get("/feedSearch/:userId/:string", function (req, res, next) {
-//   id = req.params.userId;
-//   let searchString = req.params.string;
-//   Feed.aggregate(
-//     [{
-//       $match: {
-//         $or: [{
-//           title: {
-//             $regex: searchString,
-//             $options: 'i'
-//           }
-//         }, {
-//           content: {
-//             $regex: searchString,
-//             $options: 'i'
-//           }
-//         }, {
-//           memberName: {
-//             $regex: searchString,
-//             $options: 'i'
-//           }
-//         }]
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: "feedlogs",
-//         localField: "_id",
-//         foreignField: "feedId",
-//         as: "feedStats" // to get all the views, comments, shares count
-//       }
-//     },
-//     ],
-//     function (err, data) {
-//       if (err) {
-//         res.send(err);
-//       }
-//       // Filter FeedStats to get views, shares, follow and comment count
-//       for (let i = 0; i < data.length; i++) {
-//         let likesCount = 0;
-//         let sharesCount = 0;
-//         let commentsCount = 0;
-//         let followCount = 0;
-//         let likeStatus = false;
-//         let viewStatus = false;
-//         let bookmarkStatus = false;
-
-//         for (let j = 0; j < data[i].feedStats.length; j++) {
-//           if (data[i].feedStats[j].activities == "views") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "views")) {
-//               likeStatus = true;
-//             }
-//             likesCount = likesCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "bookmark") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "bookmark")) {
-//               bookmarkStatus = true;
-//             }
-//           }
-//           if (data[i].feedStats[j].activities == "share") {
-//             sharesCount = sharesCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "follow") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "follow")) {
-//               viewStatus = true;
-//             }
-//             followCount = followCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "comment") {
-//             commentsCount = data[i].feedStats[j].source.length + commentsCount;
-//           }
-//         }
-//         // Append the counts to main object
-//         data[i].likesCount = likesCount;
-//         data[i].sharesCount = sharesCount;
-//         data[i].commentsCount = commentsCount;
-//         data[i].followCount = followCount;
-//         data[i].likeStatus = likeStatus;
-//         data[i].viewStatus = viewStatus;
-//         data[i].bookmarkStatus = bookmarkStatus;
-//       }
-//       // End of Filter FeedStats to get views, shares, follow and comment count
-//       return res.send(data);
-//     }
-//   );
-
-// });
-//////// END OF FEED SEARCH //////////////////
-
-///////////////// PAGINATION ///////////////////////////////
-// Get Feed By Celebrities in Order
-// router.get("/feedPagination/:userId/:limit/:skip", function (req, res) {
-//   id = req.params.userId;
-//   limit = parseInt(req.params.limit);
-//   skip = parseInt(req.params.skip);
-//   // Fetch Feed By Recent Order
-//   // Aggregate Memberpreferences MemberIds with User collection's UserIds
-//   Feed.aggregate(
-//     [{
-//       $lookup: {
-//         from: "feedlogs",
-//         localField: "_id",
-//         foreignField: "feedId",
-//         as: "feedStats" // to get all the views, comments, shares count
-//       }
-//     },
-
-//     {
-//       $lookup: {
-//         from: "users",
-//         localField: "memberId",
-//         foreignField: "_id",
-//         as: "memberProfile" // to get all the views, comments, shares count
-//       }
-//     },
-//     {
-//       $lookup: {
-//         from: "mediaTracking",
-//         localField: "activityMemberID",
-//         foreignField: "mediaId",
-//         as: "mediaStats" // to get all the views, comments, shares count
-//       }
-//     },
-//     {
-//       $sort: {
-//         created_at: -1
-//       }
-//     },
-//     //pagination start
-//     { $skip: skip },
-//     { $limit: limit },
-//     ],
-//     function (err, data) {
-//       if (err) {
-//         res.send(err);
-//       }
-//       // Filter FeedStats to get views, shares, follow and comment count
-//       for (let i = 0; i < data.length; i++) {
-//         let likesCount = 0;
-//         let sharesCount = 0;
-//         let commentsCount = 0;
-//         let followCount = 0;
-//         let mlikesCount = 0;
-//         let msharesCount = 0;
-//         let mcommentsCount = 0;
-//         let likeStatus = false;
-//         let viewStatus = false;
-//         let bookmarkStatus = false;
-//         let mlikeStatus = false;
-//         let mviewStatus = false;
-//         //console.log(data[i].feedStats[j]);
-
-//         for (let j = 0; j < data[i].feedStats.length; j++) {
-//           //console.log(data[i].feedStats[j]);
-//           if (data[i].feedStats[j].activities == "views") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "views")) {
-//               likeStatus = true;
-
-//             }
-//             likesCount = likesCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "bookmark") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "bookmark")) {
-//               bookmarkStatus = true;
-//             }
-//           }
-//           if (data[i].feedStats[j].activities == "share") {
-//             sharesCount = sharesCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "follow") {
-//             if ((data[i].feedStats[j].memberId == id) && (data[i].feedStats[j].activities == "follow")) {
-//               viewStatus = true;
-//             }
-//             followCount = followCount + 1;
-//           }
-//           if (data[i].feedStats[j].activities == "comment") {
-//             commentsCount = data[i].feedStats[j].source.length + commentsCount;
-//           }
-//         }
-
-//         for (let j = 0; j < data[i].mediaStats.length; j++) {
-//           if (data[i].mediaStats[j].activities == "views") {
-//             if ((data[i].mediaStats[j].memberId == id) && (data[i].mediaStats[j].activities == "views")) {
-//               mlikeStatus = true;
-//             }
-//             mlikesCount = likesCount + 1;
-//           }
-//           if (data[i].mediaStats[j].activities == "share") {
-//             msharesCount = sharesCount + 1;
-//           }
-//           if (data[i].mediaStats[j].activities == "comment") {
-//             mcommentsCount = data[i].mediaStats[j].source.length + commentsCount;
-//           }
-//         }
-//         // Append the counts to main object
-//         //console.log(data[i].feedStats[i]);
-//         data[i].likesCount = likesCount;
-//         data[i].sharesCount = sharesCount;
-//         data[i].commentsCount = commentsCount;
-//         data[i].followCount = followCount;
-//         data[i].likeStatus = likeStatus;
-//         data[i].viewStatus = viewStatus;
-//         data[i].bookmarkStatus = bookmarkStatus;
-//         data[i].mlikesCount = mlikesCount;
-//         data[i].msharesCount = msharesCount;
-//         data[i].mcommentsCount = mcommentsCount;
-//         data[i].mlikeStatus = mlikeStatus;
-//         data[i].mviewStatus = mviewStatus;
-//       }
-//       // End of Filter FeedStats to get views, shares, follow and comment count
-//       return res.send(data);
-//     }
-//   );
-
-// });
-// End of Get Feed By Celebrities in Order
-///////////////// END OF PAGINATION ////////////////////////
-
-//////////////////////////////////////// Edit Feed (MediaPost) ////////////////////////////////////
-// router.post("/edit/:feedID", upload.any(), function (req, res) {
-//   let id = req.params.feedID;
-//   let media_id = req.body.media_id;
-//   let reqbody = req.body;
-//   reqbody.updated_at = new Date();
-//   //console.log(req.body)
-//   //console.log(req.files)
-
-//   Feed.findById(id, function (err, newresult) {
-//     if (err) res.send(err);
-//     let fid = newresult._id;
-//     if (newresult) {
-//       Feed.findOneAndUpdate({ _id: ObjectId(fid) }, reqbody, function (
-//         err,
-//         result
-//       ) {
-//         if (err) {
-//           res.send(err);
-//         } else {
-//           res.json({ message: "Feed updated successfully" });
-//         }
-//       });
-//     } else {
-//       res.json({
-//         error: "Feed Not Exists / Send a valid ID"
-//       });
-//     }
-//   });
-// });
-//////////////////////////////////////// End of Edit Feed (MediaPost) /////////////////////////////
-
-//////////////////////////////////edit feed by rohit start /////////////////////////////////////
-// router.put('/editFeedById/:feed_Id', upload.any(), (req, res, next) => {
-//   let feedId = req.params.feed_Id;
-//   //console.log(feedId)
-//   var imageFilesArray = [];
-//   var videoFilesArray = [];
-//   var audioFilesArray = [];
-//   var memberMediaObj = {};
-//   var existedMediaArray = [];
-//   var updatedMediaArray = []
-//   var updatedMediaObject;
-//   var untouchArray = [];
-//   let feedObj = req.body;
-//   feedObj.updated_at = new Date();
-//   if (!feedObj.isSave) {
-//     untouchArray = feedObj.mediaArray;
-//     for (var i = 0; i < untouchArray.length; i++) {
-//       if (untouchArray[i].media_id) {
-//         updatedMediaArray.push(untouchArray[i])
-//       } else {
-//         let mediaName = untouchArray[i].mediaName;
-//         fs.unlinkSync("uploads/feeds/" + mediaName);
-//       }
-//     }
-//     return res.json({ success: 0, message: "Uploaded new Media have deleted successfully" });
-//   }
-
-
-//   Feed.getFeedById(feedId, (err, existedFeedObj) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       let memberId = ObjectId(existedFeedObj.memberId);
-//       existedMediaArray = existedFeedObj.mediaArray;
-//       untouchArray = feedObj.mediaArray;
-//       for (var i = 0; i < untouchArray.length; i++) {
-//         if (untouchArray[i].media_id) {
-//           updatedMediaArray.push(untouchArray[i])
-//         } else {
-//           updatedMediaObject = {};
-//           let mediaUrl = untouchArray[i].mediaUrl;
-//           let mediaName = untouchArray[i].mediaName;
-//           let mediaType = untouchArray[i].mediaType;
-//           let mediaSortOrder = untouchArray[i].mediaSortOrder;
-//           let mediaCreditValue = untouchArray[i].mediaCreditValue;
-//           let mediaStatus = untouchArray[i].mediaStatus;
-//           let mediaDesc = untouchArray[i].mediaDesc;
-//           let mediaRatio = untouchArray[i].mediaRatio;
-//           updatedMediaObject.media_id = new ObjectId();
-//           updatedMediaObject.mediaUrl = mediaUrl;
-//           updatedMediaObject.mediaName = mediaName;
-//           updatedMediaObject.mediaType = mediaType;
-//           updatedMediaObject.mediaSortOrder = mediaSortOrder;
-//           updatedMediaObject.mediaCreditValue = mediaCreditValue;
-//           updatedMediaObject.mediaStatus = mediaStatus;
-//           updatedMediaObject.mediaDesc = mediaDesc;
-//           updatedMediaObject.mediaRatio = mediaRatio;
-//           updatedMediaArray[i] = updatedMediaObject;
-//         }
-//       }
-//       feedObj.mediaArray = updatedMediaArray;
-
-//       for (let i = 0; i < untouchArray.length; i++) {
-
-//         if (untouchArray[i].media_id) {
-//         } else {
-//           if (untouchArray[i].mediaType.includes("image")) {
-//             memberMediaObj = {};
-//             let updatedAt = new Date();
-//             let mediaType = untouchArray[i].mediaType;
-//             let mediaPath = untouchArray[i].mediaUrl;
-//             let mediaOriginalName = untouchArray[i].mediaName;
-//             memberMediaObj.updatedAt = updatedAt;
-//             memberMediaObj.mediaType = mediaType;
-//             memberMediaObj.mediaPath = mediaPath;
-//             memberMediaObj.mediaOriginalName = mediaOriginalName;
-//             imageFilesArray.push(memberMediaObj);
-//           } else if (untouchArray[i].mediaType.includes("audio")) {
-//             memberMediaObj = {};
-//             let updatedAt = new Date();
-//             let mediaType = untouchArray[i].mediaType;
-//             let mediaPath = untouchArray[i].mediaUrl;
-//             let mediaOriginalName = untouchArray[i].mediaName;
-//             memberMediaObj.updatedAt = updatedAt;
-//             memberMediaObj.mediaType = mediaType;
-//             memberMediaObj.mediaPath = mediaPath;
-//             memberMediaObj.mediaOriginalName = mediaOriginalName;
-//             audioFilesArray.push(memberMediaObj);
-//           } else if (untouchArray[i].mediaType.includes("video")) {
-//             memberMediaObj = {};
-//             let updatedAt = new Date();
-//             let mediaType = untouchArray[i].mediaType;
-//             let mediaPath = untouchArray[i].mediaUrl;
-//             let mediaOriginalName = untouchArray[i].mediaName;
-//             memberMediaObj.updatedAt = updatedAt;
-//             memberMediaObj.mediaType = mediaType;
-//             memberMediaObj.mediaPath = mediaPath;
-//             memberMediaObj.mediaOriginalName = mediaOriginalName;
-//             videoFilesArray.push(memberMediaObj);
-//           }
-//         }
-//       }
-//       Feed.editFeed(feedId, feedObj, (err, feedUpdatedObj) => {
-//         if (err) {
-//           console.log(err)
-//         } else {
-
-//           let imageFiles = [];
-//           let audioFiles = [];
-//           let videoFiles = [];
-//           var query = { memberId: memberId }
-//           memberMedia.findOneAndUpdate(query,
-//             {
-//               $push: {
-//                 imageFiles: {
-//                   $each: imageFilesArray
-//                 },
-//                 audioFiles: {
-//                   $each: audioFilesArray
-//                 },
-//                 videoFiles: {
-//                   $each: videoFilesArray
-//                 }
-//               }
-//             }
-//             , (err, updatedMemberMediaObj) => {
-//               if (err) {
-//                 console.log(err);
-//               } else {
-//                 res.json({ token: req.headers['x-access-token'], success: 1, message: "Feed updated successfully", data: feedUpdatedObj })
-//               }
-//             });
-//         }
-//       });
-//     }
-//   });
-// });
-
-//////////////////////////////////edit feed by rohit end /////////////////////////////////////
-
-/////////////////////////////// start edit and delete media url before update  //////////////////////////////////////
-// router.put('/editFeedWithNewImageUrl', upload.any(), (req, res, next) => {
-//   let file = req.files;
-//   var imageDetailsArray = [];
-//   var imageDetailObj = {};
-//   //console.log(req.body);
-//   for (let index = 0; index < file.length; index++) {
-//     imageDetailObj = {};
-//     imageDetailObj.imageUrl = file[index].path;
-//     imageDetailObj.imageName = file[index].filename;
-//     fileName = file[index].filename;
-//     fileExtension = fileName.replace(/^.*\./, '');
-//     if (fileExtension == 'png' || fileExtension == 'jpg' || fileExtension == 'jpeg') {
-//       imageDetailObj.mediaType = "image";
-//     }
-//     else if (fileExtension == '3gp' || fileExtension == 'mp4' || fileExtension == 'AVI' || fileExtension == 'WMV') {
-//       imageDetailObj.mediaType = "video";
-//     }
-//     else if (fileExtension == 'mpeg' || fileExtension == 'mp3') {
-//       imageDetailObj.mediaType = "audio";
-//     }
-//     imageDetailsArray.push(imageDetailObj);
-//   }
-//   res.json({ success: 1, uploadedImages: imageDetailsArray });
-// });
-
-// router.post('/deleteFeedWithImageUrl', (req, res, next) => {
-//   let url = req.body.imageUrl;
-//   //console.log("=======url==========" + "uploads/feeds/" + url)
-//   fs.unlink("uploads/feeds/" + url, (err, data) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       //console.log(url)
-//       //console.log(req.body);
-//       res.json({ success: 1, message: "Delete  from upload" });
-//     }
-//   });
-
-// });
-
-
-/////////////////////////////// start edit and delete media url before update  /////////////////////////////////////
-
-
-// Get Feed likes count by mediaId
-// router.get("/getFeedLikesCountByMediaId/:feedId", function (req, res) {
-//   let feedId = ObjectId(req.params.feedId);
-//   Feed.aggregate(
-//     [
-//       {
-//         $match: { $and: [{ _id: ObjectId(feedId) }] }
-//       },
-//       {
-//         $lookup: {
-//           from: "mediatrackings",
-//           localField: "_id",
-//           foreignField: "feedId",
-//           as: "mediaStats" // to get all the views, comments, shares count
-//         }
-//       }
-//     ],
-//     function (err, data) {
-//       if (err) {
-//         res.send(err);
-//       }
-//       // Filter FeedStats to get views, shares, follow and comment count
-//       for (let i = 0; i < data.length; i++) {
-//         for (let j = 0; j < data[i].mediaStats.length; j++) {
-//           let likesCount = 0;
-//           let sharesCount = 0;
-//           let commentsCount = 0;
-//           let likeStatus = false;
-//           let viewStatus = false;
-
-//           if (data[i].mediaStats[j].activities == "views") {
-//             //console.log("1");
-//             if ((data[i].mediaStats[j].memberId) && (data[i].mediaStats[j].activities == "views")) {
-//               likeStatus = true;
-//               likesCount = likesCount + 1;
-//             }
-//           }
-//           if (data[i].mediaStats[j].activities == "share") {
-//             sharesCount = sharesCount + 1;
-//           }
-//           if (data[i].mediaStats[j].activities == "comment") {
-//             commentsCount = data[i].mediaStats[j].source.length + commentsCount;
-//           }
-//           data[i].mediaStats[j].likesCount = likesCount;
-//           data[i].mediaStats[j].sharesCount = sharesCount;
-//           data[i].mediaStats[j].commentsCount = commentsCount;
-//           data[i].mediaStats[j].likeStatus = likeStatus;
-//           data[i].mediaStats[j].viewStatus = viewStatus;
-//         }
-//       }
-//       // End of Filter FeedStats to get views, shares, follow and comment count
-//       res.send(data);
-//     }
-//   );
-// });
-// End of Get Feed likes by mediaId
-
-// router.post('/postFeedLikeOnlyByFanFollowByNumber', (req, res) => {
-//   req.body.numberOfLikes = parseInt(req.body.numberOfLikes)
-//   if (req.body.feedId == undefined || !req.body.feedId.length) {
-//     res.json({ success: 0, message: "Please Provide Feed Deatails" })
-//   }
-//   else if (parseInt(req.body.numberOfLikes) < 0 || req.body.numberOfLikes == "0") {
-//     res.json({ success: 0, message: "Please provide positive integer value more than 0" })
-//   }
-//   else if (req.body.numberOfLikes == undefined || !req.body.numberOfLikes) {
-//     res.json({ success: 0, message: "Please Provide likes count" })
-//   }
-//   else {
-//     let now = new Date();
-//     let todayMinut = now.getMinutes()
-//     Feed.aggregate([
-//       {
-//         $match: {
-//           _id: ObjectId(req.body.feedId)
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: "mediatrackings",
-//           localField: "_id",
-//           foreignField: "feedId",
-//           as: "feedLike"
-//         }
-//       },
-//       {
-//         $unwind: {
-//           "path": "$feedLike",
-//           "preserveNullAndEmptyArrays": true
-//         },
-//       },
-//       {
-//         $sort: { 'feedLike.created_at': -1 }
-//       },
-//       {
-//         $group: {
-//           '_id': {
-//             _id: "$_id",
-//             memberId: "$memberId"
-//           },
-//           created_at: {
-//             $push: {
-//               "created_at": "$created_at",
-//             }
-//           },
-//           feedLike: {
-//             $push: {
-//               "_id": "$feedLike._id",
-//               "feedId": "$feedLike.feedId",
-//               "memberId": "$feedLike.memberId",
-//               "isLike": "$feedLike.isLike",
-//               "activities": "$feedLike.ctivities",
-//               "status": "$feedLike.status",
-//               "updatedBy": "$feedLike.updatedBy",
-//               "createdBy": "$feedLike.createdBy",
-//               "updated_at": "$feedLike.updated_at",
-//               "created_at": "$feedLike.created_at"
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $project: {
-//           _id: 1,
-//           feedLike: 1,
-//           created_at: 1
-//         }
-//       }
-//     ], (err, feedDetails) => {
-//       if (err) {
-//         res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-//       } else {
-//         let startTime = feedDetails[0].created_at[0].created_at;
-//         if (feedDetails[0] && feedDetails[0].feedLike.length && feedDetails[0].feedLike[0].created_at) {
-//           startTime = feedDetails[0].feedLike[0].created_at;
-//         }
-//         if (feedDetails.length) {
-//           // console.log(feedDetails[0])
-//           let likedArray = feedDetails[0].feedLike.map((feedLikeObj) => {
-//             return ObjectId(feedLikeObj.memberId);
-//           })
-//           let celebrityId = feedDetails[0]._id.memberId;
-//           let startMinut = todayMinut;
-//           let randomNumber = parseInt(req.body.numberOfLikes)
-//           MemberPreferences.aggregate([
-//             {
-//               $match: {
-//                 celebrities: { $elemMatch: { CelebrityId: celebrityId, isFollower: true } }
-//               }
-//             },
-//             {
-//               $lookup: {
-//                 from: "users",
-//                 localField: "memberId",
-//                 foreignField: "_id",
-//                 as: "memberProfile"
-//               }
-//             },
-//             {
-//               $match: { "memberProfile.IsDeleted": { $eq: false }, "memberProfile.dua": { $eq: true }, memberProfile: { $ne: [] } }
-//             },
-//             {
-//               $unwind: "$memberProfile"
-//             }
-//           ], (err, vertualFollowers) => {
-//             if (err) {
-//               res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-//             } else if (vertualFollowers) {
-//               let followersArray = vertualFollowers.map((follower) => {
-//                 return follower._id
-//               })
-//               User.aggregate([
-//                 {
-//                   $match: {
-//                     IsDeleted: false,
-//                     dua: true,
-//                     $or: [{ _id: { $nin: likedArray } }, { _id: { $in: followersArray } }]
-//                   }
-//                 },
-//                 {
-//                   $sample:
-//                   {
-//                     size: randomNumber
-//                   }
-//                 },
-//                 {
-//                   $project: {
-//                     _id: 1,
-//                     email: 1
-//                   }
-//                 }], (err, usersList) => {
-//                   if (err) {
-//                     res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-//                   }
-//                   else {
-//                     console.log(usersList)
-//                     let insertManyLike = usersList.map((userde) => {
-//                       // let randomDate = randomTime(startTime)
-//                       randomDate = generateRandom(Date.now(), startTime.setMinutes(startMinut))
-//                       user = {
-//                         "feedId": req.body.feedId,
-//                         "memberId": userde._id,
-//                         "isLike": true,
-//                         "activities": "views",
-//                         "status": "Active",
-//                         "updatedBy": "Admin",
-//                         "createdBy": "Admin",
-//                         "updated_at": randomDate,
-//                         "created_at": randomDate
-//                       }
-//                       return user;
-//                     })
-//                     mediaTracking.insertMany(insertManyLike, (err, likedArray) => {
-//                       if (err) {
-//                         res.json({ success: 0, token: req.headers['x-access-token'], message: err });
-//                       }
-//                       else {
-//                         res.json({ success: 1, insertManyLike: insertManyLike, users: usersList, feedDetails: feedDetails, likedArray: likedArray, numberOfLikes: randomNumber })
-//                         updateLoginTime(usersList)
-//                       }
-//                     })
-//                   }
-//                 })
-//             }
-//           })
-//         }
-//         else {
-//           res.json({ success: 0, token: req.headers['x-access-token'], message: "Feed details not found id " + req.body.feedId });
-//         }
-//       }
-//     })
-//   }
-// })
-
-updateLoginTime = (userArray) => {
-  let currentDate = new Date();
-  let randomNumber = Math.floor(Math.random() * 20) + 35;
-  let loginTime = currentDate.setMinutes(currentDate.getMinutes() - randomNumber)
-  let logouttime = currentDate.setMinutes(currentDate.getMinutes() + randomNumber)
-  let userEmailArray = userArray.map((user) => {
-    return user.email;
-  })
-  LoginInfo.update({ email: { $in: userEmailArray } }, {
-    $set: {
-      lastLoginDate: loginTime,
-      lastLogoutDate: logouttime
-    }
-  }, { multi: true }, (err, loginInfo) => {
-    if (err) {
-      console.log(err)
-    }
-    else {
-      console.log(loginInfo)
-    }
-  })
-}
-// router.get('/getAllFeed/:created_at', (req, res) => {
-//   let created_at = req.params.created_at;
-//   Feed.find({ isDelete: false, created_at: { $lt: new Date(created_at) } }, (err, feed) => {
-//     if (err) {
-//       res.json({ token: req.headers['x-access-token'], success: 0, data: [] });
-//     } else {
-//       res.json({ token: req.headers['x-access-token'], success: 1, data: feed });
-//     }
-//   }).limit(10).sort({ created_at: -1 });
-// });
-
-// router.get('/getFeedByMemberPreferancesCreateTime/:memberId/:created_at', (req, res) => {
-//   let created_at = req.params.created_at;
-//   MemberPreferences.findOne({ memberId: ObjectId(req.params.memberId) }, (err, memberpreferences) => {
-//     if (err) {
-//       res.json({ success: 0, message: "err" + err })
-//     } else {
-//       var query = memberpreferences.celebrities.map((celeb) => {
-//         let x = { $and: [{ memberId: celeb.CelebrityId }, { created_at: { $gt: celeb.createdAt } }, { isDelete: false }] }
-//         return x;
-//       })
-//       query.push({ created_at: { $lt: new Date(created_at) } })
-//       Feed.find({ $or: query }, (err, feed) => {
-//         if (err) {
-//           res.json({ token: req.headers['x-access-token'], success: 0, data: [] });
-//         } else {
-//           res.json({ token: req.headers['x-access-token'], success: 1, data: feed, query: { $or: query } });
-//         }
-//       }).limit(10).sort({ created_at: -1 });
-//     }
-//   })
-// });
 
 // (year: number, month: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number)
 let randomTime = (date) => {

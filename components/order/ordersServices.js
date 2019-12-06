@@ -3,6 +3,7 @@ const ObjectId = require("mongodb").ObjectID;
 let creditServices = require('../credits/creditServices');
 let paymentTransactionServices = require('../paymentTransaction/paymentTransactionServices');
 let packageCollectionServices = require('../packageCollection/packageCollectionServices');
+let slotmasters = require('../slotMaster/slotMasterModel')
 
 const getOrdersByMemberId = (memberId, createdAt, limit, callback) => {
     memberId = ObjectId(memberId);
@@ -18,6 +19,7 @@ const getOrdersByMemberId = (memberId, createdAt, limit, callback) => {
                 createdAt: { $lt: new Date(getOrdersByTime) }
             }
         },
+          
         {
             $sort: {
                 createdAt: -1
@@ -25,7 +27,36 @@ const getOrdersByMemberId = (memberId, createdAt, limit, callback) => {
         },
         {
             $limit: limit
-        }
+        },
+        {
+            $project: {
+                _id:1,
+                memberId:1,
+                celebId:1,
+                orderType:1,
+                slotId:1,
+                ordersStatus:1,
+                createdAt:1,
+                paymentMode:1,
+                refCreditTransactionId:1,
+                refCartIds:1,
+                paymentAmount:1,
+                credits:1,
+                paymentMode:1,
+                paymentAmount:1,
+                serviceType:1,
+                startTime:1,
+                endTime:1,
+                refPaymentTransactionId:1,
+                celebFirstName:1,
+                celebLastName:1,
+                celebProfilepic:1,
+                //celebProfile:1
+                
+
+
+            }
+          }
     ], (err, Orders) => {
         if (err) {
             callback(err, null)
@@ -39,7 +70,7 @@ const getAll = (params, callback) => {
     let pageNo = parseInt(params.pageNo);
     let startFrom = params.limit * (pageNo - 1);
     let limit = parseInt(params.limit);
-    Orders.count({}, (err, count) => {
+    Orders.countDocuments({}, (err, count) => {
         if (err) {
             callback(err, null)
         } else {

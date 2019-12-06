@@ -430,17 +430,17 @@ var findAllMemberDetailsById = (auditionId, callback)=> {
 }
 //NEW code for findAllMemberDetailsById grouping  by roleid ENd
 
-applyAuditions.find({ memberId: ObjectId("5bace25de4ca7e39085b4ff5") }).populate({
-    path: 'roleId',
-    match: {
-        "roleType" : "Musician"
-    }
-  }).exec((err, users)=> {
-    users = users.filter((user)=> {
-      return user.roleName; // return only users with email matching 'type: "Gmail"' query
-    });
-    // console.log(users);
-  });
+// applyAuditions.find({ memberId: ObjectId("5bace25de4ca7e39085b4ff5") }).populate({
+//     path: 'roleId',
+//     match: {
+//         "roleType" : "Musician"
+//     }
+//   }).exec((err, users)=> {
+//     users = users.filter((user)=> {
+//       return user.roleName; // return only users with email matching 'type: "Gmail"' query
+//     });
+//     // console.log(users);
+//   });
 var findAllApplyAuditionByMemberId = (memberId, callback) =>{
     applyAuditions.aggregate([
         {

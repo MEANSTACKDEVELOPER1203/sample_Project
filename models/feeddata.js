@@ -266,11 +266,18 @@ let Feed = (module.exports = mongoose.model("Feed", FeedSchema));
 
 // Find by Id
 
-module.exports.getFeedById = function (id, callback) {
+module.exports.getFeedById = (id, callback) => {
     Feed.findById(ObjectId(id), callback);
 };
 
 /************************All services PK Start ******************************* */
+
+
+let provideData = {
+    _id: 1, avtar_imgPath: 1, avtar_originalname: 1, cover_imgPath: 1, custom_imgPath: 1,
+    imageRatio: 1, name: 1, firstName: 1, lastName: 1, prefix: 1, role: 1, profession: 1, industry: 1, isCeleb: 1,
+    isTrending: 1, aboutMe: 1, category: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
+}
 
 module.exports.getFeedById_PK = function (query, callback) {
     //Feed.findById(ObjectId(id), callback);
@@ -313,18 +320,7 @@ module.exports.getFeedById_PK = function (query, callback) {
                 "created_at": 1,
                 "state": 1,
                 "countryCode": 1,
-                feedByMemberDetails: {
-                    _id: 1,
-                    isCeleb: 1,
-                    isManager: 1,
-                    isOnline: 1,
-                    avtar_imgPath: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    profession: 1,
-                    gender: 1,
-                    username: 1
-                },
+                feedByMemberDetails: provideData,
                 feedLikesCount: {
                     $size: {
                         $filter: {
@@ -696,60 +692,60 @@ module.exports.findFeedLikesById = function (feedId, createdAt, callback) {
 }
 
 //get media likes by feed id
-module.exports.findMediaLikesById = function (mediaId, createdAt, callback) {
-    let getLikesByTime = new Date();
-    if (createdAt != "null" && createdAt != "0") {
-        getLikesByTime = createdAt
-    }
-    mediaId = ObjectId(mediaId);
-    MediaTracking.aggregate([
-        {
-            $match: { $and: [{ mediaId: mediaId }, { activities: "views" }, { isLike: true }, { created_at: { $lt: new Date(getLikesByTime) } }] }
-        },
-        {
-            $sort: { created_at: -1 }
-        },
-        {
-            $limit: 50
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "memberId",
-                foreignField: "_id",
-                as: "memberProfile"
-            }
-        },
-        {
-            $match: { $and: [{ memberProfile: { $ne: [] } }] }
-        },
-        { "$unwind": "$memberProfile" },
-        {
-            $project: {
-                _id: 1,
-                isLike: 1,
-                created_at: 1,
-                updated_at: 1,
-                "memberProfile._id": 1,
-                "memberProfile.username": 1,
-                "memberProfile.avtar_imgPath": 1,
-                "memberProfile.email": 1,
-                "memberProfile.name": 1,
-                "memberProfile.firstName": 1,
-                "memberProfile.lastName": 1,
-                "memberProfile.isCeleb": 1,
-                "memberProfile.profession": 1,
-                "memberProfile.aboutMe": 1,
-            }
-        }
-    ], function (err, listOfMediaLikesObj) {
-        if (!err)
-            callback(null, listOfMediaLikesObj);
-        else
-            callback(err, null);
-    }
-    )
-}
+// module.exports.findMediaLikesById = function (mediaId, createdAt, callback) {
+//     let getLikesByTime = new Date();
+//     if (createdAt != "null" && createdAt != "0") {
+//         getLikesByTime = createdAt
+//     }
+//     mediaId = ObjectId(mediaId);
+//     MediaTracking.aggregate([
+//         {
+//             $match: { $and: [{ mediaId: mediaId }, { activities: "views" }, { isLike: true }, { created_at: { $lt: new Date(getLikesByTime) } }] }
+//         },
+//         {
+//             $sort: { created_at: -1 }
+//         },
+//         {
+//             $limit: 50
+//         },
+//         {
+//             $lookup: {
+//                 from: "users",
+//                 localField: "memberId",
+//                 foreignField: "_id",
+//                 as: "memberProfile"
+//             }
+//         },
+//         {
+//             $match: { $and: [{ memberProfile: { $ne: [] } }] }
+//         },
+//         { "$unwind": "$memberProfile" },
+//         {
+//             $project: {
+//                 _id: 1,
+//                 isLike: 1,
+//                 created_at: 1,
+//                 updated_at: 1,
+//                 "memberProfile._id": 1,
+//                 "memberProfile.username": 1,
+//                 "memberProfile.avtar_imgPath": 1,
+//                 "memberProfile.email": 1,
+//                 "memberProfile.name": 1,
+//                 "memberProfile.firstName": 1,
+//                 "memberProfile.lastName": 1,
+//                 "memberProfile.isCeleb": 1,
+//                 "memberProfile.profession": 1,
+//                 "memberProfile.aboutMe": 1,
+//             }
+//         }
+//     ], function (err, listOfMediaLikesObj) {
+//         if (!err)
+//             callback(null, listOfMediaLikesObj);
+//         else
+//             callback(err, null);
+//     }
+//     )
+// }
 
 //get feed Comments by feed id pagination
 module.exports.findFeedCommentsByFeedId = (params, callback) => {
@@ -814,58 +810,74 @@ module.exports.findFeedCommentsByFeedId = (params, callback) => {
 
 module.exports.findMediaCommentsByMediaId = (params, callback) => {
     let mediaId = ObjectId(params.mediaId);
+    let feedId = ObjectId(params.feedId);
+    let conditionObj = {};
     let createdAt = params.createdAt;
     let getNotificatonByTime = new Date();
     if (createdAt != "null" && createdAt != "0") {
         getNotificatonByTime = createdAt
     }
     let limit = parseInt(10)
-    MediaTracking.aggregate([
-        {
-            $match: { mediaId: mediaId, activities: "comment", created_at: { $lt: new Date(getNotificatonByTime) } }
-        },
-        {
-            $sort: { created_at: -1 }
-        },
-        {
-            $limit: limit
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "memberId",
-                foreignField: "_id",
-                as: "memberProfile"
+    Feed.findById(feedId, (err, feedObj) => {
+        if (err)
+            console.log("Error while fetching the feed ");
+        else {
+            if (feedObj.media.length <= 1) {
+                conditionObj = { feedId: feedId, activities: "comment", created_at: { $lt: new Date(getNotificatonByTime) } }
+            } else {
+                conditionObj = { mediaId: mediaId, activities: "comment", created_at: { $lt: new Date(getNotificatonByTime) } }
             }
-        },
-        {
-            $match: { $and: [{ memberProfile: { $ne: [] } }] }
-        },
-        { "$unwind": "$memberProfile" },
-        {
-            $project: {
-                _id: 1,
-                isLike: 1,
-                source: 1,
-                created_at: 1,
-                "memberProfile._id": 1,
-                "memberProfile.username": 1,
-                "memberProfile.avtar_imgPath": 1,
-                "memberProfile.email": 1,
-                "memberProfile.name": 1,
-                "memberProfile.firstName": 1,
-                "memberProfile.lastName": 1,
-                "memberProfile.isCeleb": 1,
-                "memberProfile.profession": 1,
-                "memberProfile.aboutMe": 1,
-            }
+            // console.log(conditionObj, "condition ")
+            MediaTracking.aggregate([
+                {
+                    $match: conditionObj
+                },
+                {
+                    $sort: { created_at: -1 }
+                },
+                {
+                    $limit: limit
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "memberId",
+                        foreignField: "_id",
+                        as: "memberProfile"
+                    }
+                },
+                {
+                    $match: { $and: [{ memberProfile: { $ne: [] } }] }
+                },
+                { "$unwind": "$memberProfile" },
+                {
+                    $project: {
+                        _id: 1,
+                        isLike: 1,
+                        source: 1,
+                        created_at: 1,
+                        "memberProfile._id": 1,
+                        "memberProfile.username": 1,
+                        "memberProfile.avtar_imgPath": 1,
+                        "memberProfile.email": 1,
+                        "memberProfile.name": 1,
+                        "memberProfile.firstName": 1,
+                        "memberProfile.lastName": 1,
+                        "memberProfile.isCeleb": 1,
+                        "memberProfile.profession": 1,
+                        "memberProfile.aboutMe": 1,
+                    }
+                }
+            ], function (err, listOfMediaCommentsObj) {
+                if (!err)
+                    callback(null, listOfMediaCommentsObj);
+                else
+                    callback(err, null);
+            })
+
         }
-    ], function (err, listOfMediaCommentsObj) {
-        if (!err)
-            callback(null, listOfMediaCommentsObj);
-        else
-            callback(err, null);
-    }
-    )
+    })
+
+
 }
 /************************All services PK End ******************************* */

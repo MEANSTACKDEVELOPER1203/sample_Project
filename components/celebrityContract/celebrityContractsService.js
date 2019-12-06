@@ -1,4 +1,5 @@
 const CelebContractsModel = require('./celebrityContractsModel')
+const mongoose = require('mongoose')
 
 const getCelebContractsForFan = (celebrityId, callback) => {
     CelebContractsModel.findOne(
@@ -24,7 +25,27 @@ const getCelebContractsByServiceType = (celebrityId, serviceType, callback) => {
         });
 }
 
+const calculateCelebSharingPercentage = (totalCreditValue, contractObj, callback) => {
+
+}
+
+const getCelebIdWhoHaveContract = () =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            CelebContractsModel.distinct("memberId")
+                .then((contractsCelebArray) => {
+                    let celebContractIds = contractsCelebArray.map(s =>
+                        mongoose.Types.ObjectId(s)
+                    );
+                    resolve(celebContractIds)
+                })
+                .catch(err => reject(err))
+        }, 100)
+    })
+
 module.exports = {
     getCelebContractsForFan: getCelebContractsForFan,
-    getCelebContractsByServiceType: getCelebContractsByServiceType
+    getCelebContractsByServiceType: getCelebContractsByServiceType,
+    calculateCelebSharingPercentage: calculateCelebSharingPercentage,
+    getCelebIdWhoHaveContract: getCelebIdWhoHaveContract
 }

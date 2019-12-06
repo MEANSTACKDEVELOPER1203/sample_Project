@@ -17,7 +17,7 @@ const isAlreadySearched = (memberId, celebrityId, callback) => {
             }
         }
     ], (err, searchOrNot) => {
-        console.log(searchOrNot)
+        // console.log(searchOrNot)
         if (err) {
             callback(err, null)
         } else if (searchOrNot.length) {
@@ -29,7 +29,7 @@ const isAlreadySearched = (memberId, celebrityId, callback) => {
 }
 
 const saveSearchHistory = (body, callback) => {
-    console.log(body)
+    // console.log(body)
     SearchHistoryModel.findOne({ memberId: ObjectId(body.memberId) }, { _id: 1 }, (err, searchHistoryObj) => {
         if (err) {
             callback(err, null)
@@ -188,6 +188,7 @@ const getSearchHistoryByMemberId = (params, callback) => {
                                 aboutMe: "$celebrityDetails.aboutMe",
                                 cover_imgPath: "$celebrityDetails.cover_imgPath",
                                 profession: "$celebrityDetails.profession",
+                                category: "$celebrityDetails.category",
                                 _id: "$celebrityDetails._id",
                             }
                         }
@@ -212,6 +213,7 @@ const getSearchHistoryByMemberId = (params, callback) => {
                             aboutMe: 1,
                             cover_imgPath: 1,
                             profession:1,
+                            category:1,
                             _id:1
                         }
                     }

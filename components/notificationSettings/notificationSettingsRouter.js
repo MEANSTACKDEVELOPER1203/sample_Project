@@ -4,7 +4,6 @@ let ObjectId = require("mongodb").ObjectID;
 let notificationSetting = require("./notificationSettingsModel");
 
 // setMemberPreferences for a User
-
 router.post("/setNotificationSettings", function (req, res) {
   let memberId = ObjectId(req.body.memberId);
   let notificationSettingId = req.body.notificationSettingId;
@@ -53,70 +52,71 @@ router.post("/setNotificationSettings", function (req, res) {
 });
 // End of setMemberPreferences for a User
 
-// getByID (SettingID)
-router.get("/getByID/:settingID", function (req, res) {
-  let id = req.params.settingID;
 
-  notificationSetting.findById(id, function (err, result) {
-    if (err) return res.send(err);
-    if (result) {
-      res.send(result);
-    } else {
-      res.json({
-        error: "No Data / Invalid ID"
-      });
-    }
-  });
-});
-// End of getByID (SettingID)
+// // getByID (SettingID)
+// router.get("/getByID/:settingID", function (req, res) {
+//   let id = req.params.settingID;
 
-// Get by UserID
-router.get("/getByMemberId/:memberId", function (req, res) {
-  let id = req.params.memberId;
-  let query = { memberId: id };
-  notificationSetting.find(query, function (err, result) {
-    if (err) return res.send(err);
-    if (result) {
-      res.send(result);
-    } else {
-      res.json({
-        error: "No data found!"
-      });
-    }
-  });
-});
-// End of Get by UserID
+//   notificationSetting.findById(id, function (err, result) {
+//     if (err) return res.send(err);
+//     if (result) {
+//       res.send(result);
+//     } else {
+//       res.json({
+//         error: "No Data / Invalid ID"
+//       });
+//     }
+//   });
+// });
+// // End of getByID (SettingID)
 
-// get list of notification settings fro all users
-router.get("/getAll", function (req, res) {
-  notificationSetting.find({}, function (err, result) {
-    if (err) return res.send(err);
-    if (result) {
-      res.send(result);
-    } else {
-      res.json({
-        error: "No data found!"
-      });
-    }
-  });
-});
-// End of get list of notification settings fro all users
+// // Get by UserID
+// router.get("/getByMemberId/:memberId", function (req, res) {
+//   let id = req.params.memberId;
+//   let query = { memberId: id };
+//   notificationSetting.find(query, function (err, result) {
+//     if (err) return res.send(err);
+//     if (result) {
+//       res.send(result);
+//     } else {
+//       res.json({
+//         error: "No data found!"
+//       });
+//     }
+//   });
+// });
+// // End of Get by UserID
 
-// Delete by notificationSettingID
+// // get list of notification settings fro all users
+// router.get("/getAll", function (req, res) {
+//   notificationSetting.find({}, function (err, result) {
+//     if (err) return res.send(err);
+//     if (result) {
+//       res.send(result);
+//     } else {
+//       res.json({
+//         error: "No data found!"
+//       });
+//     }
+//   });
+// });
+// // End of get list of notification settings fro all users
 
-router.delete("/delete/:settingID", function (req, res, next) {
-  let id = req.params.settingID;
+// // Delete by notificationSettingID
 
-  notificationSetting.findById(id, function (err, result) {
-    if (result) {
-      notificationSetting.findByIdAndRemove(id, function (err, post) {
-        if (err) return res.send(err);
-        res.json({ message: "Deleted notificationSettings Successfully" });
-      });
-    } else {
-      res.json({ error: "notificationSettingID not found / Invalid" });
-    }
-  });
-});
+// router.delete("/delete/:settingID", function (req, res, next) {
+//   let id = req.params.settingID;
+
+//   notificationSetting.findById(id, function (err, result) {
+//     if (result) {
+//       notificationSetting.findByIdAndRemove(id, function (err, post) {
+//         if (err) return res.send(err);
+//         res.json({ message: "Deleted notificationSettings Successfully" });
+//       });
+//     } else {
+//       res.json({ error: "notificationSettingID not found / Invalid" });
+//     }
+//   });
+// });
 
 module.exports = router;

@@ -1,5 +1,4 @@
 let mongoose = require('mongoose');
-
 let storyTrackingSchema = new mongoose.Schema({
     memberId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -14,6 +13,9 @@ let storyTrackingSchema = new mongoose.Schema({
     isSeen: {
         type: Boolean,
         default: false
+    },
+    seenBy: {
+        type: String,
     },
     seenTime: {
         type: Date,

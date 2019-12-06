@@ -4,21 +4,21 @@ let ObjectId = require("mongodb").ObjectID;
 let active, inactive;
 
 let payCreditsSchema = new mongoose.Schema({
-    payType:{
+    payType: {
         type: String,
-        default:"",
+        default: "",
     },
     memberId: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
     celebId: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
-    managerId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+    managerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
     referralId: {
         type: mongoose.Schema.Types.ObjectId
@@ -39,28 +39,40 @@ let payCreditsSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    status : {
+    debitFromMemberReferralCreditValue: {
+        type: Number,
+        default: 0
+    },
+    debitFromCelebReferralCreditValue: {
+        type: Number,
+        default: 0
+    },
+    debitFromMainCreditValue: {
+        type: Number,
+        default: 0
+    },
+    status: {
         type: String,
         enum: [active, inactive],
         default: inactive
     },
-    createdAt: { 
-        type: Date, 
-        default: Date.now 
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
-    updatedAt: { 
-        type: Date, 
-        default: Date.now 
+    updatedAt: {
+        type: Date,
+        default: Date.now
     },
-    createdBy:{
+    createdBy: {
         type: String,
-        default:"",
+        default: "",
     },
-    updatedBy:{
+    updatedBy: {
         type: String,
-        default:"",
+        default: "",
     },
-},{
+}, {
     versionKey: false
 });
 
@@ -86,7 +98,7 @@ module.exports.getPayCreditsById = function (id, callback) {
 // Find by memberId
 
 module.exports.getByMemberId = function (id, callback) {
-    let query = {memberId : id};
+    let query = { memberId: id };
     payCredits.find(query, callback);
-  };
+};
 

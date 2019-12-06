@@ -31,10 +31,15 @@ let loginsSchema = mongoose.Schema({
     enum: [Android, IOS, Web],
     default:Web
   },
+  socialMediaType: {
+    type: String,
+    default: ""
+  },
   token: {
     type: String,
     default:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNmFhODQyMjUwZDMxMTRmZmU2NzExMiIsImlhdCI6MTU1NDQ3MTk1MCwiZXhwIjoxNTU3MDYzOTUwfQ.ol-C1u7Dag82oMBQJE9ILwE2qYr21FV4sjJOR6_rqGQ"
   },
+  
   lastLoginLocation: {
     type: String,
     default: "IN"
@@ -141,9 +146,9 @@ module.exports.getloginInfoById = function(id, callback) {
 };
 
 module.exports.comparePassword = function(candidatePassword, hash, callback) {
-  console.log(candidatePassword)
-  console.log(hash)
-  console.log("comparePassword inside+++++++++++++++++++++++++++++++++++++")
+  // console.log(candidatePassword)
+  // console.log(hash)
+  // console.log("comparePassword inside+++++++++++++++++++++++++++++++++++++")
   bcrypt.compare(candidatePassword, hash, function(err, isMatch) {
     if (err) throw err;
     callback(null, isMatch);

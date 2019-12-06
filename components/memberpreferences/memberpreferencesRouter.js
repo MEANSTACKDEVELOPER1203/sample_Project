@@ -4,12 +4,12 @@ let ObjectId = require("mongodb").ObjectID;
 let User = require("../users/userModel");
 let MemberPreferences = require("./memberpreferencesModel");
 let MemberPreferencesController = require("./memberPreferenceController");
-let Feed = require("../../models/feeddata");
-let Feedlog = require("../feedLog/feedlogModel");
-let orders = require("../order/ordersModel");
-let payCredits = require("../payCredits/payCreditsModel");
-let Credits = require("../credits/creditsModel");
-let celebrityContract = require("../celebrityContract/celebrityContractsModel");
+// let Feed = require("../../models/feeddata");
+// let Feedlog = require("../feedLog/feedlogModel");
+// let orders = require("../order/ordersModel");
+// let payCredits = require("../payCredits/payCreditsModel");
+// let Credits = require("../credits/creditsModel");
+// let celebrityContract = require("../celebrityContract/celebrityContractsModel");
 let feedbackModel = require("../feedback/feedbackModel");
 let Feedback = require('../feedback/feedbackModel');
 let logins = require("../loginInfo/loginInfoModel");
@@ -24,48 +24,7 @@ let FeedMapping = require('../feed/feedMappingModel');
 const ActivityLog = require("../activityLog/activityLogService");
 let otpService = require('../otp/otpRouter');
 
-
 router.get("/getMemberPreferancesCount/:memberId", MemberPreferencesController.getMemberPreferancesCount)
-
-// router.put("/setMemberCelebrityAsFan/:memberId",MemberPreferencesController.beFanOfCelebrity)
-// router.put("/setMemberCelebrityAsFollower/:memberId",MemberPreferencesController.followCelebrity)
-// router.put("/unFan/:memberId", MemberPreferencesController.unFanCelebrity)
-// router.put("/unFollow/:memberId",MemberPreferencesController.unfollowCelebrity)
-// router.put("/blockUser/:memberId",MemberPreferencesController.blockMember);
-
-
-// setMemberPreferences for a User
-// MemberPreferences.find({ '_id': ObjectId('5bc0288f17729a2f63002937')},(err,data)=>{
-//   console.log("data")
-//   console.log(data)
-// }).populate('preferences')
-
-// MemberPreferences.aggregate([
-//   // Unwind the source
-//   {$match:{
-//     '_id': ObjectId('5bc0288f17729a2f63002937')
-//   }},
-//   { "$unwind": "$preferences" },
-//   // Do the lookup matching
-//   { "$lookup": {
-//      "from": "preferences",
-//      "localField": "preferences",
-//      "foreignField": "_id",
-//      "as": "preferenceObjects"
-//   }},
-//   // Unwind the result arrays ( likely one or none )
-//   { "$unwind": "$preferenceObjects" },
-//   // Group back to arrays
-//   { "$group": {
-//       "_id": "$_id",
-//       "preferences": { "$push": "$preferences" },
-//       "preferenceObjects": { "$push": "$preferenceObjects" }
-//   }}
-// ],(err,data)=>{
-//   console.log(data)
-//   console.log(data[0].preferenceObjects)
-// })
-
 
 router.post("/setMemberPreferences", function (req, res) {
   let memberId = ObjectId(req.body.userId);
@@ -137,718 +96,253 @@ router.post("/setMemberPreferences", function (req, res) {
   });
 });
 
-/*old api start */
-// router.put("/setMemberCelebrityAsFollower", function (req, res) {
-//   let memberId = ObjectId(req.body.userId);
-//   let CelebrityId = ObjectId(req.body.CelebrityId);
-//   let reqbody = req.body;
-//   reqbody.isFollower = true;
-
-//   User.findById(memberId, function (err, result) {
-//     if (err) {
-//       res.send(err);
-//     }
-//     if (result) {
-//       MemberPreferences.findOne(
-//         { memberId: ObjectId(req.body.userId) },
-//         function (err, newresult) {
-//           if (newresult) {
-//             let id = newresult._id;
-//             let FollowerCount = 0;
-//             for (let i = 0; i < newresult.celebrities.length; i++) {
-//               if (
-//                 newresult.celebrities[i].CelebrityId == req.body.CelebrityId &&
-//                 newresult.celebrities[i].isFollower == true
-//               ) {
-//                 FollowerCount = FollowerCount + 1;
-//               }
-//             }
-//             if (FollowerCount == 0) {
-//               MemberPreferences.setFollower(id, reqbody, function (err, user) {
-//                 if (err) {
-//                   res.send(err);
-//                 }
-//                 res.send({ message: "Preferences Updated Successfully" });
-//               });
-//             } else {
-//               res.send({ message: "User already a Follower" });
-//             }
-//           } else {
-//             let newRecord = new MemberPreferences({
-//               memberId: memberId,
-//             });
-//             MemberPreferences.createNewRecord(newRecord, function (err, user) {
-//               if (err) {
-//                 res.send(err);
-//               } else {
-//                 MemberPreferences.setFollower(newRecord._id, reqbody, function (err, user) {
-//                   if (err) {
-//                     res.send(err);
-//                   }
-//                   else {
-//                     res.send({ message: "Preferences Updated Successfully" });
-//                   }
-
-//                 });
-//               }
-
-
-//             });
-
-//           }
-//         }
-//       );
-
-//     } else {
-//       res.json({
-//         error: "User Not Exists / Send a valid UserID"
-//       });
-//     }
-//   });
-// });
-
-// router.put("/setMemberCelebrityAsFan", function (req, res) {
-//   let memberId = ObjectId(req.body.userId);
+// set Member Celebrity As a Fan new api testing purpose
+// router.put("/setMemberCelebrityAsFan/:memberId", function (req, res) {
+//   let memberId = ObjectId(req.params.memberId);
 //   let CelebrityId = ObjectId(req.body.CelebrityId);
 //   let isFan = req.body.isFan;
 //   let credits = req.body.credits;
 //   let reqbody = req.body;
-//   //let credits = req.body.credits;
 //   reqbody.isFan = true;
-//   console.log(reqbody);
-
 //   User.findById(memberId, function (err, result) {
 //     if (err) {
-//       res.send(err);
+//       res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
 //     }
 //     if (result) {
-//       MemberPreferences.findOne(
-//         { memberId: ObjectId(req.body.userId) },
-//         function (err, newresult) {
-//           if (newresult) {
-//             let id = newresult._id;
-//             let FanCount = 0;
-//             for (let i = 0; i < newresult.celebrities.length; i++) {
-//               if (
-//                 newresult.celebrities[i].CelebrityId == req.body.CelebrityId &&
-//                 newresult.celebrities[i].isFan == true
-//               ) {
-//                 FanCount = FanCount + 1;
-//               }
-//             }
-//             if (FanCount == 0) {
-//               // let query = {
-//               //   $and: [{ reason: "Block/Report" }, { celebrityId: ObjectId(CelebrityId) }, { memberId: ObjectId(memberId) }]
-//               // };
-//               // //console.log(query);
-//               // feedbackModel.find(query, function (err, Fresult) {
-//               //   console.log("Fresult", Fresult);
-//               //   if (Fresult.length > 0) {
-//               //     res.json({
-//               //       error: "This celebrity has blocked you."
-//               //     });
-
-//               //   } else {
-//                   MemberPreferences.setFan(id, reqbody, function (err, user) {
-//                     if (err) {
-//                       res.send(err);
-//                     }
-//                     res.send({ message: "Preferences Updated Successfully" });
-//                     celebrityContract.findOne(
-//                       { $and: [{ memberId: CelebrityId }, { serviceType: "fan" }, { isActive: true }] },
-//                       function (err, CCresult) {
-//                         if (err) return res.send(err);
-//                         //console.log("CCresult", CCresult);
-//                         //console.log( Tresult[i].receiverId);
-//                         //let idC = Tresult[i].receiverId;
-//                         // start of credits
-//                         Credits.find(
-//                           { memberId: CelebrityId },
-//                           null,
-//                           { sort: { createdAt: -1 } },
-//                           function (err, cBal) {
-//                             if (err) return res.send(err);
-//                             if (cBal) {
-//                               cBalObj = cBal[0];
-//                               newReferralCreditValue = cBalObj.referralCreditValue;
-//                               oldCumulativeCreditValue = parseFloat(cBalObj.cumulativeCreditValue);
-//                               credits = CCresult.serviceCredits;
-//                               test2 = CCresult.sharingPercentage;
-//                               test = credits * test2 / 100;
-//                               ckCredits = credits - test;
-//                               //console.log(test);
-//                               newCumulativeCreditValue = parseFloat(oldCumulativeCreditValue) + parseFloat(test);
-//                               let newPayCredits = new payCredits({
-//                                 memberId: CelebrityId,
-//                                 celebId: memberId,
-//                                 creditValue: credits,
-//                                 celebPercentage: test,
-//                                 celebKonnectPercentage: ckCredits,
-//                                 createdBy: "Pavan"
-//                               });
-
-//                               payCredits.createPayCredits(newPayCredits, function (err, payCredits) {
-
-//                                 if (err) {
-//                                   //res.send(err);
-//                                 } else {
-//                                   // res.json({
-//                                   //   message: "payCredits saved successfully",
-//                                   //   "payCredits": payCredits
-//                                   // });
-//                                 }
-//                               });
-
-//                               let newCredits = new Credits({
-
-//                                 memberId: CelebrityId,
-//                                 creditType: "credit",
-//                                 creditValue: test,
-//                                 cumulativeCreditValue: newCumulativeCreditValue,
-//                                 referralCreditValue: newReferralCreditValue,
-//                                 //referralCreditValue: referralCreditValue,
-//                                 remarks: "Service Earnings for Fan",
-//                                 createdBy: "Admin"
-//                               });
-//                               // Insert Into Credit Table
-//                               Credits.createCredits(newCredits, function (err, credits) {
-//                                 if (err) {
-//                                   //res.send(err);
-//                                 } else {
-//                                   console.log("credits updated" + credits)
-//                                   // let myBody = {};
-
-//                                   // myBody.refundStatus = "active";
-//                                   // serviceTransaction.findByIdAndUpdate(idT, myBody, function (err, rStatus) {
-//                                   //   if (err) {
-//                                   //     //console.log(rStatus);
-
-//                                   //   } else {
-//                                   //   }
-//                                   // });
-
-//                                 }
-//                               });
-
-//                             }
-//                             else {
-//                             }
-
-//                           }
-//                         ); //end of credits
-//                       }
-//                     ); //end of celeb contracts
-//                   });
-
-//               //   }
-//               // });
-
-//             } else {
-//               res.send({ message: "User already a Fan" });
-//             }
-//           } else {
-//             let newRecord = new MemberPreferences({
-//               memberId: memberId,
-//             });
-//             MemberPreferences.createNewRecord(newRecord, function (err, user) {
+//       //we are checking the fan/follow from member preferances collection
+//       feedServices.findCelebFeedDate(CelebrityId, (err, lastWeekDate) => {
+//         if (err) {
+//           res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
+//         } else {
+//           FeedMapping.findOne({ memberId: memberId }, (err, feedMappingObj) => {
+//             let today = new Date();
+//             let lastWeek = new Date(lastWeekDate);
+//             MemberPreferences.findOne({ memberId: memberId }, { _id: 1, celebrities: 1 }, (err, memberPreferenceObj) => {
 //               if (err) {
-//                 res.send(err);
-//               } else {
-//                 MemberPreferences.setFan(newRecord._id, reqbody, function (err, user) {
-//                   if (err) {
-//                     res.send(err);
+//                 res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
+//               } else if (memberPreferenceObj) {
+//                 MemberPreferences.aggregate([
+//                   {
+//                     $match: {
+//                       memberId: memberId
+//                     }
+//                   },
+//                   {
+//                     $unwind: "$celebrities"
+//                   },
+//                   {
+//                     $match: {
+//                       "celebrities.CelebrityId": CelebrityId,
+//                       "celebrities.isFan": true
+//                     }
 //                   }
-//                   else {
-//                     res.send({ message: "Preferences Updated Successfully" });
-//                     celebrityContract.findOne(
-//                       { $and: [{ memberId: CelebrityId }, { serviceType: "fan" }, { isActive: true }] },
-//                       function (err, CCresult) {
-//                         if (err) return res.send(err);
-//                         //console.log("CCresult", CCresult);
-//                         //console.log( Tresult[i].receiverId);
-//                         //let idC = Tresult[i].receiverId;
-//                         // start of credits
-//                         Credits.find(
-//                           { memberId: CelebrityId },
-//                           null,
-//                           { sort: { createdAt: -1 } },
-//                           function (err, cBal) {
-//                             if (err) return res.send(err);
-//                             if (cBal) {
-//                               cBalObj = cBal[0];
-//                               newReferralCreditValue = cBalObj.referralCreditValue;
-//                               oldCumulativeCreditValue = parseFloat(cBalObj.cumulativeCreditValue);
-//                               credits = CCresult.serviceCredits;
-//                               test2 = CCresult.sharingPercentage;
-//                               test = credits * test2 / 100;
-//                               ckCredits = credits - test;
-//                               //console.log(test);
-//                               newCumulativeCreditValue = parseFloat(oldCumulativeCreditValue) + parseFloat(test);
-//                               let newPayCredits = new payCredits({
-//                                 memberId: CelebrityId,
-//                                 celebId: memberId,
-//                                 creditValue: credits,
-//                                 celebPercentage: test2,
-//                                 celebKonnectPercentage: ckCredits,
-//                                 createdBy: "Pavan"
-//                               });
-
-//                               payCredits.createPayCredits(newPayCredits, function (err, payCredits) {
-
-//                                 if (err) {
-//                                   //res.send(err);
-//                                 } else {
-//                                   // res.json({
-//                                   //   message: "payCredits saved successfully",
-//                                   //   "payCredits": payCredits
-//                                   // });
-//                                 }
-//                               });
-
-//                               let newCredits = new Credits({
-
-//                                 memberId: CelebrityId,
-//                                 creditType: "credit",
-//                                 creditValue: test,
-//                                 cumulativeCreditValue: newCumulativeCreditValue,
-//                                 referralCreditValue: newReferralCreditValue,
-//                                 //referralCreditValue: referralCreditValue,
-//                                 remarks: "Service Earnings for Fan",
-//                                 createdBy: "Admin"
-//                               });
-//                               // Insert Into Credit Table
-//                               Credits.createCredits(newCredits, function (err, credits) {
-//                                 if (err) {
-//                                   //res.send(err);
-//                                 } else {
-//                                   //console.log("credits updated" + credits)
-//                                   // let myBody = {};
-
-//                                   // myBody.refundStatus = "active";
-//                                   // serviceTransaction.findByIdAndUpdate(idT, myBody, function (err, rStatus) {
-//                                   //   if (err) {
-//                                   //     //console.log(rStatus);
-
-//                                   //   } else {
-//                                   //   }
-//                                   // });
-
-//                                 }
-//                               });
-
-//                             }
-//                             else {
-//                             }
+//                 ], (err, memberPreferencesObj) => {
+//                   if (err) {
+//                     res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
+//                   }
+//                   else if (memberPreferencesObj.length) {
+//                     res.json({ token: req.headers['x-access-token'], success: 1, message: "User already a Fan" });
+//                   } else {
+//                     memberPreferenceObj.celebrities.map((celebIdObj) => {
+//                       let celebId = celebIdObj.CelebrityId;
+//                       celebId = "" + celebId
+//                       let isCelebIdRegister = "" + CelebrityId
+//                       if (celebId == isCelebIdRegister) {
+//                         lastWeek == new Date(celebIdObj.createdAt);
+//                       }
+//                     });
+//                     if (feedMappingObj) {
+//                       if (new Date(feedMappingObj.currentSeenFeedDate).getTime() == new Date(feedMappingObj.createdAt).getTime()) {
+//                         lastWeek = new Date(lastWeekDate);
+//                       } else {
+//                         lastWeek = today;
+//                       }
+//                     }
+//                     MemberPreferences.updateOne({ memberId: memberId },
+//                       { $addToSet: { celebrities: { CelebrityId: CelebrityId, isFan: true, createdAt: lastWeek } } }
+//                       , { new: 1 }, function (err, user) {
+//                         if (err) {
+//                           res.send(err);
+//                         }
+//                         let body = {
+//                           memberId: memberId,
+//                           activityOn: CelebrityId
+//                         }
+//                         ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Fan", body, (err, newActivityLog) => {
+//                           if (err) {
+//                             // res.json({success: 0,message: "Please try again." + err});
+//                           } else {
 
 //                           }
-//                         ); //end of credits
-//                       }
-//                     ); //end of celeb contracts
-//                   }
+//                         })
+//                         res.send({ success: 1, token: req.headers['x-access-token'], message: "Successfully become fan", data: user });
+//                         celebrityContract.findOne(
+//                           { $and: [{ memberId: CelebrityId + "" }, { serviceType: "fan" }, { isActive: true }] },
+//                           function (err, CCresult) {
+//                             if (err)
+//                               return res.send(err);
+//                             Credits.find({ memberId: CelebrityId }, (err, cBal) => {
+//                               if (err)
+//                                 console.log(err)
+//                               if (cBal) {
+//                                 cBalObj = cBal[0];
+//                                 newReferralCreditValue = cBalObj.referralCreditValue;
+//                                 oldCumulativeCreditValue = parseFloat(cBalObj.cumulativeCreditValue);
+//                                 credits = CCresult.serviceCredits;
+//                                 test2 = CCresult.sharingPercentage;
+//                                 test = credits * test2 / 100;
+//                                 ckCredits = credits - test;
+//                                 newCumulativeCreditValue = parseFloat(oldCumulativeCreditValue) + parseFloat(test);
+//                                 let newPayCredits = new payCredits({
+//                                   memberId: CelebrityId,
+//                                   celebId: memberId,
+//                                   creditValue: credits,
+//                                   celebPercentage: test,
+//                                   celebKonnectPercentage: ckCredits,
+//                                   createdBy: "Pavan"
+//                                 });
+//                                 payCredits.createPayCredits(newPayCredits, function (err, payCredits) {
+//                                   if (err) {
 
+//                                   } else {
+
+//                                   }
+//                                 });
+//                                 let newCredits = new Credits({
+//                                   memberId: CelebrityId,
+//                                   creditType: "credit",
+//                                   creditValue: test,
+//                                   cumulativeCreditValue: newCumulativeCreditValue,
+//                                   referralCreditValue: newReferralCreditValue,
+//                                   remarks: "Service Earnings for Fan",
+//                                   createdBy: "Admin"
+//                                 });
+//                                 // Insert Into Credit Table
+//                                 Credits.createCredits(newCredits, function (err, credits) {
+//                                   if (err) {
+//                                     console.log(err)
+//                                   } else {
+//                                     //console.log("credits updated" + credits)
+//                                   }
+//                                 });
+//                               }
+//                               else {
+//                               }
+
+//                             }).sort({ createdAt: -1 }).limit(1); //end of credits
+//                           }); //end of celeb contracts
+//                       });
+//                   }
+//                 })
+//               }
+//               else {
+//                 let newRecord = new MemberPreferences({
+//                   memberId: memberId,
+//                 });
+//                 MemberPreferences.createNewRecord(newRecord, function (err, user) {
+//                   if (err) {
+//                     res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
+//                   } else {
+//                     MemberPreferences.updateOne({ memberId: memberId },
+//                       { $addToSet: { celebrities: { CelebrityId: CelebrityId, isFan: true } } }
+//                       , { new: 1 }, function (err, user) {
+//                         if (err) {
+//                           return res.json({
+//                             success: 0,
+//                             token: req.headers['x-access-token'],
+//                             message: `${err}`
+//                           });
+//                         }
+//                         else {
+//                           res.json({ success: 1, token: req.headers['x-access-token'], message: "Sucessfully become fan" });
+//                           celebrityContract.findOne(
+//                             { $and: [{ memberId: CelebrityId }, { serviceType: "fan" }, { isActive: true }] },
+//                             function (err, CCresult) {
+//                               if (err) {
+//                                 return res.json({
+//                                   success: 0,
+//                                   token: req.headers['x-access-token'],
+//                                   message: `${err}`
+//                                 });
+//                               }
+//                               Credits.find({ memberId: CelebrityId }, (err, cBal) => {
+//                                 if (err) {
+//                                   return res.json({
+//                                     success: 0,
+//                                     token: req.headers['x-access-token'],
+//                                     message: `${err}`
+//                                   });
+//                                 }
+//                                 if (cBal) {
+//                                   cBalObj = cBal[0];
+//                                   newReferralCreditValue = cBalObj.referralCreditValue;
+//                                   oldCumulativeCreditValue = parseFloat(cBalObj.cumulativeCreditValue);
+//                                   credits = CCresult.serviceCredits;
+//                                   test2 = CCresult.sharingPercentage;
+//                                   test = credits * test2 / 100;
+//                                   ckCredits = credits - test;
+//                                   //console.log(test);
+//                                   newCumulativeCreditValue = parseFloat(oldCumulativeCreditValue) + parseFloat(test);
+//                                   let newPayCredits = new payCredits({
+//                                     memberId: CelebrityId,
+//                                     celebId: memberId,
+//                                     creditValue: credits,
+//                                     celebPercentage: test2,
+//                                     celebKonnectPercentage: ckCredits,
+//                                     createdBy: "Pavan"
+//                                   });
+
+//                                   payCredits.createPayCredits(newPayCredits, function (err, payCredits) {
+
+//                                     if (err) {
+//                                       //res.send(err);
+//                                     } else {
+//                                       // res.json({
+//                                       //   message: "payCredits saved successfully",
+//                                       //   "payCredits": payCredits
+//                                       // });
+//                                     }
+//                                   });
+
+//                                   let newCredits = new Credits({
+
+//                                     memberId: CelebrityId,
+//                                     creditType: "credit",
+//                                     creditValue: test,
+//                                     cumulativeCreditValue: newCumulativeCreditValue,
+//                                     referralCreditValue: newReferralCreditValue,
+//                                     //referralCreditValue: referralCreditValue,
+//                                     remarks: "Service Earnings for Fan",
+//                                     createdBy: "Admin"
+//                                   });
+//                                   // Insert Into Credit Table
+//                                   Credits.createCredits(newCredits, function (err, credits) {
+//                                     if (err) {
+//                                       //res.send(err);
+//                                     } else {
+
+//                                     }
+//                                   });
+
+//                                 }
+//                                 else {
+//                                 }
+
+//                               }).sort({ createdAt: -1 }).limit(1); //end of credits
+//                             }); //end of celeb contracts
+//                         }
+//                       });
+//                   }
 //                 });
 //               }
-
-
 //             });
-
-//             // res.send({ error: "User already a Fan" });
-
-//           }
-
+//           });
 //         }
-//       );
-//     } else {
-//       res.json({
-//         error: "User Not Exists / Send a valid UserID"
-//       });
-//     }
-//   });
+//       })
 
-
-
-// });
-
-// router.put("/unFan", function (req, res) {
-//   let memberId = ObjectId(req.body.userId);
-//   let CelebrityId = ObjectId(req.body.CelebrityId);
-//   let isFan = req.body.isFan;
-//   let reqbody = req.body;
-
-//   User.findById(memberId, function (err, result) {
-//     if (result) {
-//       MemberPreferences.findOne(
-//         { memberId: ObjectId(req.body.userId) },
-//         function (err, newresult) {
-//           if (err) return res.send(err);
-//           let id = newresult._id;
-//           let FanCount = 0;
-//           for (let i = 0; i < newresult.celebrities.length; i++) {
-//             if (
-//               newresult.celebrities[i].CelebrityId == req.body.CelebrityId &&
-//               newresult.celebrities[i].isFan == true
-//             ) {
-//               FanCount = FanCount + 1;
-//             }
-//           }
-//           if (FanCount == 0) {
-//             res.send({ message: "you are not a fan" });
-//           } else {
-//             MemberPreferences.updateOne(
-//               {
-//                 $and: [
-//                   { memberId: ObjectId(newresult.memberId) },
-//                   { "celebrities.CelebrityId": ObjectId(req.body.CelebrityId) },
-//                   { "celebrities.isFan": true }
-//                 ]
-//               },
-//               {
-//                 $pull: {
-//                   celebrities: {
-//                     $and: [
-//                       { CelebrityId: ObjectId(req.body.CelebrityId) },
-//                       { isFan: true }
-//                     ]
-//                   }
-//                 }
-//               },
-//               function (err, updatedresult) {
-//                 if (err) {
-//                   res.send(err);
-//                 } else {
-//                   if (updatedresult.nModified == 1) {
-//                     res.json({ message: "UnFan Done" });
-//                   } else {
-//                     res.json({ message: "Operation Failed" });
-//                   }
-//                 }
-//               }
-//             );
-//           }
-//         }
-//       );
-//     } else {
-//       res.json({
-//         error: "User Not Exists / Send a valid UserID"
-//       });
 //     }
 //   });
 // });
-
-// router.put("/unFollow", function (req, res) {
-//   let memberId = ObjectId(req.body.userId);
-//   let CelebrityId = ObjectId(req.body.CelebrityId);
-//   let reqbody = req.body;
-
-//   User.findById(memberId, function (err, result) {
-//     if (err) return res.send(err);
-//     if (result) {
-//       MemberPreferences.findOne(
-//         { memberId: ObjectId(req.body.userId) },
-//         function (err, newresult) {
-//           let id = newresult._id;
-//           let FollowerCount = 0;
-//           for (let i = 0; i < newresult.celebrities.length; i++) {
-//             if (
-//               newresult.celebrities[i].CelebrityId == req.body.CelebrityId &&
-//               newresult.celebrities[i].isFollower == true
-//             ) {
-//               FollowerCount = FollowerCount + 1;
-//             }
-//           }
-//           if (FollowerCount == 0) {
-//             res.send({ message: "you are not a follower" });
-//           } else {
-//             MemberPreferences.updateOne(
-//               {
-//                 $and: [
-//                   { memberId: ObjectId(newresult.memberId) },
-//                   { "celebrities.CelebrityId": ObjectId(req.body.CelebrityId) },
-//                   { "celebrities.isFollower": true }
-//                 ]
-//               },
-//               {
-//                 $pull: {
-//                   celebrities: {
-//                     $and: [
-//                       { CelebrityId: ObjectId(req.body.CelebrityId) },
-//                       { isFollower: true }
-//                     ]
-//                   }
-//                 }
-//               },
-//               function (err, updatedresult) {
-//                 if (err) {
-//                   res.send(err);
-//                 } else {
-//                   if (updatedresult.nModified == 1) {
-//                     res.json({ message: "UnFollow Done" });
-//                   } else {
-//                     res.json({ message: "Operation Failed" });
-//                   }
-//                 }
-//               }
-//             );
-//           }
-//         }
-//       );
-//     } else {
-//       res.json({
-//         error: "User Not Exists / Send a valid UserID"
-//       });
-//     }
-//   });
-// });
-
-/*old api done */
-
-// set Member Celebrity As a Fan new api testing purpose
-router.put("/setMemberCelebrityAsFan/:memberId", function (req, res) {
-  let memberId = ObjectId(req.params.memberId);
-  let CelebrityId = ObjectId(req.body.CelebrityId);
-  let isFan = req.body.isFan;
-  let credits = req.body.credits;
-  let reqbody = req.body;
-  reqbody.isFan = true;
-  User.findById(memberId, function (err, result) {
-    if (err) {
-      res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
-    }
-    if (result) {
-      //we are checking the fan/follow from member preferances collection
-      feedServices.findCelebFeedDate(CelebrityId, (err, lastWeekDate) => {
-        if (err) {
-          res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
-        } else {
-          FeedMapping.findOne({ memberId: memberId }, (err, feedMappingObj) => {
-            let today = new Date();
-            let lastWeek = new Date(lastWeekDate);
-            MemberPreferences.findOne({ memberId: memberId }, { _id: 1, celebrities: 1 }, (err, memberPreferenceObj) => {
-              if (err) {
-                res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
-              } else if (memberPreferenceObj) {
-                MemberPreferences.aggregate([
-                  {
-                    $match: {
-                      memberId: memberId
-                    }
-                  },
-                  {
-                    $unwind: "$celebrities"
-                  },
-                  {
-                    $match: {
-                      "celebrities.CelebrityId": CelebrityId,
-                      "celebrities.isFan": true
-                    }
-                  }
-                ], (err, memberPreferencesObj) => {
-                  if (err) {
-                    res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
-                  }
-                  else if (memberPreferencesObj.length) {
-                    res.json({ token: req.headers['x-access-token'], success: 1, message: "User already a Fan" });
-                  } else {
-                    memberPreferenceObj.celebrities.map((celebIdObj) => {
-                      let celebId = celebIdObj.CelebrityId;
-                      celebId = "" + celebId
-                      let isCelebIdRegister = "" + CelebrityId
-                      if (celebId == isCelebIdRegister) {
-                        lastWeek == new Date(celebIdObj.createdAt);
-                      }
-                    });
-                    if (feedMappingObj) {
-                      if (new Date(feedMappingObj.currentSeenFeedDate).getTime() == new Date(feedMappingObj.createdAt).getTime()) {
-                        lastWeek = new Date(lastWeekDate);
-                      } else {
-                        lastWeek = today;
-                      }
-                    }
-                    MemberPreferences.updateOne({ memberId: memberId },
-                      { $addToSet: { celebrities: { CelebrityId: CelebrityId, isFan: true, createdAt: lastWeek } } }
-                      , { new: 1 }, function (err, user) {
-                        if (err) {
-                          res.send(err);
-                        }
-                        let body = {
-                          memberId: memberId,
-                          activityOn: CelebrityId
-                        }
-                        ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("Fan", body, (err, newActivityLog) => {
-                          if (err) {
-                            // res.json({success: 0,message: "Please try again." + err});
-                          } else {
-
-                          }
-                        })
-                        res.send({ success: 1, token: req.headers['x-access-token'], message: "Successfully become fan", data: user });
-                        celebrityContract.findOne(
-                          { $and: [{ memberId: CelebrityId + "" }, { serviceType: "fan" }, { isActive: true }] },
-                          function (err, CCresult) {
-                            if (err)
-                              return res.send(err);
-                            Credits.find({ memberId: CelebrityId }, (err, cBal) => {
-                              if (err)
-                                console.log(err)
-                              if (cBal) {
-                                cBalObj = cBal[0];
-                                newReferralCreditValue = cBalObj.referralCreditValue;
-                                oldCumulativeCreditValue = parseFloat(cBalObj.cumulativeCreditValue);
-                                credits = CCresult.serviceCredits;
-                                test2 = CCresult.sharingPercentage;
-                                test = credits * test2 / 100;
-                                ckCredits = credits - test;
-                                newCumulativeCreditValue = parseFloat(oldCumulativeCreditValue) + parseFloat(test);
-                                let newPayCredits = new payCredits({
-                                  memberId: CelebrityId,
-                                  celebId: memberId,
-                                  creditValue: credits,
-                                  celebPercentage: test,
-                                  celebKonnectPercentage: ckCredits,
-                                  createdBy: "Pavan"
-                                });
-                                payCredits.createPayCredits(newPayCredits, function (err, payCredits) {
-                                  if (err) {
-
-                                  } else {
-
-                                  }
-                                });
-                                let newCredits = new Credits({
-                                  memberId: CelebrityId,
-                                  creditType: "credit",
-                                  creditValue: test,
-                                  cumulativeCreditValue: newCumulativeCreditValue,
-                                  referralCreditValue: newReferralCreditValue,
-                                  remarks: "Service Earnings for Fan",
-                                  createdBy: "Admin"
-                                });
-                                // Insert Into Credit Table
-                                Credits.createCredits(newCredits, function (err, credits) {
-                                  if (err) {
-                                    console.log(err)
-                                  } else {
-                                    //console.log("credits updated" + credits)
-                                  }
-                                });
-                              }
-                              else {
-                              }
-
-                            }).sort({ createdAt: -1 }).limit(1); //end of credits
-                          }); //end of celeb contracts
-                      });
-                  }
-                })
-              }
-              else {
-                let newRecord = new MemberPreferences({
-                  memberId: memberId,
-                });
-                MemberPreferences.createNewRecord(newRecord, function (err, user) {
-                  if (err) {
-                    res.json({ success: 0, token: req.headers['x-access-token'], message: `${err}` });
-                  } else {
-                    MemberPreferences.updateOne({ memberId: memberId },
-                      { $addToSet: { celebrities: { CelebrityId: CelebrityId, isFan: true } } }
-                      , { new: 1 }, function (err, user) {
-                        if (err) {
-                          return res.json({
-                            success: 0,
-                            token: req.headers['x-access-token'],
-                            message: `${err}`
-                          });
-                        }
-                        else {
-                          res.json({ success: 1, token: req.headers['x-access-token'], message: "Sucessfully become fan" });
-                          celebrityContract.findOne(
-                            { $and: [{ memberId: CelebrityId }, { serviceType: "fan" }, { isActive: true }] },
-                            function (err, CCresult) {
-                              if (err) {
-                                return res.json({
-                                  success: 0,
-                                  token: req.headers['x-access-token'],
-                                  message: `${err}`
-                                });
-                              }
-                              Credits.find({ memberId: CelebrityId }, (err, cBal) => {
-                                if (err) {
-                                  return res.json({
-                                    success: 0,
-                                    token: req.headers['x-access-token'],
-                                    message: `${err}`
-                                  });
-                                }
-                                if (cBal) {
-                                  cBalObj = cBal[0];
-                                  newReferralCreditValue = cBalObj.referralCreditValue;
-                                  oldCumulativeCreditValue = parseFloat(cBalObj.cumulativeCreditValue);
-                                  credits = CCresult.serviceCredits;
-                                  test2 = CCresult.sharingPercentage;
-                                  test = credits * test2 / 100;
-                                  ckCredits = credits - test;
-                                  //console.log(test);
-                                  newCumulativeCreditValue = parseFloat(oldCumulativeCreditValue) + parseFloat(test);
-                                  let newPayCredits = new payCredits({
-                                    memberId: CelebrityId,
-                                    celebId: memberId,
-                                    creditValue: credits,
-                                    celebPercentage: test2,
-                                    celebKonnectPercentage: ckCredits,
-                                    createdBy: "Pavan"
-                                  });
-
-                                  payCredits.createPayCredits(newPayCredits, function (err, payCredits) {
-
-                                    if (err) {
-                                      //res.send(err);
-                                    } else {
-                                      // res.json({
-                                      //   message: "payCredits saved successfully",
-                                      //   "payCredits": payCredits
-                                      // });
-                                    }
-                                  });
-
-                                  let newCredits = new Credits({
-
-                                    memberId: CelebrityId,
-                                    creditType: "credit",
-                                    creditValue: test,
-                                    cumulativeCreditValue: newCumulativeCreditValue,
-                                    referralCreditValue: newReferralCreditValue,
-                                    //referralCreditValue: referralCreditValue,
-                                    remarks: "Service Earnings for Fan",
-                                    createdBy: "Admin"
-                                  });
-                                  // Insert Into Credit Table
-                                  Credits.createCredits(newCredits, function (err, credits) {
-                                    if (err) {
-                                      //res.send(err);
-                                    } else {
-
-                                    }
-                                  });
-
-                                }
-                                else {
-                                }
-
-                              }).sort({ createdAt: -1 }).limit(1); //end of credits
-                            }); //end of celeb contracts
-                        }
-                      });
-                  }
-                });
-              }
-            });
-          });
-        }
-      })
-
-    }
-  });
-});
 // End of set Member Celebrity As a Fan
 
 // set Member Celebrity As Follower new api testing purpose
@@ -909,7 +403,7 @@ router.put("/setMemberCelebrityAsFollower/:memberId", function (req, res) {
                             if (err) {
                               return res.json({ success: 0, token: req.headers['x-access-token'], message: "Something went wrong" });
                             }
-                            else if (memberPreferencesObj.length) {
+                            else if (memberPreferencesObj.length > 0) {
                               return res.json({ success: 1, token: req.headers['x-access-token'], message: "You are already Following" });
                             } else {
                               memberPreferenceObj.celebrities.map((celebIdObj) => {
@@ -1064,6 +558,7 @@ router.put("/setMemberCelebrityAsFollower/:memberId", function (req, res) {
                                             serviceType: "FOLLOW",
                                             notificationType: notificationType,
                                             title: 'Alert!!',
+                                            badge: 1,
                                             memberId: memberId,
                                             body: userDetails.firstName + " " + userDetails.lastName + " started Following you.",
                                             activity: "FOLLOW"
@@ -1164,17 +659,17 @@ router.put("/unFan/:memberId", function (req, res) {
                           if (updatedresult.nModified == 1) {
                             User.findById(ObjectId(CelebrityId), function (err, celebInfo) {
                               //celebInfo.SMresult = celebInfo;
-                              let body = {
-                                memberId: memberId,
-                                activityOn: CelebrityId
-                              }
-                              ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("UnFan", body, (err, newActivityLog) => {
-                                if (err) {
-                                  // res.json({success: 0,message: "Please try again." + err});
-                                } else {
+                              // let body = {
+                              //   memberId: memberId,
+                              //   activityOn: CelebrityId
+                              // }
+                              // ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("UnFan", body, (err, newActivityLog) => {
+                              //   if (err) {
+                              //     // res.json({success: 0,message: "Please try again." + err});
+                              //   } else {
 
-                                }
-                              })
+                              //   }
+                              // })
                               res.json({ success: 1, token: req.headers['x-access-token'], message: "You have successfully unsubscribed to " + celebInfo.firstName.charAt(0).toUpperCase() + celebInfo.firstName.slice(1) });
                             });
                           } else {
@@ -1186,17 +681,17 @@ router.put("/unFan/:memberId", function (req, res) {
                       if (updatedresult.nModified == 1) {
                         User.findById(ObjectId(CelebrityId), function (err, celebInfo) {
                           //celebInfo.SMresult = celebInfo;
-                          let body = {
-                            memberId: memberId,
-                            activityOn: CelebrityId
-                          }
-                          ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("UnFan", body, (err, newActivityLog) => {
-                            if (err) {
-                              // res.json({success: 0,message: "Please try again." + err});
-                            } else {
+                          // let body = {
+                          //   memberId: memberId,
+                          //   activityOn: CelebrityId
+                          // }
+                          // ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("UnFan", body, (err, newActivityLog) => {
+                          //   if (err) {
+                          //     // res.json({success: 0,message: "Please try again." + err});
+                          //   } else {
 
-                            }
-                          })
+                          //   }
+                          // })
                           res.json({ success: 1, token: req.headers['x-access-token'], message: "You have successfully unsubscribed to " + celebInfo.firstName.charAt(0).toUpperCase() + celebInfo.firstName.slice(1) });
                         });
                       } else {
@@ -1209,13 +704,13 @@ router.put("/unFan/:memberId", function (req, res) {
             else {
               User.findById(ObjectId(CelebrityId), function (err, celebInfo) {
                 //celebInfo.SMresult = celebInfo;
-                ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("UnFan", body, (err, newActivityLog) => {
-                  if (err) {
-                    // res.json({success: 0,message: "Please try again." + err});
-                  } else {
+                // ActivityLog.createActivityLogByProvidingActivityTypeNameAndContent("UnFan", body, (err, newActivityLog) => {
+                //   if (err) {
+                //     // res.json({success: 0,message: "Please try again." + err});
+                //   } else {
 
-                  }
-                })
+                //   }
+                // })
                 res.json({ success: 1, token: req.headers['x-access-token'], message: "You have successfully unsubscribed to " + celebInfo.firstName.charAt(0).toUpperCase() + celebInfo.firstName.slice(1) });
               });
             }
@@ -1383,10 +878,6 @@ function diffDays(d1, d2) {
   return ndays;
 }
 
-
-
-
-
 // UnFollow a User
 router.put("/unFollow/:memberId", function (req, res) {
   let memberId = ObjectId(req.params.memberId);
@@ -1523,424 +1014,423 @@ router.put("/unFollow/:memberId", function (req, res) {
 
 
 // get Member Preferences By UserID
-router.get("/getMemberPreferencesByUserID/:UserId", function (req, res) {
-  id = req.params.UserId;
-  if (id) {
-    User.findById(id, function (err, result) {
-      if (err) {
-        return res.json({
-          success: 0,
-          token: req.headers['x-access-token'],
-          message: `${err}`
-        });
-      }
-      if (result) {
-        MemberPreferences.findOne({ memberId: result._id }, function (
-          err,
-          newresult
-        ) {
-          if (err) {
-            res.json({
-              success: 0,
-              token: req.headers['x-access-token'],
-              message: `${err}`
-            });
-          }
-          else if (newresult) {
-            return res.json({ success: 1, token: req.headers['x-access-token'], data: newresult })
-          } else {
-            return res.json({
-              success: 0,
-              token: req.headers['x-access-token'],
-              message: "No data found!"
-            });
-          }
-        });
-      } else {
-        return res.json({
-          success: 0,
-          token: req.headers['x-access-token'],
-          message: "User Not Exists / Send a valid UserID"
-        });
-      }
-    });
-  }
-  else {
-    return res.json({
-      success: 0,
-      token: req.headers['x-access-token'],
-      message: "UserID not provided"
-    });
-  }
+// router.get("/getMemberPreferencesByUserID/:UserId", function (req, res) {
+//   id = req.params.UserId;
+//   if (id) {
+//     User.findById(id, function (err, result) {
+//       if (err) {
+//         return res.json({
+//           success: 0,
+//           token: req.headers['x-access-token'],
+//           message: `${err}`
+//         });
+//       }
+//       if (result) {
+//         MemberPreferences.findOne({ memberId: result._id }, function (
+//           err,
+//           newresult
+//         ) {
+//           if (err) {
+//             res.json({
+//               success: 0,
+//               token: req.headers['x-access-token'],
+//               message: `${err}`
+//             });
+//           }
+//           else if (newresult) {
+//             return res.json({ success: 1, token: req.headers['x-access-token'], data: newresult })
+//           } else {
+//             return res.json({
+//               success: 0,
+//               token: req.headers['x-access-token'],
+//               message: "No data found!"
+//             });
+//           }
+//         });
+//       } else {
+//         return res.json({
+//           success: 0,
+//           token: req.headers['x-access-token'],
+//           message: "User Not Exists / Send a valid UserID"
+//         });
+//       }
+//     });
+//   }
+//   else {
+//     return res.json({
+//       success: 0,
+//       token: req.headers['x-access-token'],
+//       message: "UserID not provided"
+//     });
+//   }
 
-});
+// });
 // End of get Member Preferences By UserID
 
 // get Member Preferences By Email
-router.get("/getMemberPreferencesByEmail/:Email", function (req, res) {
-  email = req.params.Email;
-  User.findOne({ email: email }, function (err, result) {
-    if (err) {
-      res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: `${err}`
-      });
-    }
-    if (result) {
-      MemberPreferences.findOne({ memberId: result._id }, function (
-        err,
-        newresult
-      ) {
-        if (err) {
-          return res.json({
-            success: 0,
-            token: req.headers['x-access-token'],
-            message: `${err}`
-          });
-        }
-        if (newresult) {
-          res.json({ success: 1, token: req.headers['x-access-token'], data: newresult })
-        } else {
-        }
-      });
-    } else {
-      res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: "User Not Exists / Send a valid Email"
-      });
-    }
-  });
-});
+// router.get("/getMemberPreferencesByEmail/:Email", function (req, res) {
+//   email = req.params.Email;
+//   User.findOne({ email: email }, function (err, result) {
+//     if (err) {
+//       res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: `${err}`
+//       });
+//     }
+//     if (result) {
+//       MemberPreferences.findOne({ memberId: result._id }, function (
+//         err,
+//         newresult
+//       ) {
+//         if (err) {
+//           return res.json({
+//             success: 0,
+//             token: req.headers['x-access-token'],
+//             message: `${err}`
+//           });
+//         }
+//         if (newresult) {
+//           res.json({ success: 1, token: req.headers['x-access-token'], data: newresult })
+//         } else {
+//         }
+//       });
+//     } else {
+//       res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: "User Not Exists / Send a valid Email"
+//       });
+//     }
+//   });
+// });
 // End of get Member Preferences By Email
 
 // get Member Preferences By MobileNo
-router.get("/getMemberPreferencesByMobileNo/:MobileNo", function (req, res) {
-  MobileNo = req.params.MobileNo;
+// router.get("/getMemberPreferencesByMobileNo/:MobileNo", function (req, res) {
+//   MobileNo = req.params.MobileNo;
 
-  User.findOne({ mobileNumber: MobileNo }, function (err, result) {
-    if (err) {
-      return res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: `${err}`
-      });
-    }
-    if (result) {
-      MemberPreferences.findOne({ memberId: result._id }, function (
-        err,
-        newresult
-      ) {
-        if (err) return res.send(err);
-        if (newresult) {
-          res.json({ success: 1, token: req.headers['x-access-token'], data: newresult })
-        } else {
-        }
-      });
-    } else {
-      res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: "User Not Exists / Send a valid Mobile Number"
-      });
-    }
-  });
-});
+//   User.findOne({ mobileNumber: MobileNo }, function (err, result) {
+//     if (err) {
+//       return res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: `${err}`
+//       });
+//     }
+//     if (result) {
+//       MemberPreferences.findOne({ memberId: result._id }, function (
+//         err,
+//         newresult
+//       ) {
+//         if (err) return res.send(err);
+//         if (newresult) {
+//           res.json({ success: 1, token: req.headers['x-access-token'], data: newresult })
+//         } else {
+//         }
+//       });
+//     } else {
+//       res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: "User Not Exists / Send a valid Mobile Number"
+//       });
+//     }
+//   });
+// });
 // End of get Member Preferences By MobileNo
 
 // get Member Preferences By Username
-router.get("/getMemberPreferencesByUsername/:Username", function (req, res) {
-  Username = req.params.Username;
+// router.get("/getMemberPreferencesByUsername/:Username", function (req, res) {
+//   Username = req.params.Username;
 
-  User.findOne({ username: Username }, function (err, result) {
-    if (err) {
-      return res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: `${err}`
-      });
-    }
-    if (result) {
-      MemberPreferences.findOne({ memberId: result._id }, function (
-        err,
-        newresult
-      ) {
-        if (err) {
-          return res.json({
-            success: 0,
-            token: req.headers['x-access-token'],
-            message: `${err}`
-          });
-        }
-        if (newresult) {
-          return res.json({
-            success: 1,
-            token: req.headers['x-access-token'],
-            data: newresult
-          });
-        } else {
-        }
-      });
-    } else {
-      res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: "User Not Exists / Send a valid Username"
-      });
-    }
-  });
-});
+//   User.findOne({ username: Username }, function (err, result) {
+//     if (err) {
+//       return res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: `${err}`
+//       });
+//     }
+//     if (result) {
+//       MemberPreferences.findOne({ memberId: result._id }, function (
+//         err,
+//         newresult
+//       ) {
+//         if (err) {
+//           return res.json({
+//             success: 0,
+//             token: req.headers['x-access-token'],
+//             message: `${err}`
+//           });
+//         }
+//         if (newresult) {
+//           return res.json({
+//             success: 1,
+//             token: req.headers['x-access-token'],
+//             data: newresult
+//           });
+//         } else {
+//         }
+//       });
+//     } else {
+//       res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: "User Not Exists / Send a valid Username"
+//       });
+//     }
+//   });
+// });
 // End of get Member Preferences By Username
 
 // get Celebrities By Selected Preferences
-router.get("/getCelebritiesBySelectedPreferences/:userId", function (req, res) {
-  id = req.params.userId;
+// router.get("/getCelebritiesBySelectedPreferences/:userId", function (req, res) {
+//   id = req.params.userId;
 
-  User.findById(id, function (err, result) {
-    if (err) {
-      return res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: `${err}`
-      });
-    }
-    if (result) {
-      MemberPreferences.findOne({ memberId: result._id }, function (
-        err,
-        newresult
-      ) {
-        if (err) {
-          return res.json({
-            success: 0,
-            token: req.headers['x-access-token'],
-            message: `${err}`
-          });
-        }
-        if (newresult) {
-          //  res.send(newresult.preferences);
-          // Aggregate Memberpreferences MemberIds with User collection's UserIds
-          MemberPreferences.aggregate(
-            [
-              { $match: { preferences: { $in: newresult.preferences } } },
-              {
-                $lookup: {
-                  from: "users",
-                  localField: "memberId",
-                  foreignField: "_id",
-                  as: "celebProfile"
-                }
-              },
-              { $unwind: "$celebProfile" },
-              {
-                $match: {
-                  $and: [
-                    { celebProfile: { $ne: [] } },
-                    { "celebProfile.isCeleb": true },
-                    { "celebProfile._id": { $ne: ObjectId(id) } }
-                  ]
-                }
-              },
-              {
-                $project: {
-                  _id: 0,
-                  celebProfile: 1
-                }
-              }
-            ],
-            function (err, data) {
-              if (err) {
-                return res.json({
-                  success: 0,
-                  token: req.headers['x-access-token'],
-                  message: `${err}`
-                });
-              }
-              return res.json({
-                success: 1,
-                token: req.headers['x-access-token'],
-                data: data
-              });
-            }
-          );
-        } else {
-          res.json({
-            success: 0,
-            token: req.headers['x-access-token'],
-            message: "No Preferences set for the Member"
-          });
-        }
-      });
-    } else {
-      res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: "User Not Exists / Send a valid UserID"
-      });
-    }
-  });
-});
+//   User.findById(id, function (err, result) {
+//     if (err) {
+//       return res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: `${err}`
+//       });
+//     }
+//     if (result) {
+//       MemberPreferences.findOne({ memberId: result._id }, function (
+//         err,
+//         newresult
+//       ) {
+//         if (err) {
+//           return res.json({
+//             success: 0,
+//             token: req.headers['x-access-token'],
+//             message: `${err}`
+//           });
+//         }
+//         if (newresult) {
+//           //  res.send(newresult.preferences);
+//           // Aggregate Memberpreferences MemberIds with User collection's UserIds
+//           MemberPreferences.aggregate(
+//             [
+//               { $match: { preferences: { $in: newresult.preferences } } },
+//               {
+//                 $lookup: {
+//                   from: "users",
+//                   localField: "memberId",
+//                   foreignField: "_id",
+//                   as: "celebProfile"
+//                 }
+//               },
+//               { $unwind: "$celebProfile" },
+//               {
+//                 $match: {
+//                   $and: [
+//                     { celebProfile: { $ne: [] } },
+//                     { "celebProfile.isCeleb": true },
+//                     { "celebProfile._id": { $ne: ObjectId(id) } }
+//                   ]
+//                 }
+//               },
+//               {
+//                 $project: {
+//                   _id: 0,
+//                   celebProfile: 1
+//                 }
+//               }
+//             ],
+//             function (err, data) {
+//               if (err) {
+//                 return res.json({
+//                   success: 0,
+//                   token: req.headers['x-access-token'],
+//                   message: `${err}`
+//                 });
+//               }
+//               return res.json({
+//                 success: 1,
+//                 token: req.headers['x-access-token'],
+//                 data: data
+//               });
+//             }
+//           );
+//         } else {
+//           res.json({
+//             success: 0,
+//             token: req.headers['x-access-token'],
+//             message: "No Preferences set for the Member"
+//           });
+//         }
+//       });
+//     } else {
+//       res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: "User Not Exists / Send a valid UserID"
+//       });
+//     }
+//   });
+// });
 // End of get Celebrities By Selected Preferences
 
 // get Celebrities By Preferences By Country
-router.get("/getCelebritiesByPreferencesByCountry/:UserID/:countryCode", function (req, res) {
-  id = req.params.UserID;
-  country = req.params.countryCode;
+// router.get("/getCelebritiesByPreferencesByCountry/:UserID/:countryCode", function (req, res) {
+//   id = req.params.UserID;
+//   country = req.params.countryCode;
 
-  User.findById(id, function (err, result) {
-    if (err) {
-      return res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: `${err}`
-      });
-    }
-    if (result) {
-      MemberPreferences.findOne({ memberId: result._id }, function (
-        err,
-        newresult
-      ) {
-        if (err) return res.send(err);
-        if (newresult) {
-          // Aggregate Memberpreferences MemberIds with User collection's UserIds
-          MemberPreferences.aggregate(
-            [
-              { $match: { preferences: { $in: newresult.preferences } } },
-              {
-                $lookup: {
-                  from: "users",
-                  localField: "memberId",
-                  foreignField: "_id",
-                  as: "celebProfile"
-                }
-              },
-              { $unwind: "$celebProfile" },
-              {
-                $match: {
-                  $and: [
-                    { celebProfile: { $ne: [] } },
-                    { "celebProfile.isCeleb": true },
-                    { "celebProfile.country": country }
-                  ]
-                }
-              },
-              {
-                $project: {
-                  _id: 0,
-                  celebProfile: 1
-                }
-              }
-            ],
-            function (err, data) {
-              if (err) {
-                return res.json({
-                  success: 0,
-                  token: req.headers['x-access-token'],
-                  message: `${err}`
-                });
-              }
-              return res.json({
-                success: 1,
-                token: req.headers['x-access-token'],
-                data: data
-              });
-            }
-          );
-        }
-      });
-    } else {
-      res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        error: "User Not Exists / Send a valid UserID"
-      });
-    }
-  });
-}
-);
+//   User.findById(id, function (err, result) {
+//     if (err) {
+//       return res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: `${err}`
+//       });
+//     }
+//     if (result) {
+//       MemberPreferences.findOne({ memberId: result._id }, function (
+//         err,
+//         newresult
+//       ) {
+//         if (err) return res.send(err);
+//         if (newresult) {
+//           // Aggregate Memberpreferences MemberIds with User collection's UserIds
+//           MemberPreferences.aggregate(
+//             [
+//               { $match: { preferences: { $in: newresult.preferences } } },
+//               {
+//                 $lookup: {
+//                   from: "users",
+//                   localField: "memberId",
+//                   foreignField: "_id",
+//                   as: "celebProfile"
+//                 }
+//               },
+//               { $unwind: "$celebProfile" },
+//               {
+//                 $match: {
+//                   $and: [
+//                     { celebProfile: { $ne: [] } },
+//                     { "celebProfile.isCeleb": true },
+//                     { "celebProfile.country": country }
+//                   ]
+//                 }
+//               },
+//               {
+//                 $project: {
+//                   _id: 0,
+//                   celebProfile: 1
+//                 }
+//               }
+//             ],
+//             function (err, data) {
+//               if (err) {
+//                 return res.json({
+//                   success: 0,
+//                   token: req.headers['x-access-token'],
+//                   message: `${err}`
+//                 });
+//               }
+//               return res.json({
+//                 success: 1,
+//                 token: req.headers['x-access-token'],
+//                 data: data
+//               });
+//             }
+//           );
+//         }
+//       });
+//     } else {
+//       res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         error: "User Not Exists / Send a valid UserID"
+//       });
+//     }
+//   });
+// });
 // End of get Celebrities By Preferences By Country
 
 // get Fans By Selected Preferences
-router.get("/getFansBySelectedPreferences/:userId", function (req, res) {
-  id = req.params.userId;
+// router.get("/getFansBySelectedPreferences/:userId", function (req, res) {
+//   id = req.params.userId;
 
-  User.findById(id, function (err, result) {
-    if (err) {
-      return res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: `${err}`
-      });
-    }
-    if (result) {
-      MemberPreferences.findOne({ memberId: result._id }, function (
-        err,
-        newresult
-      ) {
-        if (err) {
-          return res.json({
-            success: 0,
-            token: req.headers['x-access-token'],
-            message: `${err}`
-          });
-        }
-        if (newresult) {
-          // Aggregate Memberpreferences MemberIds with User collection's UserIds
-          MemberPreferences.aggregate(
-            [
-              { $match: { preferences: { $in: newresult.preferences } } },
-              {
-                $lookup: {
-                  from: "users",
-                  localField: "memberId",
-                  foreignField: "_id",
-                  as: "memberProfile"
-                }
-              },
-              { $unwind: "$memberProfile" },
-              {
-                $match: {
-                  $and: [
-                    { celebProfile: { $ne: [] } },
-                    { "memberProfile.isCeleb": false }
-                  ]
-                }
-              },
-              {
-                $project: {
-                  _id: 0,
-                  memberProfile: 1
-                }
-              }
-            ],
-            function (err, data) {
-              if (err) {
-                res.send(err);
-              }
-              return res.json({
-                success: 1,
-                token: req.headers['x-access-token'],
-                data: data
-              });
-            }
-          );
-        } else {
-          res.json({
-            success: 0,
-            token: req.headers['x-access-token'],
-            error: "No Preferences set for the Member"
-          });
-        }
-      });
-    } else {
-      res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        error: "User Not Exists / Send a valid UserID"
-      });
-    }
-  });
-});
+//   User.findById(id, function (err, result) {
+//     if (err) {
+//       return res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: `${err}`
+//       });
+//     }
+//     if (result) {
+//       MemberPreferences.findOne({ memberId: result._id }, function (
+//         err,
+//         newresult
+//       ) {
+//         if (err) {
+//           return res.json({
+//             success: 0,
+//             token: req.headers['x-access-token'],
+//             message: `${err}`
+//           });
+//         }
+//         if (newresult) {
+//           // Aggregate Memberpreferences MemberIds with User collection's UserIds
+//           MemberPreferences.aggregate(
+//             [
+//               { $match: { preferences: { $in: newresult.preferences } } },
+//               {
+//                 $lookup: {
+//                   from: "users",
+//                   localField: "memberId",
+//                   foreignField: "_id",
+//                   as: "memberProfile"
+//                 }
+//               },
+//               { $unwind: "$memberProfile" },
+//               {
+//                 $match: {
+//                   $and: [
+//                     { celebProfile: { $ne: [] } },
+//                     { "memberProfile.isCeleb": false }
+//                   ]
+//                 }
+//               },
+//               {
+//                 $project: {
+//                   _id: 0,
+//                   memberProfile: 1
+//                 }
+//               }
+//             ],
+//             function (err, data) {
+//               if (err) {
+//                 res.send(err);
+//               }
+//               return res.json({
+//                 success: 1,
+//                 token: req.headers['x-access-token'],
+//                 data: data
+//               });
+//             }
+//           );
+//         } else {
+//           res.json({
+//             success: 0,
+//             token: req.headers['x-access-token'],
+//             error: "No Preferences set for the Member"
+//           });
+//         }
+//       });
+//     } else {
+//       res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         error: "User Not Exists / Send a valid UserID"
+//       });
+//     }
+//   });
+// });
 // End of get Fans By Selected Preferences
 
 // following celebrities by a Member
@@ -2068,68 +1558,6 @@ router.get("/fanCelebritiesbyMember/:userId", function (req, res) {
     }
   );
 });
-
-
-//pagignation
-
-
-
-// MemberPreferences.aggregate(
-//   [
-//     {
-//       $match: { celebrities: { $elemMatch: { CelebrityId: ObjectId("5bcda16c1325b505040e0819"), isFollower: true } } }
-//     },
-//     {
-//       $lookup: {
-//           from: "users",
-//           localField: "memberId",
-//           foreignField: "_id",
-//           as: "memberProfile"
-//         }
-//     },
-//     {
-//       $match:{ "memberProfile.IsDeleted": { $ne: true },memberProfile: { $ne: [] } }
-//     },
-//     {
-//       $count: "followerCount"
-//     }
-//   ],(err,followerCount)=>{
-//     if(err)
-//     {
-
-//     }else{
-//       MemberPreferences.aggregate(
-//         [
-//           {
-//             $match: { celebrities: { $elemMatch: { CelebrityId: ObjectId("5afbd42e95a40d59e36cb3b8"), isFan: true } } }
-//           },
-//           {
-//           $lookup: {
-//               from: "users",
-//               localField: "memberId",
-//               foreignField: "_id",
-//               as: "memberProfile"
-//             }
-//           },
-//           {
-//             $match:{ "memberProfile.IsDeleted": { $ne: true },memberProfile: { $ne: [] } }
-//           },
-//           {
-//             $count: "fancount"
-//           }
-//         ],(err,fancount)=>{
-//           if(err)
-//           {
-
-//           }else{
-//             console.log(followerCount)
-//             console.log(fancount)
-//           }
-//         }
-//       )
-//     }
-//   })
-
 
 // Following Members by a Celebrity
 router.get("/followingMembersbyCelebrity/:CelebId", function (req, res) {
@@ -2271,348 +1699,348 @@ router.get("/fanMembersbyCelebrity/:CelebId", (req, res) => {
 // End of Fan Members by a Celebrity
 
 // Get Profile Activity for a Member
-router.get("/getProfileActivityCountsByMemberId/:memberId", (req, res) => {
-  let memberId = req.params.memberId;
+// router.get("/getProfileActivityCountsByMemberId/:memberId", (req, res) => {
+//   let memberId = req.params.memberId;
 
-  // followingCelebritiesByMember
-  MemberPreferences.aggregate(
-    [
-      { $match: { $and: [{ "celebrities.CelebrityId": ObjectId(memberId) }, { "celebrities.isFollower": true }] } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "memberId",
-          foreignField: "_id",
-          as: "celebProfile"
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          celebrities: 1,
-          celebProfile: 1
-        }
-      }
-    ],
-    function (err, following) {
-      if (err) {
-        return res.json({
-          success: 0,
-          token: req.headers['x-access-token'],
-          message: `${err}`
-        });
-      }
-      MemberPreferences.aggregate(
-        [
-          { $match: { $and: [{ "celebrities.CelebrityId": ObjectId(memberId) }, { "celebrities.isFan": true }] } },
-          {
-            $lookup: {
-              from: "users",
-              localField: "memberId",
-              foreignField: "_id",
-              as: "celebProfile"
-            }
-          },
-          {
-            $project: {
-              _id: 1,
-              celebrities: 1,
-              celebProfile: 1
-            }
-          }
-        ],
-        function (err, fan) {
-          if (err) {
-            return res.json({
-              success: 0,
-              token: req.headers['x-access-token'],
-              message: `${err}`
-            });
-          }
-          MemberPreferences.aggregate(
-            [
-              { $match: { $and: [{ memberId: ObjectId(memberId) }] } },
-              { $unwind: "$celebrities" },
-              { $match: { $and: [{ "celebrities.isFollower": true }] } },
-              {
-                $lookup: {
-                  from: "users",
-                  localField: "celebrities.CelebrityId",
-                  foreignField: "_id",
-                  as: "celebProfile"
-                }
-              },
-              {
-                $match: {
-                  $and: [
-                    { "celebProfile._id": { $ne: ObjectId(memberId) } },
-                    { celebProfile: { $ne: [] } }
-                  ]
-                }
-              },
-              {
-                $project: {
-                  _id: 0,
-                  celebProfile: 1
-                }
-              }
-            ],
-            function (err, fCbm) {
-              if (err) {
-                return res.json({
-                  success: 0,
-                  token: req.headers['x-access-token'],
-                  message: `${err}`
-                });
-              }
-              fCbmCount = fCbm.length;
-              MemberPreferences.aggregate(
-                [
-                  { $match: { $and: [{ memberId: ObjectId(memberId) }] } },
-                  { $unwind: "$celebrities" },
-                  { $match: { $and: [{ "celebrities.isFan": true }] } },
-                  {
-                    $lookup: {
-                      from: "users",
-                      localField: "celebrities.CelebrityId",
-                      foreignField: "_id",
-                      as: "celebProfile"
-                    }
-                  },
-                  {
-                    $match: {
-                      $and: [
-                        { "celebProfile._id": { $ne: ObjectId(memberId) } },
-                        { celebProfile: { $ne: [] } }
-                      ]
-                    }
-                  },
-                  {
-                    $project: {
-                      _id: 0,
-                      celebProfile: 1
-                    }
-                  }
-                ],
-                function (err, faCbm) {
-                  if (err) {
-                    return res.json({
-                      success: 0,
-                      token: req.headers['x-access-token'],
-                      message: `${err}`
-                    });
-                  }
-                  faCbmCount = faCbm.length;
+//   // followingCelebritiesByMember
+//   MemberPreferences.aggregate(
+//     [
+//       { $match: { $and: [{ "celebrities.CelebrityId": ObjectId(memberId) }, { "celebrities.isFollower": true }] } },
+//       {
+//         $lookup: {
+//           from: "users",
+//           localField: "memberId",
+//           foreignField: "_id",
+//           as: "celebProfile"
+//         }
+//       },
+//       {
+//         $project: {
+//           _id: 1,
+//           celebrities: 1,
+//           celebProfile: 1
+//         }
+//       }
+//     ],
+//     function (err, following) {
+//       if (err) {
+//         return res.json({
+//           success: 0,
+//           token: req.headers['x-access-token'],
+//           message: `${err}`
+//         });
+//       }
+//       MemberPreferences.aggregate(
+//         [
+//           { $match: { $and: [{ "celebrities.CelebrityId": ObjectId(memberId) }, { "celebrities.isFan": true }] } },
+//           {
+//             $lookup: {
+//               from: "users",
+//               localField: "memberId",
+//               foreignField: "_id",
+//               as: "celebProfile"
+//             }
+//           },
+//           {
+//             $project: {
+//               _id: 1,
+//               celebrities: 1,
+//               celebProfile: 1
+//             }
+//           }
+//         ],
+//         function (err, fan) {
+//           if (err) {
+//             return res.json({
+//               success: 0,
+//               token: req.headers['x-access-token'],
+//               message: `${err}`
+//             });
+//           }
+//           MemberPreferences.aggregate(
+//             [
+//               { $match: { $and: [{ memberId: ObjectId(memberId) }] } },
+//               { $unwind: "$celebrities" },
+//               { $match: { $and: [{ "celebrities.isFollower": true }] } },
+//               {
+//                 $lookup: {
+//                   from: "users",
+//                   localField: "celebrities.CelebrityId",
+//                   foreignField: "_id",
+//                   as: "celebProfile"
+//                 }
+//               },
+//               {
+//                 $match: {
+//                   $and: [
+//                     { "celebProfile._id": { $ne: ObjectId(memberId) } },
+//                     { celebProfile: { $ne: [] } }
+//                   ]
+//                 }
+//               },
+//               {
+//                 $project: {
+//                   _id: 0,
+//                   celebProfile: 1
+//                 }
+//               }
+//             ],
+//             function (err, fCbm) {
+//               if (err) {
+//                 return res.json({
+//                   success: 0,
+//                   token: req.headers['x-access-token'],
+//                   message: `${err}`
+//                 });
+//               }
+//               fCbmCount = fCbm.length;
+//               MemberPreferences.aggregate(
+//                 [
+//                   { $match: { $and: [{ memberId: ObjectId(memberId) }] } },
+//                   { $unwind: "$celebrities" },
+//                   { $match: { $and: [{ "celebrities.isFan": true }] } },
+//                   {
+//                     $lookup: {
+//                       from: "users",
+//                       localField: "celebrities.CelebrityId",
+//                       foreignField: "_id",
+//                       as: "celebProfile"
+//                     }
+//                   },
+//                   {
+//                     $match: {
+//                       $and: [
+//                         { "celebProfile._id": { $ne: ObjectId(memberId) } },
+//                         { celebProfile: { $ne: [] } }
+//                       ]
+//                     }
+//                   },
+//                   {
+//                     $project: {
+//                       _id: 0,
+//                       celebProfile: 1
+//                     }
+//                   }
+//                 ],
+//                 function (err, faCbm) {
+//                   if (err) {
+//                     return res.json({
+//                       success: 0,
+//                       token: req.headers['x-access-token'],
+//                       message: `${err}`
+//                     });
+//                   }
+//                   faCbmCount = faCbm.length;
 
-                  // followingMembersbyCelebrity
-                  MemberPreferences.aggregate(
-                    [
-                      {
-                        $match: {
-                          "celebrities.CelebrityId": { $in: [ObjectId(memberId)] }
-                        }
-                      },
-                      { $unwind: "$celebrities" },
-                      {
-                        $match: {
-                          $and: [
-                            { "celebrities.isFollower": true },
-                            { "celebrities.CelebrityId": ObjectId(memberId) }
-                          ]
-                        }
-                      },
-                      {
-                        $lookup: {
-                          from: "users",
-                          localField: "memberId",
-                          foreignField: "_id",
-                          as: "memberProfile"
-                        }
-                      },
-                      {
-                        $match: {
-                          $and: [
-                            { "memberProfile._id": { $ne: ObjectId(memberId) } },
-                            { memberProfile: { $ne: [] } }
-                          ]
-                        }
-                      },
-                      {
-                        $project: {
-                          _id: 0,
-                          memberProfile: 1
-                        }
-                      }
-                    ],
-                    function (err, fMbc) {
-                      if (err) {
-                        res.send(err);
-                      }
-                      fMbcCount = fMbc.length;
+//                   // followingMembersbyCelebrity
+//                   MemberPreferences.aggregate(
+//                     [
+//                       {
+//                         $match: {
+//                           "celebrities.CelebrityId": { $in: [ObjectId(memberId)] }
+//                         }
+//                       },
+//                       { $unwind: "$celebrities" },
+//                       {
+//                         $match: {
+//                           $and: [
+//                             { "celebrities.isFollower": true },
+//                             { "celebrities.CelebrityId": ObjectId(memberId) }
+//                           ]
+//                         }
+//                       },
+//                       {
+//                         $lookup: {
+//                           from: "users",
+//                           localField: "memberId",
+//                           foreignField: "_id",
+//                           as: "memberProfile"
+//                         }
+//                       },
+//                       {
+//                         $match: {
+//                           $and: [
+//                             { "memberProfile._id": { $ne: ObjectId(memberId) } },
+//                             { memberProfile: { $ne: [] } }
+//                           ]
+//                         }
+//                       },
+//                       {
+//                         $project: {
+//                           _id: 0,
+//                           memberProfile: 1
+//                         }
+//                       }
+//                     ],
+//                     function (err, fMbc) {
+//                       if (err) {
+//                         res.send(err);
+//                       }
+//                       fMbcCount = fMbc.length;
 
-                      // fanMembersbyCelebrity
-                      MemberPreferences.aggregate(
-                        [
-                          {
-                            $match: {
-                              "celebrities.CelebrityId": { $in: [ObjectId(memberId)] }
-                            }
-                          },
-                          { $unwind: "$celebrities" },
-                          {
-                            $match: {
-                              $and: [
-                                { "celebrities.isFan": true },
-                                { "celebrities.CelebrityId": ObjectId(memberId) }
-                              ]
-                            }
-                          },
-                          {
-                            $lookup: {
-                              from: "users",
-                              localField: "memberId",
-                              foreignField: "_id",
-                              as: "memberProfile"
-                            }
-                          },
-                          {
-                            $match: {
-                              $and: [
-                                { "memberProfile._id": { $ne: ObjectId(memberId) } },
-                                { memberProfile: { $ne: [] } }
-                              ]
-                            }
-                          },
-                          {
-                            $project: {
-                              _id: 0,
-                              memberProfile: 1
-                            }
-                          }
-                        ],
-                        function (err, faMbc) {
-                          if (err) {
-                            return res.json({
-                              success: 0,
-                              token: req.headers['x-access-token'],
-                              message: `${err}`
-                            });
-                          }
-                          faMbcCount = faMbc.length;
-                          //isDelete: true
+//                       // fanMembersbyCelebrity
+//                       MemberPreferences.aggregate(
+//                         [
+//                           {
+//                             $match: {
+//                               "celebrities.CelebrityId": { $in: [ObjectId(memberId)] }
+//                             }
+//                           },
+//                           { $unwind: "$celebrities" },
+//                           {
+//                             $match: {
+//                               $and: [
+//                                 { "celebrities.isFan": true },
+//                                 { "celebrities.CelebrityId": ObjectId(memberId) }
+//                               ]
+//                             }
+//                           },
+//                           {
+//                             $lookup: {
+//                               from: "users",
+//                               localField: "memberId",
+//                               foreignField: "_id",
+//                               as: "memberProfile"
+//                             }
+//                           },
+//                           {
+//                             $match: {
+//                               $and: [
+//                                 { "memberProfile._id": { $ne: ObjectId(memberId) } },
+//                                 { memberProfile: { $ne: [] } }
+//                               ]
+//                             }
+//                           },
+//                           {
+//                             $project: {
+//                               _id: 0,
+//                               memberProfile: 1
+//                             }
+//                           }
+//                         ],
+//                         function (err, faMbc) {
+//                           if (err) {
+//                             return res.json({
+//                               success: 0,
+//                               token: req.headers['x-access-token'],
+//                               message: `${err}`
+//                             });
+//                           }
+//                           faMbcCount = faMbc.length;
+//                           //isDelete: true
 
-                          // Posts Created Count
-                          Feed.find({ memberId: memberId, isDelete: false }, function (err, fResult) {
-                            if (err) {
-                              return res.json({
-                                success: 0,
-                                token: req.headers['x-access-token'],
-                                message: `${err}`
-                              });
-                            }
+//                           // Posts Created Count
+//                           Feed.find({ memberId: memberId, isDelete: false }, function (err, fResult) {
+//                             if (err) {
+//                               return res.json({
+//                                 success: 0,
+//                                 token: req.headers['x-access-token'],
+//                                 message: `${err}`
+//                               });
+//                             }
 
-                            feedCount = fResult.length;
+//                             feedCount = fResult.length;
 
-                            // Orders Count 
+//                             // Orders Count 
 
-                            orders.find({ memberId: memberId }, function (err, oResult) {
-                              if (err) {
-                                return res.json({
-                                  success: 0,
-                                  token: req.headers['x-access-token'],
-                                  message: `${err}`
-                                });
-                              }
+//                             orders.find({ memberId: memberId }, function (err, oResult) {
+//                               if (err) {
+//                                 return res.json({
+//                                   success: 0,
+//                                   token: req.headers['x-access-token'],
+//                                   message: `${err}`
+//                                 });
+//                               }
 
-                              orderCount = oResult.length;
+//                               orderCount = oResult.length;
 
-                              res.json({
-                                success: 1, token: req.headers['x-access-token'], data: {
-                                  memberId: memberId,
-                                  posts: feedCount,
-                                  fans: faMbcCount,
-                                  followers: fMbcCount,
-                                  orders: orderCount,
-                                  fan: fan.length,
-                                  following: following.length
-                                }
-                              });
+//                               res.json({
+//                                 success: 1, token: req.headers['x-access-token'], data: {
+//                                   memberId: memberId,
+//                                   posts: feedCount,
+//                                   fans: faMbcCount,
+//                                   followers: fMbcCount,
+//                                   orders: orderCount,
+//                                   fan: fan.length,
+//                                   following: following.length
+//                                 }
+//                               });
 
-                              // Posts Followed
-                              /* Feedlog.find(
-                                {
-                                  $and: [{ memberId: memberId }, { activities: "follow" }]
-                                },
-                                function(err, foResult) {
-                                  if (err) return res.send(err);
-                                  foCount = foResult.length;
-          
-                                  res.json({
-                                    memberId: memberId,
-                                    posts: feedCount + foCount,
-                                    fans: fCbmCount + fMbcCount,
-                                    followers: faCbmCount + faMbcCount
-                                  });
-                                }
-                              ); */
-                            }); /// End of Orders Count
-                          });
-                        }
-                      );
-                    }
-                  );
-                }
-              );
-            }
-          );
-        });
-    });
+//                               // Posts Followed
+//                               /* Feedlog.find(
+//                                 {
+//                                   $and: [{ memberId: memberId }, { activities: "follow" }]
+//                                 },
+//                                 function(err, foResult) {
+//                                   if (err) return res.send(err);
+//                                   foCount = foResult.length;
 
-});
+//                                   res.json({
+//                                     memberId: memberId,
+//                                     posts: feedCount + foCount,
+//                                     fans: fCbmCount + fMbcCount,
+//                                     followers: faCbmCount + faMbcCount
+//                                   });
+//                                 }
+//                               ); */
+//                             }); /// End of Orders Count
+//                           });
+//                         }
+//                       );
+//                     }
+//                   );
+//                 }
+//               );
+//             }
+//           );
+//         });
+//     });
+
+// });
 // End of Get Profile Activity for a Member
 
 // Get Celeb Status by Member
-router.get("/getCelebStatusByMember/:celebID/:memberID", (req, res) => {
-  celebID = req.params.celebID;
-  memberID = req.params.memberID;
+// router.get("/getCelebStatusByMember/:celebID/:memberID", (req, res) => {
+//   celebID = req.params.celebID;
+//   memberID = req.params.memberID;
 
-  MemberPreferences.findOne({ memberId: memberID }, function (err, newresult) {
-    if (err) {
-      return res.json({
-        success: 0,
-        token: req.headers['x-access-token'],
-        message: `${err}`
-      });
-    }
-    if (newresult) {
-      // Filter Celebrities array wit memberID
-      let Arr = newresult.celebrities;
-      myArr = Arr.filter(function (obj) {
-        return obj.CelebrityId == celebID;
-      });
-      res.json({ token: req.headers['x-access-token'], success: 1, data: myArr });
-    } else {
-      let newRecord = new MemberPreferences({
-        memberId: memberID,
-        //preferences: preferences,
-        //celebrities: celebrities,
-        createdBy: "celebkonect"
-      });
-      MemberPreferences.createNewRecord(newRecord, function (err, user) {
-        if (err) {
-          res.json({
-            success: 0,
-            token: req.headers['x-access-token'],
-            message: `${err}`
-          });
-        } else {
-          res.json({ success: 1, token: req.header['x-access-token'], data: user });
-        }
-      });
-      // res.json({ token: req.headers['x-access-token'], success: 0, message: "No data found!" });
-    }
-  });
-});
+//   MemberPreferences.findOne({ memberId: memberID }, function (err, newresult) {
+//     if (err) {
+//       return res.json({
+//         success: 0,
+//         token: req.headers['x-access-token'],
+//         message: `${err}`
+//       });
+//     }
+//     if (newresult) {
+//       // Filter Celebrities array wit memberID
+//       let Arr = newresult.celebrities;
+//       myArr = Arr.filter(function (obj) {
+//         return obj.CelebrityId == celebID;
+//       });
+//       res.json({ token: req.headers['x-access-token'], success: 1, data: myArr });
+//     } else {
+//       let newRecord = new MemberPreferences({
+//         memberId: memberID,
+//         //preferences: preferences,
+//         //celebrities: celebrities,
+//         createdBy: "celebkonect"
+//       });
+//       MemberPreferences.createNewRecord(newRecord, function (err, user) {
+//         if (err) {
+//           res.json({
+//             success: 0,
+//             token: req.headers['x-access-token'],
+//             message: `${err}`
+//           });
+//         } else {
+//           res.json({ success: 1, token: req.header['x-access-token'], data: user });
+//         }
+//       });
+//       // res.json({ token: req.headers['x-access-token'], success: 0, message: "No data found!" });
+//     }
+//   });
+// });
 // End of Get Celeb Status by Member
 router.get('/checkCurrentMemberIsFan/:memberId/:receiverId', (req, res) => {
   let isFan = false;
@@ -2679,17 +2107,17 @@ router.get('/checkCurrentMemberIsFan/:memberId/:receiverId', (req, res) => {
 //desc make dummy fan/follow
 //method POST
 //access private
-router.post('/makeVertualFollower', MemberPreferencesController.makeVertualFollower)
+// router.post('/makeVertualFollower', MemberPreferencesController.makeVertualFollower)
 
 //desc get users details blocked by celebrity
 //method GET
 //access public
 router.get('/getBlockUserList/:celebrityId/:pagination_Date', MemberPreferencesController.getBlockUserList)
-router.get('/getAllBlockUser/:createdAt/:limit', MemberPreferencesController.getAllBlockUser)
-router.get('/getAllUnfanWithReason/:createdAt/:limit', MemberPreferencesController.getAllUnfanWithReason)
-router.get('/getUnfanWithReasonByCelebrityId/:memberId/:createdAt/:limit', MemberPreferencesController.getUnfanWithReasonByCelebrityId)
+// router.get('/getAllBlockUser/:createdAt/:limit', MemberPreferencesController.getAllBlockUser)
+// router.get('/getAllUnfanWithReason/:createdAt/:limit', MemberPreferencesController.getAllUnfanWithReason)
+// router.get('/getUnfanWithReasonByCelebrityId/:memberId/:createdAt/:limit', MemberPreferencesController.getUnfanWithReasonByCelebrityId)
 router.post('/unblockMember', MemberPreferencesController.unblockMember)
-router.get('/getBlockersList/:memberId', MemberPreferencesController.getBlockersList)
+// router.get('/getBlockersList/:memberId', MemberPreferencesController.getBlockersList)
 router.get("/followingMembersbyCelebrity/:celebId/:createdAt/:limit", MemberPreferencesController.followingMembersbyCelebrity);
 router.get("/fanMembersbyCelebrity/:celebId/:createdAt/:limit", MemberPreferencesController.fanMembersbyCelebrity);
 router.get("/followingCelebritiesByMember/:userId/:createdAt/:limit", MemberPreferencesController.followingCelebritiesByMember);

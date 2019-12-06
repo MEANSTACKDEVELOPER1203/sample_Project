@@ -16,9 +16,9 @@ router.post("/createPaymentTransaction", function (req, res) {
     isPackage = true
     packageRefId = req.body.packageRefId
   }
-  // console.log("*****************Payment tranaction************************")
-  // console.log(req.body);
-  // console.log("*****************Payment tranaction************************")
+  //console.log("*****************Payment tranaction************************")
+  //console.log(req.body);
+  //console.log("*****************Payment tranaction************************")
   let memberId = req.body.memberId;
   packageRefId = packageRefId;
   let creditValue = req.body.creditValue;
@@ -55,7 +55,7 @@ router.post("/createPaymentTransaction", function (req, res) {
     if (err) {
       res.json({ token: req.headers['x-access-token'], success: 0, message: err })
     } else {
-      // console.log("Response ======= ", paymentTransaction)
+      console.log("Response ======= ", paymentTransaction)
       res.json({ token: req.headers['x-access-token'], success: 1, message: "paymentTransaction saved successfully", data: paymentTransaction });
     }
   });
@@ -64,6 +64,9 @@ router.post("/createPaymentTransaction", function (req, res) {
 
 // Edit a paymentTransaction start
 router.post('/generalCheckout', PaymentTransactionController.checkoutPaytmAndIntamojo)
+
+/// for web this excluding jwt token
+router.post('/generalCheckout_web', PaymentTransactionController.checkoutPaytmAndIntamojo)
 
 router.put("/editPaymentTransaction/:id", function (req, res) {
   // console.log("************* editPaymentTransaction ******************************")
@@ -118,17 +121,17 @@ router.get("/getPaymentTransactionByMemberId/:memberId", function (req, res) {
 // End Find by UserID
 
 // getAll Start
-router.get("/getAll", function (req, res) {
-  paymentTransaction.find({}, function (err, result) {
-    if (result) {
-      res.send(result);
-    } else {
-      res.json({
-        error: "No data found!"
-      });
-    }
-  }).sort({ createdAt: -1 });
-});
+// router.get("/getAll", function (req, res) {
+//   paymentTransaction.find({}, function (err, result) {
+//     if (result) {
+//       res.send(result);
+//     } else {
+//       res.json({
+//         error: "No data found!"
+//       });
+//     }
+//   }).sort({ createdAt: -1 });
+// });
 // End getAll
 
 router.get("/getAll/:pageNo/:limit", PaymentTransactionController.getAll)

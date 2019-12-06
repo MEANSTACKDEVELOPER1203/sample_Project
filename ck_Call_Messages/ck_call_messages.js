@@ -2,15 +2,15 @@
 const sendResponseMessage = function sendResponseMessage(celebDetailsObj,callRemark,reason,calllifted){
     if(celebDetailsObj)
     {
-        if(callRemark == undefined && calllifted == undefined)
-        {
-            //if celebrity not attended the call till 30 sec
-            return {
-                title:"Call not answered by "+celebDetailsObj.firstName,
-                body :"Oops!!! Looks like "+celebDetailsObj.firstName+" is busy.  Please try again later. Happy Konecting!!!"
-            }
-        }
-        else if(calllifted == undefined)
+        // if(callRemark == undefined && calllifted == undefined)
+        // {
+        //     //if celebrity not attended the call till 30 sec
+        //     return {
+        //         title:"Call not answered by "+celebDetailsObj.firstName,
+        //         body :"Oops!!! Looks like "+celebDetailsObj.firstName+" is busy.  Please try again later. Happy Konecting!!!"
+        //     }
+        // }
+        if(calllifted == undefined)
         {
         //before call lifted (calllifted key is not there)
             if(callRemark == "Call Completed")
@@ -59,7 +59,7 @@ const sendResponseMessage = function sendResponseMessage(celebDetailsObj,callRem
             {
                 return {
                     title:"Call report by "+celebDetailsObj.firstName,
-                    body :"Oops!!! Looks Call report by "+celebDetailsObj.firstName+".  Please try again later. Happy Konecting!!!"
+                    body :"Oops!!! Looks like  "+celebDetailsObj.firstName+" is busy. Please try again later. Happy Konecting!!!"
                 }
             }
         }
@@ -111,7 +111,7 @@ const sendResponseMessage = function sendResponseMessage(celebDetailsObj,callRem
             {
                 return {
                     title:"Call report by "+celebDetailsObj.firstName,
-                    body :"Oops!!! Looks Call report by "+celebDetailsObj.firstName+".  Please try again later. Happy Konecting!!!"
+                    body :"Oops!!! Looks like  "+celebDetailsObj.firstName+" is busy. Please try again later. Happy Konecting!!!"
                 }
             }
         }

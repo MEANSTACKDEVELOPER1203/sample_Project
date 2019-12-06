@@ -58,10 +58,10 @@ let mediaTrackingSchema = new mongoose.Schema({
         default: ""
     },
 }, {
-        versionKey: false,
-        autoIndex: true
-    });
-mediaTrackingSchema.index({ feedId: 1 }, { unique: true });
+    versionKey: false,
+    autoIndex: true
+});
+mediaTrackingSchema.index({ feedId: 1, mediaId: 1 }, { unique: true });
 let mediaTracking = (module.exports = mongoose.model("mediaTracking", mediaTrackingSchema));
 
 
@@ -118,7 +118,7 @@ module.exports.findIsLiked = function (mediaTrackingObj, callback) {
                 callback(err, null);
         });
     }
-    if (mediaTrackingObj.feedId) {
+    else if (mediaTrackingObj.feedId) {
         mediaTracking.find({ memberId: ObjectId(mediaTrackingObj.memberId), feedId: ObjectId(mediaTrackingObj.feedId), activities: "views" }, (err, islikedObj) => {
             if (!err)
                 callback(null, islikedObj);
@@ -134,6 +134,7 @@ module.exports.findIsLiked = function (mediaTrackingObj, callback) {
 module.exports.saveMedia = function (mediaTrackingObj, callback) {
     var mediaObj;
     if (mediaTrackingObj.feedId) {
+        // console.log("CCCC")
         mediaObj = new mediaTracking({
             feedId: ObjectId(mediaTrackingObj.feedId),
             memberId: ObjectId(mediaTrackingObj.memberId),
@@ -146,6 +147,7 @@ module.exports.saveMedia = function (mediaTrackingObj, callback) {
         });
     }
     else if (mediaTrackingObj.mediaId) {
+        // console.log("DDDD")
         mediaObj = new mediaTracking({
             mediaId: ObjectId(mediaTrackingObj.mediaId),
             isLike: mediaTrackingObj.isLike,
@@ -162,29 +164,29 @@ module.exports.saveMedia = function (mediaTrackingObj, callback) {
         if (!err)
             callback(null, mediaTrackingObj);
         else
-            callback(err, null);
+            return callback(err, null);
     });
 }
 
-
-
 //update media 
 module.exports.updateMedia = function (mediaTrackingObj, callback) {
-
+    // console.log("AAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBB")
     if (mediaTrackingObj.feedId) {
-        mediaTracking.updateOne({ memberId: mediaTrackingObj.memberId, feedId: mediaTrackingObj.feedId }, { isLike: mediaTrackingObj.isLike, updated_at: new Date(), created_at: new Date() }, (err, mediaTrackingObj) => {
+        // console.log("AAAA")
+        mediaTracking.updateOne({ memberId: mediaTrackingObj.memberId, feedId: mediaTrackingObj.feedId, activities: "views" }, { isLike: mediaTrackingObj.isLike, updated_at: new Date(), created_at: new Date() }, (err, mediaTrackingObj) => {
             if (!err)
                 callback(null, mediaTrackingObj);
             else
-                callback(err, null);
+                return callback(err, null);
         });
     }
-    if (mediaTrackingObj.mediaId) {
-        mediaTracking.updateOne({ memberId: mediaTrackingObj.memberId, mediaId: mediaTrackingObj.mediaId }, { isLike: mediaTrackingObj.isLike, updated_at: new Date(), created_at: new Date() }, (err, mediaTrackingObj) => {
+    else if (mediaTrackingObj.mediaId) {
+        // console.log("BBBBB")
+        mediaTracking.updateOne({ memberId: mediaTrackingObj.memberId, mediaId: mediaTrackingObj.mediaId, activities: "views" }, { isLike: mediaTrackingObj.isLike, updated_at: new Date(), created_at: new Date() }, (err, mediaTrackingObj) => {
             if (!err)
                 callback(null, mediaTrackingObj);
             else
-                callback(err, null);
+                return callback(err, null);
         });
     }
 }

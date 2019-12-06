@@ -9,6 +9,7 @@ let ViewFeedHistory = require('./viewFeedHistoryModel');
 let feedMapping = require('./feedMappingModel');
 let advertisementServices = require('../advertisement/advertisementServices');
 let CelebContractsModel = require('../celebrityContract/celebrityContractsModel');
+let feedSetting = require('../feedSettings/feedSettingsModel')
 let isPlainTextAdded;
 let getFeedsNew = (req, res) => {
     let memberId = (req.params.member_Id) ? req.params.member_Id : '';
@@ -16,6 +17,7 @@ let getFeedsNew = (req, res) => {
     let isFirstTime = false;
     let isNewSession = false;
     let noFanFallowers = false;
+    let feedSettingobj1;
     let limit = 10;
     if (paginationDate == "0") {
         isPlainTextAdded = false;
@@ -41,6 +43,7 @@ let getFeedsNew = (req, res) => {
                                 return callback(new Error(`Error while fetching the ads details : ${err}`), null);
                             else {
                                 return callback(null, userObj, feedMappingObj, listOfAdsObj);
+
                             }
                         })
                     }
@@ -53,25 +56,30 @@ let getFeedsNew = (req, res) => {
             if (err) {
                 return callback(new Error(`Error while fetching the fan follow : ${err}`), null)
             } else {
+                //console.log("fanFollowerObj",fanFollowerObj);
                 if (fanFollowerObj.fanFollowers.length <= 0 && fanFollowerObj.isFanFollow == false)
                     noFanFallowers = true
                 return callback(null, userObj, feedMappingObj, listOfAdsObj, fanFollowerObj, fanFollowerObj.isAddPreference);
             }
         })
     }, function (userObj, feedMappingObj, listOfAdsObj, fanFollowerObj, isAddPreference, callback) {
-        //console.log(feedMappingObj)
-        // console.log(fanFollowerObj)
-        //console.log(listOfAdsObj)
+        // console.log("p1",feedMappingObj)
+        // console.log("p2",fanFollowerObj)
+        // console.log("p3",listOfAdsObj)
         if (noFanFallowers) {
+
             let listOfFeedObj = [];
             let suggestionsObj = {};
             suggestionsObj.type = 0;
             suggestionsObj.createdAt = new Date();
             suggestionsObj.suggestions = fanFollowerObj.suggestions;
             listOfFeedObj.push(suggestionsObj);
+            // console.log("suggestionsObj",listOfFeedObj);
+            // console.log("p4",listOfFeedObj)
             return callback(null, listOfFeedObj, isAddPreference)
         } else {
             // console.log(fanFollowerObj.fanFollowers, "isFirstTime", isFirstTime);
+
             let query = {};
             query.memberId = memberId;
             query.limit = limit;
@@ -125,6 +133,7 @@ let getFeedsNew = (req, res) => {
                                     advertisementObj.advertisement = listOfAdsObj[Math.floor(Math.random() * listOfAdsObj.length)];
                                     listOfFeedObj.splice(5, 0, advertisementObj)
                                 }
+                                // console.log("list4",listOfFeedObj)
                                 return callback(null, listOfFeedObj, isAddPreference)
                             }
                         });
@@ -168,7 +177,7 @@ let getFeedsNew = (req, res) => {
                                     advertisementObj.advertisement = listOfAdsObj[Math.floor(Math.random() * listOfAdsObj.length)];
                                     listOfFeedObj.splice(5, 0, advertisementObj)
                                 }
-
+                                // console.log("list1",listOfFeedObj)
                                 return callback(null, listOfFeedObj, isAddPreference)
                             }
                         })
@@ -177,7 +186,7 @@ let getFeedsNew = (req, res) => {
                         console.log("@@@@@@@@@@ == Scrolling===== @@@@@@@@@@@@@@@@")
                         // console.log("*****************************")
                         if (feedMappingObj && listOfFeedObj.length > 0 && !isPlainTextAdded) {
-                            //console.log("@@@@@@@@@@ == Scrolling 11111===== @@@@@@@@@@@@@@@@")
+                            console.log("@@@@@@@@@@ == Scrolling 11111===== @@@@@@@@@@@@@@@@")
                             let index = listOfFeedObj.findIndex(item => new Date(item.created_at).getTime() <= new Date(feedMappingObj.lastSeenFeedDate).getTime());
                             let planTextObj = {
                                 type: 3,
@@ -196,6 +205,7 @@ let getFeedsNew = (req, res) => {
                                 advertisementObj.advertisement = listOfAdsObj[Math.floor(Math.random() * listOfAdsObj.length)];
                                 listOfFeedObj.splice(5, 0, advertisementObj)
                             }
+                            // console.log("list",listOfFeedObj)
                             return callback(null, listOfFeedObj, isAddPreference)
                         }
                         else if ((isFirstTime || isNewSession) && listOfFeedObj.length <= 0) {
@@ -205,14 +215,19 @@ let getFeedsNew = (req, res) => {
                             suggestionsObj.createdAt = new Date();
                             suggestionsObj.suggestions = fanFollowerObj.suggestions;
                             listOfFeedObj1.splice(0, 0, suggestionsObj);
+                            //  console.log("p6",listOfFeedObj)
                             return callback(null, listOfFeedObj1, isAddPreference)
                         }
                         else {
+                            //  console.log("p7",listOfFeedObj)
                             return callback(null, listOfFeedObj, isAddPreference)
                         }
                     }
+
                 }
+
             })
+
         }
     }],
         function (err, listOfFeedObj, isAddPreference) {
@@ -220,11 +235,7 @@ let getFeedsNew = (req, res) => {
                 // console.log(err);
                 return res.status(404).json({ success: 0, message: `${err}` });
             } else {
-                // listOfFeedObj.sort(function (x, y) {
-                //     var dateA = new Date(x.created_at), dateB = new Date(y.created_at);
-                //     return dateB - dateA;
-                // });
-                return res.status(200).json({ success: 1, data: listOfFeedObj, shouldAddPreference: isAddPreference });
+                return res.status(200).json({ success: 1, data: listOfFeedObj, shouldAddPreference: isAddPreference, feedSetting: feedSettingobj1 });
             }
         })
 }
@@ -772,7 +783,7 @@ let getTrendingFeed = (req, res) => {
 }
 
 let hideAndUnhideFeed = (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     feedServices.hideAndUnhideFeed(req.body, (err, hideObj) => {
         if (err) {
             return res.status(404).json({ success: 0, message: "Error while hidding the feed ", err });
@@ -786,13 +797,59 @@ let hideAndUnhideFeed = (req, res) => {
     })
 }
 
+let getIndividualMediaCount = (req, res) => {
+    memberId = (req.params.member_Id) ? req.params.member_Id : '';
+    let mediaId = (req.params.media_Id) ? req.params.media_Id : '';
+    let feedId = (req.params.feed_Id) ? req.params.feed_Id : '';
+    feedServices.findIndividualMediaCount(memberId, mediaId, feedId, (err, mediaObj) => {
+        if (err)
+            return res.status(404).json({ success: 0, message: "Error while fetching the media by id ", err });
+        else {
+            return res.status(200).json({ success: 1, data: { mediaInfo: mediaObj } })
+        }
+    });
+}
+
+const getMediaLikesProfileById = async (req, res) => {
+    let query = {
+        feedId: (req.params.feed_Id) ? req.params.feed_Id : '',
+        mediaId: (req.params.media_Id) ? req.params.media_Id : '',
+        createdAt: (req.params.createdAt) ? req.params.createdAt : ''
+    }
+    try {
+        let feedObj = await feedServices.findFeedByIdForMediaCount(query);
+        if (feedObj.media.length <= 1 && (query.mediaId != "" && query.mediaId != undefined)) {
+            query.mediaId = "";
+            delete query.mediaId;
+        } else if (feedObj.media.length > 1) {
+            query.feedId = "";
+            delete query.feedId;
+        }
+        let mediaLikedByUsersObj = await feedServices.findMediaLikedUsersProfileById(query);
+        if (mediaLikedByUsersObj.length) {
+            mediaLikedByUsersObj.map((obj) => {
+                obj.memberProfile.username = obj.memberProfile.firstName + " " + obj.memberProfile.lastName
+                return obj
+            })
+            return res.status(200).json({ success: 1, data: mediaLikedByUsersObj, token: req.headers['x-access-token'] });
+        } else {
+            return res.status(200).json({ success: 1, message: "Record not found" })
+        }
+    } catch (error) {
+        console.log("Error here ", error);
+        return res.status(404).json({ success: 0, message: `Something went wrong ${error}` })
+    }
+}
+
 let feedController = {
     getFeeds: getFeeds,
     getFeedById: getFeedById,
     getFeedByFeedPreference: getFeedByFeedPreference,
     getFeedsNew: getFeedsNew,
     getTrendingFeed: getTrendingFeed,
-    hideAndUnhideFeed: hideAndUnhideFeed
+    hideAndUnhideFeed: hideAndUnhideFeed,
+    getIndividualMediaCount: getIndividualMediaCount,
+    getMediaLikesProfileById: getMediaLikesProfileById
 }
 
 module.exports = feedController;

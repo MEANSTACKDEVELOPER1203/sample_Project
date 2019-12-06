@@ -104,361 +104,45 @@ router.post("/upload", upload.any(), (req, res) => {
   } else {
     res.json({ success: 0, message: "No files selected" });
   }
-
-
-  // let memberID = ObjectId(req.body.memberID);
-  // let mediaType = req.body.mediaType;
-  // let files = req.files;
-
-  // if (files) {
-  //   if (files.length > 0) {
-  //     User.findById(memberID, function(err, result) {
-  //       if (err) return res.send(err);
-  //       if (result) {
-  //         memberMedia.findOne({ memberId: memberID }, function(
-  //           err,
-  //           profiledata
-  //         ) {
-  //           if (profiledata) {
-  //             // If User Exists in Media Collection, we will update
-  //             // For Images
-  //             if (mediaType == "image") {
-  //               let imageFiles = [];
-  //               let imageObject;
-  //               let limit = req.files.length;
-  //               for (let i = 0; i < limit; i++) {
-  //                 let imageObject = {};
-  //                 let mediaPath = req.files[i].path;
-  //                 let mediaOriginalName = req.files[i].originalname;
-  //                 let mediaType = req.body.mediaType;
-  //                 let mediaStatus = req.body.mediaStatus[i];
-
-  //                 imageObject.id = new ObjectId();
-  //                 imageObject.mediaPath = mediaPath;
-  //                 imageObject.mediaOriginalName = mediaOriginalName;
-  //                 imageObject.mediaType = mediaType;
-  //                 imageObject.mediaStatus = mediaStatus;
-
-  //                 imageFiles[i] = imageObject;
-  //               }
-
-  //               let newMedia = new memberMedia({
-  //                 memberId: memberID,
-  //                 imageFiles: imageFiles
-  //               });
-
-  //               // Push Images Objects to ImageArray
-
-  //               memberMedia.updateOne(
-  //                 { _id: profiledata._id },
-  //                 { $push: { imageFiles: { $each: imageFiles ,$sort: -1 }} },
-  //                 function(err, updateResult) {
-  //                   if (err) return res.send(err);
-  //                   if (updateResult.nModified == 1) {
-  //                     res.json({
-  //                       message: "Images uploaded successfully"
-  //                     });
-  //                   } else {
-  //                     res.json({ message: "Operation Failed!" });
-  //                   }
-  //                 }
-  //               );
-  //             }
-
-  //             // End of Image Files
-
-  //             // For Videos
-
-  //             if (mediaType == "video") {
-  //               let videoFiles = [];
-  //               let videoObject;
-  //               let limit = req.files.length;
-
-  //               for (let i = 0; i < limit; i++) {
-  //                 let videoObject = {};
-  //                 let mediaPath = req.files[i].path;
-  //                 let mediaOriginalName = req.files[i].originalname;
-  //                 let mediaType = req.body.mediaType;
-  //                 let mediaStatus = req.body.mediaStatus[i];
-
-  //                 videoObject.id = new ObjectId();
-  //                 videoObject.mediaPath = mediaPath;
-  //                 videoObject.mediaOriginalName = mediaOriginalName;
-  //                 videoObject.mediaType = mediaType;
-  //                 videoObject.mediaStatus = mediaStatus;
-
-  //                 videoFiles[i] = videoObject;
-  //               }
-
-  //               let newMedia = new memberMedia({
-  //                 memberId: memberID,
-  //                 videoFiles: videoFiles
-  //               });
-
-  //               // Push Video Objects to VideoArray
-
-  //               memberMedia.updateOne(
-  //                 { _id: profiledata._id },
-  //                 { $push: { videoFiles: { $each: videoFiles ,$sort: -1}  } },
-  //                 function(err, updateResult) {
-  //                   if (err) return res.send(err);
-  //                   if (updateResult.nModified == 1) {
-  //                     res.json({
-  //                       message: "Videos uploaded successfully"
-  //                     });
-  //                   } else {
-  //                     res.json({ message: "Operation Failed!" });
-  //                   }
-  //                 }
-  //               );
-  //             }
-
-  //             // End of Video Files
-
-  //             // For Audio Files
-
-  //             if (mediaType == "audio") {
-  //               let audioFiles = [];
-  //               let audioObject;
-  //               let limit = req.files.length;
-
-  //               for (let i = 0; i < limit; i++) {
-  //                 let audioObject = {};
-  //                 let mediaPath = req.files[i].path;
-  //                 let mediaOriginalName = req.files[i].originalname;
-  //                 let mediaType = req.body.mediaType;
-  //                 let mediaStatus = req.body.mediaStatus[i];
-
-  //                 audioObject.id = new ObjectId();
-  //                 audioObject.mediaPath = mediaPath;
-  //                 audioObject.mediaOriginalName = mediaOriginalName;
-  //                 audioObject.mediaType = mediaType;
-  //                 audioObject.mediaStatus = mediaStatus;
-
-  //                 audioFiles[i] = audioObject;
-  //               }
-
-  //               let newMedia = new memberMedia({
-  //                 memberId: memberID,
-  //                 audioFiles: audioFiles
-  //               });
-
-  //               // Push Audio Objects to AudioArray
-
-  //               memberMedia.updateOne(
-  //                 { _id: profiledata._id },
-  //                 { $push: { audioFiles: { $each: audioFiles, $sort: -1}  } },
-  //                 function(err, updateResult) {
-  //                   if (err) return res.send(err);
-  //                   if (updateResult.nModified == 1) {
-  //                     res.json({
-  //                       message: "Audio Files uploaded successfully"
-  //                     });
-  //                   } else {
-  //                     res.json({ message: "Operation Failed!" });
-  //                   }
-  //                 }
-  //               );
-  //             }
-
-  //             // End of Audio Files
-  //           } else {
-  //             // If User does not exists in Media Collection, we will create new one
-  //             // For Images
-
-  //             if (mediaType == "image") {
-  //               let imageFiles = [];
-  //               let imageObject;
-  //               let limit = req.files.length;
-  //               for (let i = 0; i < limit; i++) {
-  //                 let imageObject = {};
-  //                 let mediaPath = req.files[i].path;
-  //                 let mediaOriginalName = req.files[i].originalname;
-  //                 let mediaType = req.body.mediaType;
-  //                 let mediaStatus = req.body.mediaStatus[i];
-
-  //                 imageObject.id = new ObjectId();
-  //                 imageObject.mediaPath = mediaPath;
-  //                 imageObject.mediaOriginalName = mediaOriginalName;
-  //                 imageObject.mediaType = mediaType;
-  //                 imageObject.mediaStatus = mediaStatus;
-
-  //                 imageFiles[i] = imageObject;
-  //               }
-
-  //               let newMedia = new memberMedia({
-  //                 memberId: memberID,
-  //                 imageFiles: imageFiles
-  //               });
-
-  //               memberMedia.createMedia(newMedia, null, {sort: {createdAt: -1}}, function(err, post) {
-  //                 if (err) {
-  //                   res.send(err);
-  //                 } else {
-  //                   res.json({
-  //                     message: "Images uploaded successfully"
-  //                   });
-  //                 }
-  //               });
-  //             }
-
-  //             // End of Image Files
-
-  //             // For Videos
-
-  //             if (mediaType == "video") {
-  //               let videoFiles = [];
-  //               let videoObject;
-  //               let limit = req.files.length;
-
-  //               for (let i = 0; i < limit; i++) {
-  //                 let videoObject = {};
-  //                 let mediaPath = req.files[i].path;
-  //                 let mediaOriginalName = req.files[i].originalname;
-  //                 let mediaType = req.body.mediaType;
-  //                 let mediaStatus = req.body.mediaStatus[i];
-
-  //                 videoObject.id = new ObjectId();
-  //                 videoObject.mediaPath = mediaPath;
-  //                 videoObject.mediaOriginalName = mediaOriginalName;
-  //                 videoObject.mediaType = mediaType;
-  //                 videoObject.mediaStatus = mediaStatus;
-
-  //                 videoFiles[i] = videoObject;
-  //               }
-
-  //               let newMedia = new memberMedia({
-  //                 memberId: memberID,
-  //                 videoFiles: videoFiles
-  //               });
-
-  //               memberMedia.createMedia(newMedia,null, {sort: {createdAt: -1}}, function(err, post) {
-  //                 if (err) {
-  //                   res.send(err);
-  //                 } else {
-  //                   res.json({
-  //                     message: "Videos uploaded successfully"
-  //                   });
-  //                 }
-  //               });
-  //             }
-
-  //             // End of Video Files
-
-  //             // For Audio Files
-
-  //             if (mediaType == "audio") {
-  //               let audioFiles = [];
-  //               let audioObject;
-  //               let limit = req.files.length;
-
-  //               for (let i = 0; i < limit; i++) {
-  //                 let audioObject = {};
-  //                 let mediaPath = req.files[i].path;
-  //                 let mediaOriginalName = req.files[i].originalname;
-  //                 let mediaType = req.body.mediaType;
-  //                 let mediaStatus = req.body.mediaStatus[i];
-
-  //                 audioObject.id = new ObjectId();
-  //                 audioObject.mediaPath = mediaPath;
-  //                 audioObject.mediaOriginalName = mediaOriginalName;
-  //                 audioObject.mediaType = mediaType;
-  //                 audioObject.mediaStatus = mediaStatus;
-
-  //                 audioFiles[i] = audioObject;
-  //               }
-
-  //               let newMedia = new memberMedia({
-  //                 memberId: memberID,
-  //                 audioFiles: audioFiles
-  //               });
-
-  //               memberMedia.createMedia(newMedia,null, {sort: {createdAt: -1}}, function(err, post) {
-  //                 if (err) {
-  //                   res.send(err);
-  //                 } else {
-  //                   res.json({
-  //                     message: "Videos uploaded successfully"
-  //                   });
-  //                 }
-  //               });
-  //             }
-
-  //             // End of Audio Files
-  //           }
-  //         });
-  //       } else {
-  //         res.json({
-  //           error: "User Not Exists / Send a valid UserID"
-  //         });
-  //       }
-  //     });
-  //   } else {
-  //     res.json({
-  //       error: "wrong info sent / invalid userID"
-  //     });
-  //   }
-  // } else {
-  //   res.json({
-  //     error: "No files selected"
-  //   });
-  // }
 });
 // End of Create member Media
 
 //Get Media By User ID
-router.get("/getMediaByUserId/:UserID", function (req, res) {
-  let id = req.params.UserID;
-  // MemberMedia.findOne({ memberId: id }, function (err, result) {
-  //   if (err) {
-  //     return res.send(err);
-  //   }
-  //   if (result) {
-  //     res.send(result);
+// router.get("/getMediaByUserId/:UserID", function (req, res) {
+//   let id = req.params.UserID;
+//   MemberMedia.aggregate(
+//     [
+//       {
+//         $match:{memberId: ObjectId(id) } 
+//       },
+//       { "$unwind" : "$media" },
+//       {$sort: {"media.createdAt": -1}},
+//       {$group:{_id : "$_id",media:{$push:"$media"}}},
+//       {
+//         $project: {
+//           _id: 1,
+//           memberId:1,
+//            createdAt:1,
+//           // mediaSize: 1,
+//           // mediaRatio: 1,
+//           // src: 1,
+//           // status: 1,
+//           // createdAt: 1,
+//           // mediaType: 1,
+//           media:1
+//         }
+//       }
+//     ],
+//     function(err, result) {
+//       if (err) {
+//         return res.json({success:0,message:`${err}`,token:req.header['x-access-token']})
+//       }
+//       res.json({success:1,data:result[0],token:req.header['x-access-token']})
+//     }
+//   );
 
 
-  //   } else {
-  //     res.json({
-  //       error: "Data Not Exists / Send a valid ID"
-  //     });
-  //   }
-  // }).sort({
-  //   'media.createdAt': -1
-  // });
-
-  MemberMedia.aggregate(
-    [
-      {
-        $match:{memberId: ObjectId(id) } 
-      },
-      { "$unwind" : "$media" },
-      {$sort: {"media.createdAt": -1}},
-      {$group:{_id : "$_id",media:{$push:"$media"}}},
-      {
-        $project: {
-          _id: 1,
-          memberId:1,
-           createdAt:1,
-          // mediaSize: 1,
-          // mediaRatio: 1,
-          // src: 1,
-          // status: 1,
-          // createdAt: 1,
-          // mediaType: 1,
-          media:1
-        }
-      }
-    ],
-    function(err, result) {
-      if (err) {
-        return res.json({success:0,message:`${err}`,token:req.header['x-access-token']})
-      }
-      res.json({success:1,data:result[0],token:req.header['x-access-token']})
-    }
-  );
-
-
-});
+// });
 
 //@des get member media with pagination
 //@method GET
@@ -469,37 +153,7 @@ router.get('/getMemberMedia/:member_Id/:media_Type/:pagination_Date', memberMedi
 //@access type public (ForwardAndBackward) 
 router.get('/getMemberMediaWithPreAndNext/:member_Id/:media_Type/:pre_next/:pagination_Date', memberMediaController.getMemberMediaWithPreAndNext);
 
-
-
-
-
-
-
-
-// End of Get Media By User ID
-
-// Get Feed Comments by FeedID
-// router.get("/getMediaByUserId/:UserID", function(req, res) {
-//   let id = ObjectId(req.params.UserID);
-//   memberMedia.aggregate(
-//       [
-//         {
-//           $match:{memberId: ObjectId(id) } 
-//         },
-//         {$sort: {"imageFiles._id": 1}}
-//       ],
-//       function(err, result) {
-//         if (err) {
-//           res.send(err);
-//         }
-//         res.send(result)
-//       }
-//     );
-// });
-// End of Get Feed Comments by FeedID
-
 // Update mediaStatus   start
-
 router.put("/deleteMedia/:schID", function (req, res) {
   let reqbody = req.body;
   let schID = req.params.schID;

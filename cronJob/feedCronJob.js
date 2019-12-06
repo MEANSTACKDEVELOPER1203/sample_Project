@@ -32,7 +32,7 @@ Cron.schedule('58 49 15 * * *', () => {
         }
         else{
             feeds.forEach((feedDetials)=>{
-                Feed.aggregate([
+              FeedModel.aggregate([
                     {
                       $match:{
                         _id:feedDetials._id

@@ -60,7 +60,7 @@ let getCurrentMemberChat = (req, res) => {
                                     //lastMsgObj.senderInfoFan = msgObj.senderInfoFan;
                                     //lastMsgObj.receiverInfoFan = msgObj.receiverInfoFan;
                                     //console.log(msgObj.createdAt);
-                                    Chat.count({ chatRoomId: lastMsgObj._id, receiverId: ObjectId(memberId), isRead: false }, function callback(err, totalUnReadMsgCount) {
+                                    Chat.countDocuments({ chatRoomId: lastMsgObj._id, receiverId: ObjectId(memberId), isRead: false }, function callback(err, totalUnReadMsgCount) {
                                         if (err) {
                                             console.log(err)
                                             cb(err, null)
@@ -161,10 +161,12 @@ let getAllChatMessages = (req, res) => {
                 if (err)
                     console.log("**** Error while fetch the Sender Credit value *************", err)
                 else {
+                    senderUpdatedcreditsObj[0].cumulativeCreditValue = senderUpdatedcreditsObj[0].cumulativeCreditValue + senderUpdatedcreditsObj[0].memberReferCreditValue;
                     Credits.find({ memberId: ObjectId(receiverId) }, (err, receiverUpdatedcreditsObj) => {
                         if (err)
                             console.log("**** Error while fetch the receiver Credit value *************", err);
                         else {
+                            receiverUpdatedcreditsObj[0].cumulativeCreditValue = receiverUpdatedcreditsObj[0].cumulativeCreditValue + receiverUpdatedcreditsObj[0].memberReferCreditValue;
                             CelebrityContracts.findOne({ memberId: receiverId, serviceType: "chat" }, (err, celebContractObj) => {
                                 if (!celebContractObj)
                                     celebContractObj = "";
@@ -204,7 +206,7 @@ var getLastMessagesByReceiverId = (req, res) => {
         if (err) {
             return res.status(404).json({ success: 0, message: "Error while fetching last message by receiver id" })
         } else {
-            Chat.count({ chatRoomId: latestMegObj.chatRoomId, senderId: ObjectId(senderId), isRead: false }, function callback(err, totalUnReadMsgCount) {
+            Chat.countDocuments({ chatRoomId: latestMegObj.chatRoomId, senderId: ObjectId(senderId), isRead: false }, function callback(err, totalUnReadMsgCount) {
                 if (err) {
                     console.log(err)
                 } else {
@@ -291,7 +293,7 @@ var createChatMessage = (req, res) => {
                                         if (err)
                                             console.log("****** Error while  fetch data *******", err);
                                         else {
-                                            console.log("****** Receiver  Device Info *******", userDeviceInfoObj);
+                                            // console.log("****** Receiver  Device Info *******", userDeviceInfoObj);
                                             // if (userDeviceInfoObj.callingDeviceToken == "" || userDeviceInfoObj.callingDeviceToken == null)
                                             //     os = "android"
                                             // else
@@ -305,7 +307,7 @@ var createChatMessage = (req, res) => {
                                                     if (totalMsgCountForToday == 0 && req.body.numberOfMessages > 1) {
                                                         noOfMessage = req.body.numberOfMessages;
                                                         req.body.numberOfMessages = req.body.numberOfMessages - 1
-                                                        console.log("********************************************************************", noOfMessage)
+                                                        // console.log("********************************************************************", noOfMessage)
                                                     }
                                                     // console.log(req.body);
                                                     // console.log(totalMsgCountForToday);
@@ -330,65 +332,67 @@ var createChatMessage = (req, res) => {
                                                                             if (err)
                                                                                 console.log("****** Error while fetching sender updated credits*******", err);
                                                                             else {
+                                                                                senderUpdatedCreditsObj[0].cumulativeCreditValue = senderUpdatedCreditsObj[0].cumulativeCreditValue + senderUpdatedCreditsObj[0].memberReferCreditValue
                                                                                 Credits.find({ memberId: ObjectId(receiverId) }, (err, receiverUpdatedCreditsObj) => {
                                                                                     if (err)
                                                                                         console.log("******* Error while fetching  updatds receiver credits **********", err);
                                                                                     else {
+                                                                                        receiverUpdatedCreditsObj[0].cumulativeCreditValue = receiverUpdatedCreditsObj[0].cumulativeCreditValue + receiverUpdatedCreditsObj[0].memberReferCreditValue
                                                                                         if (receiverStatus == "offline") {
-                                                                                           if(userDeviceInfoObj.osType == "Android"){
-                                                                                            console.log("Lesh than 0ne")
-                                                                                            let message = {
-                                                                                                to: userDeviceInfoObj.deviceToken,
-                                                                                                collapse_key: 'Service-alerts',
-                                                                                                data: {
-                                                                                                    serviceType: "chat",
-                                                                                                    title: req.body.senderFirstName + " " + req.body.senderLastName,
-                                                                                                    body: req.body.message,
-                                                                                                    memberId: senderId,
-                                                                                                    receiverId: receiverId,
-                                                                                                    isCeleb: req.body.isCeleb,
-                                                                                                    senderFirstName: req.body.senderFirstName,
-                                                                                                    senderLastName: req.body.senderLastName,
-                                                                                                    senderAvatar: req.body.senderAvatar,
-                                                                                                    isFan: isFan,
-                                                                                                    chatCount: unReadMesssageCount.chatCount,
-                                                                                                    unSeenMessageCount: unReadMesssageCount.unSeenMessageCount
+                                                                                            if (userDeviceInfoObj.osType == "Android") {
+                                                                                                // console.log("Lesh than 0ne")
+                                                                                                let message = {
+                                                                                                    to: userDeviceInfoObj.deviceToken,
+                                                                                                    collapse_key: 'Service-alerts',
+                                                                                                    data: {
+                                                                                                        serviceType: "chat",
+                                                                                                        title: req.body.senderFirstName + " " + req.body.senderLastName,
+                                                                                                        body: req.body.message,
+                                                                                                        memberId: senderId,
+                                                                                                        receiverId: receiverId,
+                                                                                                        isCeleb: req.body.isCeleb,
+                                                                                                        senderFirstName: req.body.senderFirstName,
+                                                                                                        senderLastName: req.body.senderLastName,
+                                                                                                        senderAvatar: req.body.senderAvatar,
+                                                                                                        isFan: isFan,
+                                                                                                        chatCount: unReadMesssageCount.chatCount,
+                                                                                                        unSeenMessageCount: unReadMesssageCount.unSeenMessageCount
+                                                                                                    }
                                                                                                 }
+                                                                                                fcm.send(message, function (err, response) {
+                                                                                                    if (err) {
+                                                                                                        console.log("Something has gone wrong!", err);
+                                                                                                    } else {
+                                                                                                        console.log("Successfully sent with response Andriod: ", response);
+                                                                                                    }
+                                                                                                });
+                                                                                            } else {
+                                                                                                let message = {
+                                                                                                    to: userDeviceInfoObj.deviceToken,
+                                                                                                    collapse_key: 'Service-alerts',
+                                                                                                    notification: {
+                                                                                                        serviceType: "chat",
+                                                                                                        title: req.body.senderFirstName + " " + req.body.senderLastName,
+                                                                                                        body: req.body.message,
+                                                                                                        memberId: senderId,
+                                                                                                        receiverId: receiverId,
+                                                                                                        isCeleb: req.body.isCeleb,
+                                                                                                        senderFirstName: req.body.senderFirstName,
+                                                                                                        senderLastName: req.body.senderLastName,
+                                                                                                        senderAvatar: req.body.senderAvatar,
+                                                                                                        isFan: isFan,
+                                                                                                        chatCount: unReadMesssageCount.chatCount,
+                                                                                                        unSeenMessageCount: unReadMesssageCount.unSeenMessageCount
+                                                                                                    }
+                                                                                                }
+                                                                                                fcm.send(message, function (err, response) {
+                                                                                                    if (err) {
+                                                                                                        console.log("Something has gone wrong!", err);
+                                                                                                    } else {
+                                                                                                        console.log("Successfully sent with response IOS: ", response);
+                                                                                                    }
+                                                                                                });
                                                                                             }
-                                                                                            fcm.send(message, function (err, response) {
-                                                                                                if (err) {
-                                                                                                    console.log("Something has gone wrong!", err);
-                                                                                                } else {
-                                                                                                    console.log("Successfully sent with response Andriod: ", response);
-                                                                                                }
-                                                                                            });
-                                                                                           }else{
-                                                                                            let message = {
-                                                                                                to: userDeviceInfoObj.deviceToken,
-                                                                                                collapse_key: 'Service-alerts',
-                                                                                                notification: {
-                                                                                                    serviceType: "chat",
-                                                                                                    title: req.body.senderFirstName + " " + req.body.senderLastName,
-                                                                                                    body: req.body.message,
-                                                                                                    memberId: senderId,
-                                                                                                    receiverId: receiverId,
-                                                                                                    isCeleb: req.body.isCeleb,
-                                                                                                    senderFirstName: req.body.senderFirstName,
-                                                                                                    senderLastName: req.body.senderLastName,
-                                                                                                    senderAvatar: req.body.senderAvatar,
-                                                                                                    isFan: isFan,
-                                                                                                    chatCount: unReadMesssageCount.chatCount,
-                                                                                                    unSeenMessageCount: unReadMesssageCount.unSeenMessageCount
-                                                                                                }
-                                                                                            }
-                                                                                            fcm.send(message, function (err, response) {
-                                                                                                if (err) {
-                                                                                                    console.log("Something has gone wrong!", err);
-                                                                                                } else {
-                                                                                                    console.log("Successfully sent with response IOS: ", response);
-                                                                                                }
-                                                                                            });
-                                                                                           }
                                                                                         }
                                                                                         return res.status(200).json({ success: 1, data: createdChatMessageObj, message: "message created successfully.", senderUpdatedCredits: senderUpdatedCreditsObj[0], receiverUpdatedCredits: receiverUpdatedCreditsObj[0], token: req.headers['x-access-token'] });
                                                                                     }
@@ -419,7 +423,7 @@ var createChatMessage = (req, res) => {
                                                                         return res.status(404).json({ success: 0, message: "Error while fetching last credits by sender ID " })
                                                                     } else {
                                                                         let creditCharge = req.body.numberOfMessages;
-                                                                        let currentCumulativeCreditValue = creditsObj[0].cumulativeCreditValue;
+                                                                        let currentCumulativeCreditValue = creditsObj[0].cumulativeCreditValue + creditsObj[0].memberReferCreditValue;
                                                                         currentCumulativeCreditValue = parseInt(currentCumulativeCreditValue);
                                                                         creditCharge = parseInt(creditCharge);
                                                                         //let creditsPerMessage = req.body.credits;
@@ -444,8 +448,28 @@ var createChatMessage = (req, res) => {
                                                                                         if (err)
                                                                                             console.log("********* Error while fetching unseen message by reciever id********************", err);
                                                                                         else {
-                                                                                            let newCumulativeCreditValue = currentCumulativeCreditValue - creditCharge;
+                                                                                            let remainingCredits = 0;
+                                                                                            let debitFromMemberReferralCreditValue = 0;
+                                                                                            let debitFromMainCreditValue = 0;
+                                                                                            let oldNewCumulativeCreditValue = creditsObj[0].cumulativeCreditValue;
                                                                                             let newReferralCreditValue = creditsObj[0].referralCreditValue;
+                                                                                            let oldMemberReferCreditValue = creditsObj[0].memberReferCreditValue;
+                                                                                            if (oldMemberReferCreditValue >= creditCharge) {
+                                                                                                newMemberReferCreditValue = parseInt(oldMemberReferCreditValue) - parseInt(creditCharge);
+                                                                                                newCumulativeCreditValue = oldNewCumulativeCreditValue
+                                                                                                debitFromMemberReferralCreditValue = creditCharge;
+                                                                                            } else if (oldMemberReferCreditValue > 0 && oldMemberReferCreditValue < creditCharge) {
+                                                                                                remainingCredits = parseInt(creditCharge) - parseInt(oldMemberReferCreditValue);
+                                                                                                newMemberReferCreditValue = 0;
+                                                                                                newCumulativeCreditValue = parseInt(oldNewCumulativeCreditValue) - parseInt(remainingCredits);
+                                                                                                debitFromMemberReferralCreditValue = oldMemberReferCreditValue;
+                                                                                                debitFromMainCreditValue = remainingCredits;
+                                                                                            } else {
+                                                                                                newMemberReferCreditValue = oldMemberReferCreditValue;
+                                                                                                newCumulativeCreditValue = parseInt(creditsObj[0].cumulativeCreditValue) - parseInt(creditCharge);
+                                                                                                debitFromMainCreditValue = creditCharge;
+                                                                                            }
+
                                                                                             if (isCeleb == true) {
                                                                                                 newCumulativeCreditValue = creditsObj[0].cumulativeCreditValue;
                                                                                                 creditCharge = "0";
@@ -461,20 +485,22 @@ var createChatMessage = (req, res) => {
                                                                                                         //console.log("********   Fetch celebrityCreditObj ***********", celebrityCreditObj)
                                                                                                         let celebPermessagePercentage = parseFloat(celebContractObj.sharingPercentage);
                                                                                                         let totalCelebPercentage = parseFloat(creditCharge) * parseFloat(celebPermessagePercentage) / 100;
-                                                                                                        totalCelebPercentage = totalCelebPercentage.toFixed(2)
+                                                                                                        totalCelebPercentage = totalCelebPercentage.toFixed(2);
                                                                                                         let celebCreditValue = totalCelebPercentage;
                                                                                                         let celebKonectAppCharge = totalCelebPercentage
                                                                                                         //console.log("********   333333 cumulativeCreditValue ***********", celebrityCreditObj.cumulativeCreditValue)
                                                                                                         //console.log("********   333333 totalCelebPercentage ***********", totalCelebPercentage)
-                                                                                                        totalCelebPercentage = celebrityCreditObj.cumulativeCreditValue + parseFloat(totalCelebPercentage)
-                                                                                                        //console.log("********   444444 totalCelebPercentage ***********", parseFloat(totalCelebPercentage))
+                                                                                                        totalCelebPercentage = parseFloat(celebrityCreditObj.cumulativeCreditValue) + parseFloat(totalCelebPercentage)
+                                                                                                        totalCelebPercentage = totalCelebPercentage.toFixed(2);
+                                                                                                        // console.log("********   444444 totalCelebPercentage ***********", totalCelebPercentage)
                                                                                                         let newCreditInfoForCeleb = new Credits({
                                                                                                             memberId: receiverId,
                                                                                                             creditType: "credit",
                                                                                                             status: "active",
                                                                                                             referralCreditValue: celebrityCreditObj.referralCreditValue,
-                                                                                                            creditValue: celebCreditValue,
+                                                                                                            memberReferCreditValue: celebrityCreditObj.memberReferCreditValue,
                                                                                                             cumulativeCreditValue: totalCelebPercentage,
+                                                                                                            creditValue: celebCreditValue,
                                                                                                             remarks: "credited for chat"
                                                                                                         })
                                                                                                         Credits.create(newCreditInfoForCeleb, (err, celebCreditUpdatedObj) => {
@@ -489,9 +515,11 @@ var createChatMessage = (req, res) => {
                                                                                                                     celebPercentage: celebKonectAppCharge,
                                                                                                                     managerPercentage: "0",
                                                                                                                     celebKonnectPercentage: totalCelebKonectAppCharge,
-                                                                                                                    memberId: senderId,
-                                                                                                                    celebId: receiverId,
-                                                                                                                    createdAt: new Date()
+                                                                                                                    memberId: receiverId,
+                                                                                                                    celebId: senderId,
+                                                                                                                    createdAt: new Date(),
+                                                                                                                    debitFromMemberReferralCreditValue: debitFromMemberReferralCreditValue,
+                                                                                                                    debitFromMainCreditValue: debitFromMainCreditValue,
                                                                                                                 })
                                                                                                                 PayCredits.create(payCreditsInfo, (err, payCreditsObj) => {
                                                                                                                     if (err)
@@ -509,8 +537,9 @@ var createChatMessage = (req, res) => {
                                                                                                 creditType: "debit",
                                                                                                 status: "active",
                                                                                                 referralCreditValue: newReferralCreditValue,
-                                                                                                creditValue: creditCharge,
                                                                                                 cumulativeCreditValue: newCumulativeCreditValue,
+                                                                                                memberReferCreditValue: newMemberReferCreditValue,
+                                                                                                creditValue: creditCharge,                                                                                               
                                                                                                 remarks: "debited for chat"
                                                                                             });
                                                                                             Credits.create(newCredits, (err, createdCreditObj) => {
@@ -521,10 +550,12 @@ var createChatMessage = (req, res) => {
                                                                                                         if (err)
                                                                                                             console.log("****** Error while fetching sender updated credits*******", err);
                                                                                                         else {
+                                                                                                            senderUpdatedCreditsObj[0].cumulativeCreditValue = senderUpdatedCreditsObj[0].cumulativeCreditValue + senderUpdatedCreditsObj[0].memberReferCreditValue
                                                                                                             Credits.find({ memberId: ObjectId(receiverId) }, (err, receiverUpdatedCreditsObj) => {
                                                                                                                 if (err)
                                                                                                                     console.log("******* Error while fetching  updatds receiver credits **********", err);
                                                                                                                 else {
+                                                                                                                    receiverUpdatedCreditsObj[0].cumulativeCreditValue = receiverUpdatedCreditsObj[0].cumulativeCreditValue + receiverUpdatedCreditsObj[0].memberReferCreditValue
                                                                                                                     User.findOne({ _id: senderId }, (err, uResult) => {
                                                                                                                         nId = uResult._id;
                                                                                                                         oldValue = parseInt(uResult.cumulativeSpent);
@@ -535,8 +566,8 @@ var createChatMessage = (req, res) => {
                                                                                                                                 console.log("*** Error while update member Credit in user table **** ", err)
                                                                                                                             else {
                                                                                                                                 if (receiverStatus == "offline") {
-                                                                                                                                    if(userDeviceInfoObj.osType == "Android"){
-                                                                                                                                        console.log("MOre than 0ne")
+                                                                                                                                    if (userDeviceInfoObj.osType == "Android") {
+                                                                                                                                        // console.log("MOre than 0ne")
                                                                                                                                         let message = {
                                                                                                                                             to: userDeviceInfoObj.deviceToken,
                                                                                                                                             collapse_key: 'Service-alerts',
@@ -562,7 +593,7 @@ var createChatMessage = (req, res) => {
                                                                                                                                                 console.log("Successfully sent with response Andriod: ", response);
                                                                                                                                             }
                                                                                                                                         });
-                                                                                                                                       }else{
+                                                                                                                                    } else {
                                                                                                                                         let message = {
                                                                                                                                             to: userDeviceInfoObj.deviceToken,
                                                                                                                                             collapse_key: 'Service-alerts',
@@ -588,7 +619,7 @@ var createChatMessage = (req, res) => {
                                                                                                                                                 console.log("Successfully sent with response IOS: ", response);
                                                                                                                                             }
                                                                                                                                         });
-                                                                                                                                       }
+                                                                                                                                    }
                                                                                                                                 }
                                                                                                                                 return res.status(200).json({ success: 1, data: createdChatMessageObj, message: "message created successfully.", senderUpdatedCredits: senderUpdatedCreditsObj[0], receiverUpdatedCredits: receiverUpdatedCreditsObj[0], token: req.headers['x-access-token'] })
                                                                                                                             }
@@ -650,13 +681,107 @@ getUnreadMessageCount = function (req, res) {
     });
 }
 
+function addKeyValue(obj, key, data) {
+    obj[key] = data;
+}
+
+const getSeenCount = countQuery => {
+    return Promise((resolve, reject) => {
+        Chat.find(countQuery)
+            //return setTimeout((counter) => resolve(counter), 10)
+            .then((counter) => resolve(counter))
+    })
+}
+
+const fruitBasket = {
+    apple: 27,
+    grape: 100,
+    pear: 14
+}
+const getNumFruit = fruit => {
+    return fruitBasket[fruit]
+}
+
+let getCurrentMemberChatAsync = async (req, res) => {
+    let memberId = (req.params.member_Id) ? req.params.member_Id : '';
+    try {
+        const listOfChatRoomIdObj1 = await chatServices.findAllChatRoomForCurrentMember1(memberId);
+        if (listOfChatRoomIdObj1.length <= 0) {
+            return res.status(200).json({ success: 1, data: [] })
+        } else {
+            // console.log("listOfChatRoomIdObj1", listOfChatRoomIdObj1.length);
+            let query = {
+                memberId: memberId,
+                listOfChatRoomId: listOfChatRoomIdObj1
+            }
+            const listOfChatsObj1 = await chatServices.findChatsByCurrentMember1(query);
+            if (listOfChatsObj1) {
+                // console.log("listOfChatsObj1 === ", listOfChatsObj1.length);
+                const memberFanObj1 = await MemberPreferences.findOne({ memberId: ObjectId(memberId) })
+                if (memberFanObj1) {
+                    // console.log("memberFanObj1 === ", memberFanObj1);
+                    let unReadMsgQuery = {
+                        memberId: memberId,
+                        listOfChatRoomId: listOfChatRoomIdObj1
+                    }
+                    const unReadMesssageObj1 = await chatServices.findUnReadMessage(unReadMsgQuery);
+                    // console.log("unReadMesssageObj1 === ", unReadMesssageObj1);
+                    let memberCelebArray = memberFanObj1.celebrities;
+                    listOfChatsObj1.map((chatObj) => {
+                        let counter = 0;
+                        let celebrityId = "";
+                        let isFan = false;
+                        if (chatObj.senderInfo._id != memberId) {
+                            celebrityId = chatObj.senderInfo._id;
+                        } else {
+                            celebrityId = chatObj.receiverInfo._id
+                        }
+                        unReadMesssageObj1.map((count) => {
+                            if (chatObj._id == count._id) {
+                                counter = count.count
+                            }
+                        })
+                        chatObj.counter = counter
+                        memberCelebArr = memberCelebArray.filter(function (obj) {
+                            // console.log(typeof "======= " + obj.CelebrityId)
+                            // console.log(typeof " ======= " + celebrityId)
+                            return "" + obj.CelebrityId === "" + celebrityId && obj.isFan === true
+                        });
+                        // console.log("memberCelebArr", memberCelebArr)
+                        if (memberCelebArr.length > 0 && memberCelebArr[0].isFan == true)
+                            isFan = true;
+                        if (celebrityId === chatObj.senderInfo._id) {
+                            chatObj.senderInfo.isFan = isFan
+                        } else {
+                            chatObj.receiverInfo.isFan = isFan
+                        }
+
+                    })
+                    listOfChatsObj1.sort(function (x, y) {
+                        var dateA = new Date(x.createdAt), dateB = new Date(y.createdAt);
+                        return dateB - dateA;
+                    });
+                    return res.status(200).json({ token: req.headers['x-access-token'], success: 1, data: listOfChatsObj1 });
+                } else {
+                    return res.status(404).json({ token: req.headers['x-access-token'], success: 0, message: "Error while fetching current member preferences" });
+                }
+            } else {
+                return res.status(404).json({ token: req.headers['x-access-token'], success: 0, message: "Error while fetching current member chat by member ID" });
+            }
+        }
+    } catch (error) {
+        res.status(401).json({ message: 'Something went wrong', error: error });
+    }
+}
+
 var chatController = {
     getCurrentMemberChat: getCurrentMemberChat,
     getAllChatMessages: getAllChatMessages,
     getLastMessagesByReceiverId: getLastMessagesByReceiverId,
     createChatMessage: createChatMessage,
     getMessageById: getMessageById,
-    getUnreadMessageCount: getUnreadMessageCount
+    getUnreadMessageCount: getUnreadMessageCount,
+    getCurrentMemberChatAsync: getCurrentMemberChatAsync
 }
 
 module.exports = chatController;

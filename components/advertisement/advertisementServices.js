@@ -13,7 +13,8 @@ let saveAdvertiesment = function (advertisementObj, callback) {
         expire: new Date(advertisementObj.expire),
         appLogoUrl: advertisementObj.appLogoUrl,
         appLogoRatio: advertisementObj.appLogoRatio,
-        src: advertisementObj.src
+        src: advertisementObj.src,
+        isDeleted: false
     });
     Advertisement.create(advertisementInfo, (err, advertisementObj) => {
         if (!err)
@@ -24,7 +25,7 @@ let saveAdvertiesment = function (advertisementObj, callback) {
 }
 
 let findAllAds = function (callback) {
-    Advertisement.find({},{start:0,expire:0,status:0,location:0,},(err, listOfAdsObj) => {
+    Advertisement.find({ isDeleted: false }, { start: 0, expire: 0, status: 0, location: 0, }, (err, listOfAdsObj) => {
         if (!err)
             callback(null, listOfAdsObj)
         else

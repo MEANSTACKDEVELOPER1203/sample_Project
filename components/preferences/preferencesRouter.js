@@ -5,24 +5,32 @@ let Preferences = require("./preferencesModel");
 let MemberPreferences = require("../memberpreferences/memberpreferencesModel");
 let preferenceController = require('./preferenceController');
 var cron = require('node-cron');
+let preferenceServices = require('./preferenceServices');
 //let preferenceList = [];
+global.preferenceList = [];
 
 router.get("/getAllPreferances/:userId", function (req, res) {
+  //console.log(global.preferenceList)
+  let preferenceList = global.preferenceList;
+  // console.log("preferenceList",global.preferenceList);
   MemberPreferences.findOne({ memberId: ObjectId(req.params.userId) }, (err, MemberPreference) => {
     if (err) {
       res.json({ token: req.headers['x-access-token'], success: 0, message: err });
     }
     else {
       //console.log("preferenceList",preferenceList);
-      preferenceList.map((parentPreferenceObj) => { 
+
+      preferenceList.map((parentPreferenceObj) => {
+        //console.log("parentPreferenceObj",parentPreferenceObj);
         let Categories = parentPreferenceObj.Categories.filter((catagoryObj) => {
-         //console.log("catagoryObj",catagoryObj.celebsByPreferences);
+          //console.log("catagoryObj",catagoryObj);
           if (catagoryObj.celebsByPreferences.length > 0) {
-            catagoryObj.celebsByPreferences = [];
+            //catagoryObj.celebsByPreferences = [];
             return parentPreferenceObj;
           }
         })
         parentPreferenceObj.Categories = Categories.map((catagoryObj) => {
+          //console.log("parentPreferenceObj",catagoryObj);
           if (MemberPreference) {
             catagoryObj.isSelected = MemberPreference.preferences.some((userPrefernceId) => {
               //console.log("test")
@@ -40,20 +48,23 @@ router.get("/getAllPreferances/:userId", function (req, res) {
         return parentPreferenceObj;
       });
       let prefernceListUser = preferenceList.filter((preferenceObj) => {
-        // console.log("preferenceObj",preferenceObj);
+
         if (preferenceObj.Categories.length > 0) {
+          //console.log("preferenceObj",preferenceObj);
           return preferenceObj
         }
+
       })
       res.json({ token: req.headers['x-access-token'], success: 1, data: prefernceListUser });
       //console.log(globalString);
     }
   });
+
 });
 
-var newPreferences = cron.schedule('*/10 * * * * *', function (req, res) {
-  //console.log("preferenceList",global.preferenceList);
-//console.log(globalString); // Output: "This can be accessed anywhere!"
+var newPreferences = cron.schedule('*/1 * * * *', function (req, res) {
+
+  // console.log("globalString"); // Output: "This can be accessed anywhere!"
 
   Preferences.aggregate(
     [
@@ -125,7 +136,7 @@ var newPreferences = cron.schedule('*/10 * * * * *', function (req, res) {
         console.log(err);
         //res.json({ token: req.headers['x-access-token'], success: 0, message: err });
       }
-     
+
       //console.log(" ====================== @@@@@@@ ",preferenceList)
       // let arr = [];
       // for (let i = 0; i < preferenceList.length; i++) {
@@ -152,21 +163,21 @@ var newPreferences = cron.schedule('*/10 * * * * *', function (req, res) {
       //res.json({ token: req.headers['x-access-token'], success: 1, data: prefernceList });
     });
 
- }, false);
- newPreferences.start();
+}, false);
+newPreferences.start();
 
-// createPreferences start
+// createPreferences start(now using in backend please integrate to admin and delete from here) 
 router.post('/createPreferences', preferenceController.createPreferences)
 // End createPreferences
 
-// getPreferencesList start
 
-router.get("/getPreferencesList", function (req, res) {
-  Preferences.find(function (err, users) {
-    if (err) return next(err);
-    res.json(users);
-  });
-});
+// getPreferencesList start
+// router.get("/getPreferencesList", function (req, res) {
+//   Preferences.find(function (err, users) {
+//     if (err) return next(err);
+//     res.json(users);
+//   });
+// });
 // End getPreferencesList
 
 
@@ -220,6 +231,7 @@ router.get("/getPreferencesByParentlist", function (req, res, next) {
           PreferenceId: 1,
           categories: {
             preferenceName: 1,
+            _id: 1
           },
         }
       },
@@ -241,138 +253,137 @@ router.get("/getPreferencesByParentlist", function (req, res, next) {
       if (err) {
         return res.status(404).json({ success: 0, err: err });
       } else {
-        data.map((preferenceObj) => {
-          let catArr = [];
-          preferenceObj.categories.map((catObj) => {
-            catArr.push(catObj.preferenceName);
-          })
-          preferenceObj.categories = catArr
-        })
+        // console.log(data);
+        // data.map((preferenceObj) => {
+        //   let catArr = [];
+        //   preferenceObj.categories.map((catObj) => {
+        //     catArr.push(catObj.preferenceName);
+        //   })
+        //   preferenceObj.categories = catArr
+        // })
         return res.status(200).json({ success: 1, data: data });
       }
 
     }
   );
 });
-let preferenceServices = require('./preferenceServices');
-router.get("/getPreferencesByParentId", function (req, res, next) {
-  let parentPreferenceId = "null";
-  preferenceServices.findParentPrefrence((err, listOfParentPreference) => {
-    if (err)
-      return res.status(404).json({ success: 0, message: "Error while fetching the parent preference ", err });
-    else {
-      preferenceServices.findPreference(listOfParentPreference, (err, listOfPreferenceObj) => {
-        if (err)
-          return res.status(404).json({ success: 0, message: "Error while fetching preference ", err });
-        else {
-          return res.status(200).json({ success: 1, data: listOfPreferenceObj });
-        }
-      })
-    }
-  })
+
+// router.get("/getPreferencesByParentId", function (req, res, next) {
+//   let parentPreferenceId = "null";
+//   preferenceServices.findParentPrefrence((err, listOfParentPreference) => {
+//     if (err)
+//       return res.status(404).json({ success: 0, message: "Error while fetching the parent preference ", err });
+//     else {
+//       preferenceServices.findPreference(listOfParentPreference, (err, listOfPreferenceObj) => {
+//         if (err)
+//           return res.status(404).json({ success: 0, message: "Error while fetching preference ", err });
+//         else {
+//           return res.status(200).json({ success: 1, data: listOfPreferenceObj });
+//         }
+//       })
+//     }
+//   })
 
 
 
 
-});
+// });
 
 // End get preferences by parentlist
 // get preferences by parentId start
 
-router.get("/getPreferencesByParentId/:parentPreferenceId", function (req, res, next) {
-  let parentPreferenceId = req.params.parentPreferenceId;
-  Preferences.getPreferencesByParentId(parentPreferenceId, function (err, result) {
-    if (result == null) {
-      res.json({
-        error: "No preferences found"
-      });
-    } else {
-      res.send(result);
-    }
-  });
-});
+// router.get("/getPreferencesByParentId/:parentPreferenceId", function (req, res, next) {
+//   let parentPreferenceId = req.params.parentPreferenceId;
+//   Preferences.getPreferencesByParentId(parentPreferenceId, function (err, result) {
+//     if (result == null) {
+//       res.json({
+//         error: "No preferences found"
+//       });
+//     } else {
+//       res.send(result);
+//     }
+//   });
+// });
 // End get preferences by parentId
 
 // get profession by preference name start
 
-router.get("/getProfessionByPreferenceName/:preferenceName", function (req, res, next) {
-  let preferenceName = req.params.preferenceName;
-  Preferences.getProfessionByPreferenceName(preferenceName, function (err, result) {
-    if (result == null) {
-      res.json({
-        error: "No preferences found"
-      });
-    } else {
-      res.send(result[0].professions);
-    }
-  });
-});
+// router.get("/getProfessionByPreferenceName/:preferenceName", function (req, res, next) {
+//   let preferenceName = req.params.preferenceName;
+//   Preferences.getProfessionByPreferenceName(preferenceName, function (err, result) {
+//     if (result == null) {
+//       res.json({
+//         error: "No preferences found"
+//       });
+//     } else {
+//       res.send(result[0].professions);
+//     }
+//   });
+// });
 
 // End get profession by preference name
 
-// Edit a preferences start
+// Edit a preferences start (add in admin and delete from here)
+// router.put("/edit/:Preferences_id", function (req, res) {
+//   let preferenceName = req.body.preferenceName;
+//   let parentPreferenceId = ObjectId(req.body.parentPreferenceId);
+//   let countries = req.body.countries;
+//   let created_at = req.body.created_at;
+//   let updated_at = req.body.updated_at;
 
-router.put("/edit/:Preferences_id", function (req, res) {
-  let preferenceName = req.body.preferenceName;
-  let parentPreferenceId = ObjectId(req.body.parentPreferenceId);
-  let countries = req.body.countries;
-  let created_at = req.body.created_at;
-  let updated_at = req.body.updated_at;
+//   let reqbody = req.body;
+//   reqbody.updated_at = new Date;
+//   reqbody.parentPreferenceId = parentPreferenceId;
+//   let id = req.params.Preferences_id;
+//   Preferences.editPreferences(id, reqbody, function (err, result) {
+//     res.send(result);
 
-  let reqbody = req.body;
-  reqbody.updated_at = new Date;
-  reqbody.parentPreferenceId = parentPreferenceId;
-  let id = req.params.Preferences_id;
-  Preferences.editPreferences(id, reqbody, function (err, result) {
-    res.send(result);
+//   });
 
-  });
-
-});
+// });
 // End Edit a preferences
 
 // Find by Id  start
 
-router.get("/getPreferences/:id", function (req, res) {
-  let id = req.params.id;
-  Preferences.getPreferencesById(id, function (err, result) {
-    res.send(result);
-  });
-});
+// router.get("/getPreferences/:id", function (req, res) {
+//   let id = req.params.id;
+//   Preferences.getPreferencesById(id, function (err, result) {
+//     res.send(result);
+//   });
+// });
 // End Find by Id
 
 // getPreferencesByParentID start
 
-router.post("/getPreferencesParentID", function (req, res) {
-  let newArr = req.body.parentPreferenceIds;
-  let parentPreferenceId = newArr.map(function (id) {
-    return ObjectId(id);
-  });
-  Preferences.find({ "parentPreferenceId": { "$in": parentPreferenceId } }, function (err, result) {
-    res.send(result);
-  });
-});
+// router.post("/getPreferencesParentID", function (req, res) {
+//   let newArr = req.body.parentPreferenceIds;
+//   let parentPreferenceId = newArr.map(function (id) {
+//     return ObjectId(id);
+//   });
+//   Preferences.find({ "parentPreferenceId": { "$in": parentPreferenceId } }, function (err, result) {
+//     res.send(result);
+//   });
+// });
 
 // End getPreferencesByParentID
-// Delete by PreferencesID start
 
-router.delete("/delete/:preferencesID", function (req, res, next) {
 
-  let id = req.params.preferencesID;
+// Delete by PreferencesID start (please integrate in admin and delete from here)
+// router.delete("/delete/:preferencesID", function (req, res, next) {
+//   let id = req.params.preferencesID;
 
-  Preferences.findById(id, function (err, result) {
-    if (result) {
-      Preferences.findByIdAndRemove(id, function (err, post) {
-        if (err) return next(err);
-        res.json({ message: "Deleted Preferences Successfully" });
-      });
-    } else {
-      res.json({ error: "PreferencesID not found / Invalid" });
-    }
-  });
+//   Preferences.findById(id, function (err, result) {
+//     if (result) {
+//       Preferences.findByIdAndRemove(id, function (err, post) {
+//         if (err) return next(err);
+//         res.json({ message: "Deleted Preferences Successfully" });
+//       });
+//     } else {
+//       res.json({ error: "PreferencesID not found / Invalid" });
+//     }
+//   });
 
-});
-
+// });
 // End Delete by PreferencesID
 
 module.exports = router;

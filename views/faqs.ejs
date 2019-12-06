@@ -1,115 +1,192 @@
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"  crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+  crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css"
+  crossorigin="anonymous">
 <style type="text/css">
-    *{ margin:0px; padding: 0px;}
-    body{ font-family: arial, tahoma, verdana; font-size:13px; color: #000;}
-    .signup_hdng{ font-size: 16px; font-weight: bold; color: #000; border: 1px solid #ddd; padding-bottom: 10px;
-    display: block; margin-bottom: 5px; padding-left: 15px; margin-left: 0px; padding-top: 10px; position: relative;
-    }
-    .sub_hdng{ font-size:14px; display: block; padding-bottom: 5px; padding-left: 0px; margin-left: 0px;}
-    .lst{ list-style: none;  }
-    
-    .lst > li > a{ text-decoration: none; color: #297ec1;}
-    .lst{ display: none;}
-    .accord_head{ cursor: pointer;}
-    .acp{ color: #000; font-weight: bold; font-size: 18px; position: absolute; right: 15px;}
-    .adact1{ color: #297ec1;}
-    .lst2{ display: block;}
-    .acp2{ color: #297ec1;}
+  * {
+    margin: 0px;
+    padding: 0px;
+  }
 
+  body {
+    font-family: arial, tahoma, verdana;
+    font-size: 13px;
+    color: #000;
+  }
 
+  .signup_hdng {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+    border: 1px solid #ddd;
+    padding-bottom: 10px;
+    display: block;
+    margin-bottom: 5px;
+    padding-left: 15px;
+    margin-left: 0px;
+    padding-top: 10px;
+    position: relative;
+  }
 
-.container {
-    margin-top: 20px;
-}
+  .sub_hdng {
+    font-size: 14px;
+    display: block;
+    padding-bottom: 5px;
+    padding-left: 0px;
+    margin-left: 0px;
+  }
 
-ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+  .lst {
+    list-style: none;
+  }
 
-.nav li {
-  /* border-bottom: 1px solid #eee; */
-  padding:10px 20px;
-  
-}
+  .lst>li>a {
+    text-decoration: none;
+    color: #297ec1;
+  }
 
-.nav li a {
-  font-size: 14px;
-  display: inline-block;
-}
+  .lst {
+    display: none;
+  }
 
-#accordionMenu {
- 
-}
+  .accord_head {
+    cursor: pointer;
+  }
 
-.panel-body {
-  padding: 0;
-}
+  .acp {
+    color: #000;
+    font-weight: bold;
+    font-size: 18px;
+    position: absolute;
+    right: 15px;
+  }
 
-.panel-group .panel+.panel {
-  margin-top: 0;
-  border-top: 0;
-}
+  .adact1 {
+    color: #297ec1;
+  }
 
-.panel-group .panel {
-  border-radius: 0;
-}
+  .lst2 {
+    display: block;
+  }
 
-.panel-default>.panel-heading {
-  color: #333;
-  background-color: #fff;
-  border-color: #e4e5e7;
-  padding: 0;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  font-size: 18px;
-}
+  .acp2 {
+    color: #297ec1;
+  }
 
-.panel-default>.panel-heading a {
-  display: block;
-  padding: 15px 15px;
-  font-weight: bold;
-  text-decoration: none;
-}
+  .container {
+    margin-top: 5px
+  }
 
-.panel-default>.panel-heading a:after {
-  content: "";
-  position: relative;
-  top: 1px;
-  display: inline-block;
-  font-family: 'Glyphicons Halflings';
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  float: right;
-  transition: transform .25s linear;
-  -webkit-transition: -webkit-transform .25s linear;
-}
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none
+  }
 
-.panel-default>.panel-heading a[aria-expanded="true"] {
-  background-color: #eee;
-  color: #297ec1;
-  font-weight: bold;
-}
+  .nav li {
+    padding: 10px 20px
+  }
 
-.panel-default>.panel-heading a[aria-expanded="true"]:after {
-  content: "\e113";
-}
+  .nav li a {
+    font-size: 14px;
+    display: inline-block
+  }
 
-.panel-default>.panel-heading a[aria-expanded="false"]:after {
-  content: "\e114";
-}
-.lst > li{ padding-bottom: 15px; padding-left: 15px; padding-right: 15px; border:none!important;}
+  .panel-body {
+    padding: 0
+  }
 
-.nav li a{ text-decoration: none; background-color: none; padding: 0px; }
-.nav li a:hover{ background: none;}
-.nav li a.active{ background: none;}
+  .panel-group .panel+.panel {
+    margin-top: 0;
+    border-top: 0
+  }
 
+  .panel-group .panel {
+    border-radius: 0
+  }
+
+  .panel-default>.panel-heading {
+    color: #333;
+    background-color: #fff;
+    border-color: #e4e5e7;
+    padding: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 18px
+  }
+
+  .panel.panel-default {
+    border-right: 0;
+    border-left: 0
+  }
+
+  .panel-default>.panel-heading a {
+    display: block;
+    padding: 15px;
+    font-weight: 700;
+    text-decoration: none
+  }
+
+  .panel-default>.panel-heading a:after {
+    content: "";
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'themify';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    float: right;
+    transition: transform .25s linear;
+    -webkit-transition: -webkit-transform .25s linear;
+  }
+
+  .panel-default>.panel-heading a[aria-expanded="true"] {
+    background-color: #fff;
+    color: #4579C7;
+    font-weight: 700;
+  }
+
+  .panel-default>.panel-heading a[aria-expanded="true"]:after {
+    content: "\e648";
+  }
+
+  .panel-default>.panel-heading a[aria-expanded="false"]:after {
+    content: "\e64b";
+  }
+
+  .lst>li {
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border: none !important
+  }
+
+  .nav li a {
+    text-decoration: none;
+    background-color: none;
+    padding: 0
+  }
+
+  .nav li a:hover {
+    background: none
+  }
+
+  .nav li a.active {
+    background: none
+  }
+
+  .bordertop-0 {
+    border-top: 0px;
+  }
+
+  .panel {
+    box-shadow: none;
+  }
 </style>
 <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
@@ -134,342 +211,376 @@ ul {
 </script> -->
 
 <div class="container">
-        <div class="panel-group" id="accordionMenu" role="tablist" aria-multiselectable="true">
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingOne">
-              <h4 class="panel-title">
-              <a role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                    Sign Up / Registrations
-              </a>
-            </h4>
-            </div>
-            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-              <div class="panel-body">
-                <ul class="nav">
-                        <li>
-                                <b class="sub_hdng">Where can I download the application?</b>
-                                The CelebKonect app is available on the App Store and Play Store. You can also find a link on our website <a onclick="window.open('http://www.celebkonect.com/', '_blank', 'toolbar=yes,top=500,left=500,width=100%,height=auto');">www.celebkonect.com</a>
-                            </li>
-                            <li>
-                                <b class="sub_hdng">Is it necessary to provide a referral code to sign up?</b>
-                                No, a referral code is not mandatory for sign up. 
-                            </li>
-                            <li>
-                                <b class="sub_hdng">Can I still use the application if I don't have a phone number? </b>
-                                Providing a phone number to complete the registration is mandatory. 
-                            </li>
-                            <li>
-                                <b class="sub_hdng">Is it necessary to provide both, my email address as well as my phone number?</b>
-                                Yes, it is necessary to provide both, your email ID and phone number for registration. It is also necessary to verify youremail ID and phone number.
-                            </li>
-                            <li>
-                                <b class="sub_hdng">Can I view the application before I register or sign up?</b>
-                                Yes, you can download the app and browse through most of the application without registration. Youwill be requested to register only for performing actions. 
-                            </li>
-
-                            <li>
-                              <b class="sub_hdng">If I sign up from my social media account, do I have to provide any other details?</b>
-                              No, if you sign up from your social media account, then you don’t have to provide any other details.
-                          </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingTwo">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Fan Subscription
-              </a>
-            </h4>
-            </div>
-            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-              <div class="panel-body">
-                <ul class="nav">
-                 <li>
-                <b class="sub_hdng">What is the difference between a fan and a follower?</b>
-                A Fan subscription to a celebrity will allow you to access premium content such as exclusive campaigns run by a celebrity and make audio / video calls to celebrity. A follower will only be able to access the basic content and updates.
+  <div class="panel-group" id="accordionMenu" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default bordertop-0">
+      <div class="panel-heading" role="tab" id="headingOne">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseOne" aria-expanded="true"
+            aria-controls="collapseOne">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/Signup_Registrations.png" height="22px;"
+                width="23px;"></span>
+            Sign-up / Registrations
+          </a>
+        </h4>
+      </div>
+      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">Where can I download the application?</b>
+              The application is available at the app store as well as the play store. You can also find a link on our
+              website <a
+                onclick="window.open('http://www.celebkonect.com/', '_blank', 'toolbar=yes,top=500,left=500,width=100%,height=auto');">www.celebkonect.com</a>
             </li>
             <li>
-                <b class="sub_hdng">What is the duration and cost of a fan subscription?</b>
-                There are 4 FAN subscription packages available, Monthly / Quarterly / Half-yearly / Annual. You can choose any of those packages. The offers and benefits of each package will be different from one other. 
+              <b class="sub_hdng">Is it necessary to provide a referral code to sign up?</b>
+              No, it is not necessary to provide the referral code during the signup process.
             </li>
             <li>
-                <b class="sub_hdng">If I un-fan the celebrity immediately, will I get my credit back?</b>
-                Once subscribed, you will not get your credits back. If you have a multi-month subscription, you will be able to change a celebrity at the end of each month.
+              <b class="sub_hdng">Can I still use the application if I don't have a phone number? </b>
+              No, it is mandatory to provide your phone number during the registration process.
             </li>
             <li>
-              <b class="sub_hdng">Can I fan my friends?</b>
-              No, you can only fan celebrities.
-          </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingThree">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    Menu/Home
-              </a>
-            </h4>
-            </div>
-            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-              <div class="panel-body">
-                <ul class="nav">
-                 <li>
-                <b class="sub_hdng">In the home option, will I be able to view all the celebrities or only the ones I have chosen?</b>
-                In the Home screen on top of feed, you can view celebrities who are online.To explore all celebrities there is an icon available at the bottom, the navigation bar.
+              <b class="sub_hdng">Is it necessary to provide both, my email address as well as my phone number?</b>
+              Yes, it is necessary to provide both, your email ID and phone number for security reasons.
             </li>
             <li>
-                <b class="sub_hdng">Is the bell button on the top right corner for updates on all celebrities or only the prefered celebrities?</b>
-                The notification bell is to notify you about services and your preferred celebrity activities such as feeds, schedules.
+              <b class="sub_hdng">Can I view the application before I register or sign up?</b>
+              You can view the application on major app stores, or visit <a
+                onclick="window.open('http://www.celebkonect.com/', '_blank', 'toolbar=yes,top=500,left=500,width=100%,height=auto');">www.celebkonect.com</a>
             </li>
-            <li>
-                <b class="sub_hdng">Will I be notified if the celebrities I haven't prefered are online and available?</b>
-                No, you will not be notified but you will be able to see the celebrities that are online through the 'celebrities' button.
-            </li>
-            <li>
-              <b class="sub_hdng">Can I search for my friends on the search bar?</b>
-              No, you can only search for celebrities.
-          </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          
-          
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingFour">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                    Profile
-              </a>
-            </h4>
-            </div>
-            <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-              <div class="panel-body">
-                <ul class="nav">
-                 <li>
-                <b class="sub_hdng">Is it necessary to answer the Industry and Profession questions?</b>
-                Yes, it is mandatory to provide all the details.
-            </li>
-            <li>
-                <b class="sub_hdng">Can the username and the first name be the same?</b>
-                Yes, your username and your first name can be the same.
-            </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingFive">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseFive" aria-expanded="false" aria-controls="collapseFour">
-                    Preferences
-              </a>
-            </h4>
-            </div>
-            <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
-              <div class="panel-body">
-                <ul class="nav">
-                        <li>
-                              <b class="sub_hdng">Is there a particular limit to how many options we can choose in the preference option?</b>
-                                No, there is no limit on the on the number of preferences you can pick.
-                            </li>
-                            <li>
-                                <b class="sub_hdng">Can I pick all the preferences and all the choices within them?</b>
-                                Yes, you can pick all the preferences and choices available to you.
-                            </li>
-                            <li>
-                                <b class="sub_hdng">Can I change or unsubscribe to a few choices at my convenience after a period of time?</b>
-                                Yes, you can unfollow or change your preferences at any time.
-                            </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-
-
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingSix">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseSix" aria-expanded="false" aria-controls="collapseFour">
-                    Celebrities
-              </a>
-            </h4>
-            </div>
-            <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-              <div class="panel-body">
-                <ul class="nav">
-                  <li>
-                <b class="sub_hdng">If I unfollow a celebrity, Will the celebrity know my identity?</b>
-                No, the celebrity will not know your ID if you choose to unfollow them.
-            </li>
-            <li>
-                <b class="sub_hdng">Can I chat with two celebrities at a time?</b>
-                Yes, you can chat with multiple celebrities simultaneously.
-            </li>
-            <li>
-                <b class="sub_hdng">Can I fan different celebrities without following them?</b>
-                Yes, depending on your subscription package, you can fan as many celebrities as you like.
-            </li>
-            <li>
-              <b class="sub_hdng">How many celebrities can I fan and follow?</b>
-              You can follow as many celebrities as you like. To fan a number of celebrities, it depends on your package.
-          </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingSeven">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseSeven" aria-expanded="false" aria-controls="collapseFour">
-                    Calendar
-              </a>
-            </h4>
-            </div>
-            <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
-              <div class="panel-body">
-                <ul class="nav">
-                 <li>
-                <b class="sub_hdng">Will I be able to schedule multiple services with the same celebrity on the same day?</b>
-                Depending on the celebrities preferences, you will be able to schedule multiple services with the same celebrity on the same day.
-            </li>
-            <li>
-                <b class="sub_hdng">Can I cancel my schedule without losing credits?</b>
-                No, your credits will not be refunded in case you cancel a scheduled service.
-            </li>
-            <li>
-                <b class="sub_hdng">What if I don't accept/miss the schedule Konect with the celebrity? Will I get a refund on my credits?</b>
-                No, when you miss a scheduled service it will be recorded as a complete transaction and your credits will not be refunded.
-            </li>
-            <li>
-                <b class="sub_hdng">What if the celebrity is busy during the scheduled time? Will they call me back?</b>
-                In case the celebrity is busy during the scheduled time, you will be notified and also given a new scheduled time.
-            </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingEight">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseEight" aria-expanded="false" aria-controls="collapseFour">
-                    Orders
-              </a>
-            </h4>
-            </div>
-            <div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingEight">
-              <div class="panel-body">
-                <ul class="nav">
-                  <li>
-                <b class="sub_hdng">Can we use two different cards to pay for the same transaction?</b>
-                No, there are no split payments available. The transaction needs to be made through one source.
-            </li>
-            <li>
-                <b class="sub_hdng">How long will my purchased credits be valid for?</b>
-                Your purchased credits will remain valid for 12 months from the date on your last in-app transaction.
-            </li>
-            <li>
-                <b class="sub_hdng">I have purchased credits but they are not showing up in my account. What can I do now?</b>
-                Contact the CelebKonect team on <a href="mailto:support@celebkonect.com" target="_top">support@celebkonect.com</a> to verify your transaction.
-            </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingNine">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseNine" aria-expanded="false" aria-controls="collapseFour">
-                    Settings
-              </a>
-            </h4>
-            </div>
-            <div id="collapseNine" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNine">
-              <div class="panel-body">
-                <ul class="nav">
-                <li>
-                <b class="sub_hdng">Will I get notified every time there is an update in the celebrity profile?</b>
-                A subscribed fan will be given a notification whenever a celebrity updates their profile.
-            </li>
-            <li>
-                <b class="sub_hdng">Is it necessary to make a profile for posting my auditions?</b>
-                Yes, it is necessary to make a profile before posting your auditions.
-            </li>
-            
-                </ul>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingTen">
-              <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseTen" aria-expanded="false" aria-controls="collapseFour">
-                    App Promotions
-              </a>
-            </h4>
-            </div>
-            <div id="collapseTen" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTen">
-              <div class="panel-body">
-                <ul class="nav">
-               <li>
-                <b class="sub_hdng">Do my friends have to use the promotional code generated for me by the app?</b>
-                Yes, if the user would like to claim their credits, their referred ones must use the code generated by the application.
-            </li>
-            <li>
-                <b class="sub_hdng">Does the code expire after a period of time?</b>
-                Yes, the code expires after a period of time.
-            </li>
-            <li>
-                <b class="sub_hdng">How many credits will I get if I refer the same friend twice?</b>
-                You can refer one friend only once.
-            </li>
-            <li>
-                <b class="sub_hdng">How soon will credits be allotted after sharing the promotional code?</b>
-                As soon as the referred participants register with CelebKonect using the promotional code, you will receive your credits.
-            </li>
-            <li>
-              <b class="sub_hdng">Can my friend and I refer each other?</b>
-              No, only one person can refer the other, as you can’t register twice.
-          </li>
-          <li>
-            <b class="sub_hdng">Can I refer multiple people?</b>
-            Yes, you can refer as many friends as you can.
-        </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          
+          </ul>
         </div>
       </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingTwo">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseTwo"
+            aria-expanded="false" aria-controls="collapseTwo">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/FanSubscription.png" height="24px;" width="25px;"
+                style="margin-left: -4px"></span>
+            Fan Subscription
+          </a>
+        </h4>
+      </div>
+      <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">What is the difference between a fan and a follower?</b>
+              A fan will be eligible to access premium content such as exclusive campaigns run by a celebrity. A
+              follower will only be
+              able to access the basic content and updates.
+            </li>
+            <li>
+              <b class="sub_hdng">What is the duration and cost of a fan subscription?</b>
+              A subscription fee is charged on a monthly basis. The cost will differ depending on your fan package.
+              Visit <a
+                onclick="window.open('http://www.celebkonect.com/', '_blank', 'toolbar=yes,top=500,left=500,width=100%,height=auto');">www.celebkonect.com</a>
+              to view our prices.
+            </li>
+            <li>
+              <b class="sub_hdng">If I un-fan the celebrity immediately, will I get my credit back?</b>
+              Once subscribed, you will not get your credits back. If you have a multi-month subscription, you will be
+              able to change a
+              celebrity at the end of each month
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingThree">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseThree"
+            aria-expanded="false" aria-controls="collapseThree">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/Menu_Home.png" height="26px;" width="25px;"
+                style="margin-left: -5px"></span>
+            Menu/Home
+          </a>
+        </h4>
+      </div>
+      <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">In the home option, will I be able to view all the celebrities or only the ones I have
+                chosen?</b>
+              When you navigate to the home option, the button 'explore all celebrities' which will help you surf
+              through all the celeb
+              profiles.
+            </li>
+            <li>
+              <b class="sub_hdng">Is the bell button on the top right corner for updates on all celebrities or only the
+                prefered celebrities?</b>
+              No, the bell option will give you timely notifications about all the services that you have scheduled.
+            </li>
+            <li>
+              <b class="sub_hdng">Will I be notified if the celebrities I haven't prefered are online and available?</b>
+              No, you will not be notified but you will be able to see the celebrities that are online through the
+              'explore all celebrities'
+              button.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingFour">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseFour"
+            aria-expanded="false" aria-controls="collapseFour">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/MyProfile.png" height="20px;"
+                width="20px;"></span>
+            My Profile
+          </a>
+        </h4>
+      </div>
+      <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">Is it necessary to answer the Industry and Profession questions?</b>
+              Yes, it is mandatory to provide all the details.
+            </li>
+            <li>
+              <b class="sub_hdng">Can the username and the first name be the same?</b>
+              Yes, your username and your first name can be the same.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingFive">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseFive"
+            aria-expanded="false" aria-controls="collapseFour">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/MyPreferences.png" height="20px;"
+                width="20px;"></span>
+            My Preferences
+          </a>
+        </h4>
+      </div>
+      <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">Is there a particular limit to how many options we can choose in the preference
+                option?</b>
+              No, there is no limit on the on the number of preferences you can pick.
+            </li>
+            <li>
+              <b class="sub_hdng">Can I pick all the preferences and all the choices within them?</b>
+              Yes, you can pick all the preferences and choices available to you.
+            </li>
+            <li>
+              <b class="sub_hdng">Can I change or unsubscribe to a few choices at my convenience after a period of
+                time?</b>
+              Yes, you can unfollow or change your preferences at any time.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingSix">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseSix"
+            aria-expanded="false" aria-controls="collapseFour">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/MyCelebrities.png" height="20px;"
+                width="20px;"></span>
+            My Celebrities
+          </a>
+        </h4>
+      </div>
+      <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">If I unfollow a celebrity, Will the celebrity know my identity?</b>
+              No, the celebrity will not know your ID if you choose to unfollow them.
+            </li>
+            <li>
+              <b class="sub_hdng">Can I chat with two celebrities at a time?</b>
+              No, you will be able to chat with only one celebrity at a time.
+            </li>
+            <li>
+              <b class="sub_hdng">Can I fan different celebrities without following them?</b>
+              Yes, depending on your subscription package, you can fan as many celebrities as you like
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingSeven">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseSeven"
+            aria-expanded="false" aria-controls="collapseFour">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/MySchedules.png" height="19px;"
+                width="20px;"></span>
+            My Schedules
+          </a>
+        </h4>
+      </div>
+      <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">Will I be able to schedule multiple services with the same celebrity on the same
+                day?</b>
+              Depending on the celebrities preferences, you will be able to schedule multiple services with the same
+              celebrity on the same day.
+            </li>
+            <li>
+              <b class="sub_hdng">Can I cancel my schedule without losing credits?</b>
+              No, your credits will not be refunded in case you cancel a scheduled service.
+            </li>
+            <li>
+              <b class="sub_hdng">What if I don't accept/miss the schedule Konect with the celebrity? Will I get a
+                refund on my credits?</b>
+              No, when you miss a scheduled service it will be recorded as a complete transaction and your credits will
+              not be refunded.
+            </li>
+            <li>
+              <b class="sub_hdng">What if the celebrity is busy during the scheduled time? Will they call me back?</b>
+              In case the celebrity is busy during the scheduled time, you will be notified and also given a new
+              scheduled time.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingEight">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseEight"
+            aria-expanded="false" aria-controls="collapseFour">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/MyOrders.png" height="25px;"
+                width="20px;"></span>
+            My Orders
+          </a>
+        </h4>
+      </div>
+      <div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingEight">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">Can we use two different cards to pay for the same transaction?</b>
+              There are no split payments available. The transaction needs to be made through one source.
+            </li>
+            <li>
+              <b class="sub_hdng">How long will my purchased credits be valid for?</b>
+              Your purchased credits will remain valid for 12 months from the date on your last in-app transaction.
+            </li>
+            <li>
+              <b class="sub_hdng">I have purchased credits but they are not showing up in my account. What can I do
+                now?</b>
+              Contact the CelebKonect team on <a href="mailto:support@celebkonect.com"
+                target="_top">support@celebkonect.com</a> to verify your transaction.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingNine">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseNine"
+            aria-expanded="false" aria-controls="collapseFour">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/MySettings.png" height="20px;"
+                width="20px;"></span>
+            My Settings
+          </a>
+        </h4>
+      </div>
+      <div id="collapseNine" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNine">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">Will I get notified every time there is an update in the celebrity profile?</b>
+              A subscribed fan will be given a notification whenever a celebrity updates their profile.
+            </li>
+            <li>
+              <b class="sub_hdng">Will I get a notification about my services before time?</b>
+              Yes, you will be notified before your scheduled time and you can see them under your notifications
+              section.
+            </li>
+            <li>
+              <b class="sub_hdng">What does night mode do? Will it stop me from contacting my celebrity?</b>
+              'Night mode' option is used to save the battery on your phone.
+            </li>
+            <li>
+              <b class="sub_hdng">What happens if I click the 'number of hours' button? </b>
+              It will help you determine the duration of your conversation with the Celeb.
+            </li>
+            <li>
+              <b class="sub_hdng">Is the 'Do Not Disturb' option used when we are konecting with our scheduled
+                celebrity?</b>
+              The 'Do Not disturb' option will help you snooze all the notifications from the application.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingTen">
+        <h4 class="panel-title">
+          <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionMenu" href="#collapseTen"
+            aria-expanded="false" aria-controls="collapseFour">
+            <span style="padding-right: 20px;padding-left: 6px"><img
+                src="https://testapi.celebkonect.com:4300/uploads/icons/AppPromotions.png" height="25px;" width="25px;"
+                style="margin-left: -3px"></span>
+            App Promotions
+          </a>
+        </h4>
+      </div>
+      <div id="collapseTen" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTen">
+        <div class="panel-body">
+          <ul class="nav">
+            <li>
+              <b class="sub_hdng">Do my friends have to use the promotional code generated for me by the app?</b>
+              Yes, if the user would like to claim their credits, their referred ones must use the code generated by the
+              application.
+            </li>
+            <li>
+              <b class="sub_hdng">Does the code expire after a period of time?</b>
+              Yes, the code expires after a period of time.
+            </li>
+            <li>
+              <b class="sub_hdng">How many credits will I get if I refer the same friend twice?</b>
+              You can refer one friend only once.
+            </li>
+            <li>
+              <b class="sub_hdng">How soon will credits be allotted after sharing the promotional code?</b>
+              As soon as the your referred participant registers with CelebKonect with the given promotional code, you
+              will receive your credits.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

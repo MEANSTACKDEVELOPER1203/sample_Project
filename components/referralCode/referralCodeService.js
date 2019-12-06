@@ -4,18 +4,20 @@ const User = require("../users/userModel");
 const ReferralCode = require("./referralCodeModel")
 
 const payToReferrer = (memberId, ammount, callback) => {
+    // console.log("payToReferrer ==== ", ammount);
     Credits.findOne({ memberId: ObjectId(memberId) }, (err, cBal) => {
         if (err) {
             callback(err, null, "Please Login again")
         }
         if (cBal) {
-            let newReferralCreditValue = cBal.referralCreditValue + ammount;
+            let newReferralCreditValue = cBal.memberReferCreditValue + ammount;
             let newCredits = new Credits({
                 memberId: memberId,
                 creditType: "promotion",
                 creditValue: cBal.creditValue,
                 cumulativeCreditValue: cBal.cumulativeCreditValue,
-                referralCreditValue: newReferralCreditValue,
+                referralCreditValue: cBal.referralCreditValue,
+                memberReferCreditValue: newReferralCreditValue,
                 createdBy: memberId
             });
             Credits.createCredits(newCredits, (err, credits) => {
@@ -30,8 +32,9 @@ const payToReferrer = (memberId, ammount, callback) => {
                 memberId: memberId,
                 creditType: "promotion",
                 creditValue: parseInt(0),
-                cumulativeCreditValue: ammount,
+                cumulativeCreditValue: parseInt(0),
                 referralCreditValue: parseInt(0),
+                memberReferCreditValue: ammount,
                 createdBy: memberId
             });
             Credits.createCredits(newCredits, (err, credits) => {

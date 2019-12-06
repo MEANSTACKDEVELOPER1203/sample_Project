@@ -259,7 +259,7 @@ router.get('/getBannerByIdContest/:banner_Id', (req, res, next) => {
                         contestObj.isNewUser = isNewUser;
                         listOfContestArray.push(contestObj);
                     }
-                    contestEntry.count({ bannerId: ObjectId(bannerId) }).exec((err, totalParticipatedUserCount) => {
+                    contestEntry.countDocuments({ bannerId: ObjectId(bannerId) }).exec((err, totalParticipatedUserCount) => {
                         if (err) {
                             console.log(err);
                         } else {

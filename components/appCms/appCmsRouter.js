@@ -16,7 +16,7 @@ let storage = multer.diskStorage({
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     cb(null, "ck" + "_pr2" + "_" + date + "_" + Date.now() + "_" + file.originalname);
-   
+
   }
 });
 
@@ -28,7 +28,7 @@ let upload = multer({
 
 // Image Settings for banners
 let storageBanner = multer.diskStorage({
-  
+
   destination: function (req, file, cb) {
     cb(null, "uploads/banners");
   },
@@ -108,14 +108,14 @@ router.put("/editAppBanner/:mediaTitle", uploadBanner.any(), function (req, res)
   let mediaTitle = req.params.mediaTitle;
   let mediaUrl = req.body.mediaUrl;
   appCms.findOneAndUpdate({
-      "media.mediaTitle": mediaTitle
-    }, {
-      $set: {
-        "media.$.mediaUrl": file[0].path
-      }
-    }, {
-      upsert: true
-    },
+    "media.mediaTitle": mediaTitle
+  }, {
+    $set: {
+      "media.$.mediaUrl": file[0].path
+    }
+  }, {
+    upsert: true
+  },
     function (err, newresult) {
       if (err) {
         res.json({
@@ -156,8 +156,8 @@ router.get("/getContent/:moduleName/:areaName", function (req, res) {
   };
 
   appCms.findOne(query, function (err, result) {
-    if (err) return res.json({token:req.headers['x-access-token'],success:0,message:err});
-    res.json({token:req.headers['x-access-token'],success:1,data:result})
+    if (err) return res.json({ token: req.headers['x-access-token'], success: 0, message: err });
+    res.json({ token: req.headers['x-access-token'], success: 1, data: result })
     //res.send(result);
   });
 });
@@ -172,11 +172,11 @@ router.get("/getContent/:moduleName", function (req, res) {
   };
 
   appCms.find(query, function (err, result) {
-    if (err) return res.json({token:req.headers['x-access-token'],success:0,message:err});
+    if (err) return res.json({ token: req.headers['x-access-token'], success: 0, message: err });
     if (result) {
-      res.json({token:req.headers['x-access-token'],success:1,data:result})
+      res.json({ token: req.headers['x-access-token'], success: 1, data: result })
     } else {
-      res.json({token:req.headers['x-access-token'],success:0,message:"Module not found / Doesnot exist!"});
+      res.json({ token: req.headers['x-access-token'], success: 0, message: "Module not found / Doesnot exist!" });
     }
 
   });
@@ -191,8 +191,8 @@ router.get("/getfaqs", function (req, res) {
 // End of FAQs template
 
 // Render Demo
-router.get("/demo", function(req,res) {
-res.render("demo");
+router.get("/demo", function (req, res) {
+  res.render("demo");
 });
 // End of Render Demo
 
@@ -231,6 +231,13 @@ router.get("/aboutuspage", function (req, res) {
 
   res.render("aboutus");
 });
+// End of About Us template
+
+// About Us template
+// const appleIdData = require('../../appliId')
+// router.get("/appleId", function (req, res) {
+//   res.send(appleIdData);
+// });
 // End of About Us template
 
 // Delete by appCms

@@ -15,7 +15,7 @@ let creditsSchema = new mongoose.Schema({
     },
     memberId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
+        ref: 'User',
         required: true
     },
     paymentTranRefId: {
@@ -30,11 +30,15 @@ let creditsSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    cumulativeCreditValue: {
+    cumulativeCreditValue: { //this is main credit value(buy credit).
         type: Number,
         default: 0
     },
-    referralCreditValue: {
+    referralCreditValue: { //this is referral value based on you have registred through referral code.
+        type: Number,
+        default: 0
+    },
+    memberReferCreditValue: { //this is referral value based on they(other users) have registred through your referral code.
         type: Number,
         default: 0
     },
@@ -51,13 +55,13 @@ let creditsSchema = new mongoose.Schema({
         enum: [active, inactive],
         default: "active"
     },
-    createdAt: { 
+    createdAt: {
         type: Date,
-        default: Date.now 
+        default: Date.now
     },
-    updatedAt: { 
+    updatedAt: {
         type: Date,
-        default: Date.now 
+        default: Date.now
     },
     createdBy: {
         type: String,
@@ -67,7 +71,7 @@ let creditsSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-},{
+}, {
     versionKey: false
 });
 

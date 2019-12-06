@@ -1,7 +1,7 @@
 let express = require("express");
 let router = express.Router();
 let ObjectId = require("mongodb").ObjectID;
-let async = require('async');
+// let async = require('async');
 let notificationMaster = require("./notificationMasterModel");
 let notificationSetting = require("../notificationSettings/notificationSettingsModel");
 let userService = require('../users/userService');

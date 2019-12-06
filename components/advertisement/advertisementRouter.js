@@ -12,36 +12,23 @@ let multer = require('multer');
 // Multer Plugin Settings (Images Upload)
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "uploads/banners");
+        cb(null, "uploads/banners");
     },
     filename: function (req, file, cb) {
-      var today = new Date();
-      var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-      cb(null, "ck" + "_pr2" + "_" + date + "_" + Date.now() + "_" + file.originalname);
+        var today = new Date();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        cb(null, "ck" + "_pr2" + "_" + date + "_" + Date.now() + "_" + file.originalname);
     }
-  });
-  
-  let upload = multer({
+});
+
+let upload = multer({
     storage: storage
-  });
-  
-
-
+});
 
 //@des create advertisement
 //@Method Post
 //@access private(admin only)
 router.post('/createAdvertisement', upload.any(), advertisementController.createAdvertisement);
-
-
-
-
-
-
-
-
-
-
 const adverties = {
     suggestion: (array, currentMemberId, callback) => {
         celebrityContract.distinct("memberId", (err, contractsCelebArray) => {

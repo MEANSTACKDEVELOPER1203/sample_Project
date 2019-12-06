@@ -153,6 +153,15 @@ const getFanFollowFromMemberPreferancesOfMember = (memberId, callback) => {
     });
 }
 
+//get member preference by member ID
+const getFanFollowFromMemberPreferancesOfMemberAsync = query =>
+    new Promise((resolve, reject) => {
+        Memberpreferences.findOne({ memberId: query.memberId }, { celebrities: 1, preferences: 1 })
+            .then(listOfMyPreferences => resolve(listOfMyPreferences))
+            .catch(err => reject(err))
+    })
+
+
 
 let findAllMyPreferencesByMemberId = function (memberId, callback) {
     //console.log("mem Preference ", memberId)
@@ -267,7 +276,7 @@ const checkAlreadyFanFollowOrNot = (memberId, CelebrityId, action, callback) => 
     } else if (action == "follow" || action == "unfollow") {
         query = { "celebrities.CelebrityId": CelebrityId, "celebrities.isFollow": true }
     }
-    console.log("memberPreferencesStatus")
+    // console.log("memberPreferencesStatus")
     Memberpreferences.aggregate([
         {
             $match: {
@@ -285,7 +294,7 @@ const checkAlreadyFanFollowOrNot = (memberId, CelebrityId, action, callback) => 
             callback(err, null)
         }
         else if (memberPreferencesStatus.length) {
-            console.log(memberPreferencesStatus)
+            // console.log(memberPreferencesStatus)
             if (action == "fan")
                 callback("User already a Fan", memberPreferencesStatus)
             else if (action == "unfollow" || action == "unfan" || action.mode == "block")
@@ -576,7 +585,7 @@ const makeVertualFollower = (celebrityId, count, callback) => {
                                     let addingFollower = beingFollower.map((user) => {
                                         return user._id
                                     })
-                                    console.log(addingFollower)
+                                    // console.log(addingFollower)
                                     //priviolsy we are updating all at once but the time coming same so pagination
                                     //not working so we need to insert one by one on random time
                                     addingFollower.forEach((id) => {
@@ -825,11 +834,11 @@ const getBlockUserList = (celebrityId, paginationDate, callback) => {
 
     // console.log(paginationDate)
     let limit = 30;
-    Feedback.count({ "celebrityId": ObjectId(celebrityId), "reason": "Block/Report" }, (err, totalBlockCount) => {
+    Feedback.countDocuments({ "celebrityId": ObjectId(celebrityId), "reason": "Block/Report" }, (err, totalBlockCount) => {
         if (err) {
             callback(err, null, null)
         } else {
-            console.log("Block Count", totalBlockCount)
+            // console.log("Block Count", totalBlockCount)
             Feedback.aggregate([
                 {
                     $sort: { createdDate: -1 }
@@ -971,7 +980,7 @@ const getBlockUserList = (celebrityId, paginationDate, callback) => {
                             }
                         }
                     ], (err, blockUser2) => {
-                        // console.log("block from transaction ==== ", blockUser2)
+                        // console.log("block blockUser2 from transaction ==== ", blockUser2)
                         if (err) {
                             callback(null, blockUser1, totalBlockCount)
                         }
@@ -983,6 +992,7 @@ const getBlockUserList = (celebrityId, paginationDate, callback) => {
                                 userObj.feedback = blockUser.reason;
                                 return userObj
                             })
+                            totalBlockCount = parseInt(totalBlockCount) + blockUser2.length
                             blockUser = blockUser2.concat(blockUser1)
                             blockUser.sort(function (x, y) {
                                 var dateA = new Date(x.paginationDate), dateB = new Date(y.paginationDate);
@@ -995,8 +1005,128 @@ const getBlockUserList = (celebrityId, paginationDate, callback) => {
             })
         }
     })
-
 }
+let provideData = {
+    _id: 1, avtar_imgPath: 1, avtar_originalname: 1, cover_imgPath: 1, custom_imgPath: 1,
+    imageRatio: 1, name: 1, firstName: 1, lastName: 1, prefix: 1, role: 1, profession: 1, industry: 1, isCeleb: 1,
+    isTrending: 1, aboutMe: 1, category: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
+}
+const getBlockUserFromFeedbackListAsync = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+
+            if (query.paginationDate == "0")
+                paginationDate = new Date();
+            else
+                paginationDate = new Date(query.paginationDate);
+            Feedback.aggregate([
+                {
+                    $sort: { createdDate: -1 }
+                },
+                {
+                    $match: {
+                        $or: [{
+                            $and: [{
+                                reason: "Block/Report",
+                                celebrityId: ObjectId(query.celebrityId),
+                                createdDate: { $lt: paginationDate }
+                            }]
+                        }],
+                    }
+                },
+                {
+                    $limit: query.limit
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "memberId",
+                        foreignField: "_id",
+                        as: "memberDetails"
+                    }
+                },
+                {
+                    $unwind: "$memberDetails"
+                },
+                {
+                    $group: {
+                        _id: "$memberDetails",
+                        createdDate: { $first: "$createdDate" },
+                        updatedDate: { $first: "$updatedDate" },
+                        feedback: { $first: "$feedback" },
+                    }
+                },
+                {
+                    $match: {
+                        _id: { $ne: null }
+                    }
+                },
+                {
+                    $project: {
+                        _id: provideData
+                    }
+                }
+            ]).then(blockUsersObj => resolve(blockUsersObj))
+                .catch(error => reject(error))
+        }, 100)
+    })
+
+const getBlockUserFromServiceTransactionListAsync = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let startDate = query.paginationDate;
+            let getDateTime = new Date();
+            if (startDate != "null" && startDate != "0") {
+                getDateTime = new Date(startDate)
+            }
+            ServiceTransaction.aggregate([
+                {
+                    $match: {
+                        senderId: { $nin: query.expectId },
+                        receiverId: ObjectId(query.celebrityId),
+                        callRemarks: "Block/Report",
+                        createdAt: { $lt: new Date(getDateTime) }
+                    }
+                },
+                {
+                    $sort: { createdAt: -1 }
+                },
+                {
+                    $limit: query.limit
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "senderId",
+                        foreignField: "_id",
+                        as: "memberDetails"
+                    }
+                },
+                {
+                    $unwind: "$memberDetails"
+                },
+                {
+                    $group: {
+                        _id: "$memberDetails",
+                        createdAt: { $first: "$createdAt" },
+                        updatedAt: { $first: "$updatedAt" },
+                        reason: { $first: "$reason" },
+                    }
+                },
+                {
+                    $match: {
+                        _id: { $ne: null }
+                    }
+                },
+                {
+                    $project: {
+                        _id: provideData
+                    }
+                }
+            ]).then(blockUsersObj => resolve(blockUsersObj))
+                .catch(err => reject(err))
+        }, 100)
+    })
 
 const unblockMember = (body, callback) => {
     let celebrityId = ObjectId(body.celebrityId)
@@ -1138,7 +1268,7 @@ const getBlockersList = (memberId, callback) => {
                     callback(null, blockUser1)
                 }
                 else {
-                    console.log(blockUser2)
+                    // console.log(blockUser2)
                     blockUser2 = blockUser2.map((blockUser) => {
                         return blockUser._id
                     })
@@ -1149,6 +1279,237 @@ const getBlockersList = (memberId, callback) => {
         }
     })
 }
+const getBlockersListAsync1 = query =>
+    new Promise((resolve, reject) => {
+        Feedback.aggregate([
+            {
+                $match: {
+                    reason: "Block/Report",
+                    memberId: ObjectId(query.memberId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "celebrityId",
+                    foreignField: "_id",
+                    as: "memberDetails"
+                }
+            },
+            {
+                $unwind: "$memberDetails"
+            },
+            {
+                $group: {
+                    _id: "$memberDetails"
+                }
+            },
+            {
+                $match: {
+                    _id: { $ne: null }
+                }
+            },
+            {
+                $project: {
+                    _id: {
+                        firstName: 1,
+                        lastName: 1,
+                        _id: 1,
+                        email: 1,
+                        username: 1,
+                        osType: 1,
+                        mobileNumber: 1,
+                        isCeleb: 1,
+                        isManager: 1,
+                        profession: 1,
+                        avtar_imgPath: 1,
+                        avtar_originalname: 1
+                    }
+                }
+            }
+        ]).then(blockUser1 => resolve(blockUser1))
+            .catch(err => reject(err))
+    })
+
+const getBlockersListAsync2 = query =>
+    new Promise((resolve, reject) => {
+        blockUser1 = query.blockUser1.map((blockUser) => {
+            return blockUser._id
+        })
+        let expectId = blockUser1.map((blockUser) => {
+            return blockUser._id
+        })
+
+        ServiceTransaction.aggregate([
+            {
+                $match: {
+                    callRemarks: "Block/Report",
+                    senderId: ObjectId(query.memberId),
+                    receiverId: { $nin: expectId }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "receiverId",
+                    foreignField: "_id",
+                    as: "memberDetails"
+                }
+            },
+            {
+                $unwind: "$memberDetails"
+            },
+            {
+                $group: {
+                    _id: "$memberDetails"
+                }
+            },
+            {
+                $match: {
+                    _id: { $ne: null }
+                }
+            },
+            {
+                $project: {
+                    _id: {
+                        firstName: 1,
+                        lastName: 1,
+                        _id: 1,
+                        email: 1,
+                        username: 1,
+                        osType: 1,
+                        mobileNumber: 1,
+                        isCeleb: 1,
+                        isManager: 1,
+                        profession: 1,
+                        avtar_imgPath: 1,
+                        avtar_originalname: 1
+                    }
+                }
+            }
+        ]).then(blockUser2 => resolve(blockUser2))
+            .catch(err => reject(err))
+    })
+
+// Feedback.aggregate([
+//     {
+//         $match: {
+//             reason: "Block/Report",
+//             memberId: ObjectId(memberId)
+//         }
+//     },
+//     {
+//         $lookup: {
+//             from: "users",
+//             localField: "celebrityId",
+//             foreignField: "_id",
+//             as: "memberDetails"
+//         }
+//     },
+//     {
+//         $unwind: "$memberDetails"
+//     },
+//     {
+//         $group: {
+//             _id: "$memberDetails"
+//         }
+//     },
+//     {
+//         $match: {
+//             _id: { $ne: null }
+//         }
+//     },
+//     {
+//         $project: {
+//             _id: {
+//                 firstName: 1,
+//                 lastName: 1,
+//                 _id: 1,
+//                 email: 1,
+//                 username: 1,
+//                 osType: 1,
+//                 mobileNumber: 1,
+//                 isCeleb: 1,
+//                 isManager: 1,
+//                 profession: 1,
+//                 avtar_imgPath: 1,
+//                 avtar_originalname: 1
+//             }
+//         }
+//     }
+// ], (err, blockUser1) => {
+//     if (err) {
+//         callback(err, null)
+//     } else {
+//         blockUser1 = blockUser1.map((blockUser) => {
+//             return blockUser._id
+//         })
+//         let expectId = blockUser1.map((blockUser) => {
+//             return blockUser._id
+//         })
+//         ServiceTransaction.aggregate([
+//             {
+//                 $match: {
+//                     callRemarks: "Block/Report",
+//                     senderId: ObjectId(memberId),
+//                     receiverId: { $nin: expectId }
+//                 }
+//             },
+//             {
+//                 $lookup: {
+//                     from: "users",
+//                     localField: "receiverId",
+//                     foreignField: "_id",
+//                     as: "memberDetails"
+//                 }
+//             },
+//             {
+//                 $unwind: "$memberDetails"
+//             },
+//             {
+//                 $group: {
+//                     _id: "$memberDetails"
+//                 }
+//             },
+//             {
+//                 $match: {
+//                     _id: { $ne: null }
+//                 }
+//             },
+//             {
+//                 $project: {
+//                     _id: {
+//                         firstName: 1,
+//                         lastName: 1,
+//                         _id: 1,
+//                         email: 1,
+//                         username: 1,
+//                         osType: 1,
+//                         mobileNumber: 1,
+//                         isCeleb: 1,
+//                         isManager: 1,
+//                         profession: 1,
+//                         avtar_imgPath: 1,
+//                         avtar_originalname: 1
+//                     }
+//                 }
+//             }
+//         ], (err, blockUser2) => {
+//             if (err) {
+//                 callback(null, blockUser1)
+//             }
+//             else {
+//                 // console.log(blockUser2)
+//                 blockUser2 = blockUser2.map((blockUser) => {
+//                     return blockUser._id =
+//                     })
+//                 blockUser = blockUser2.concat(blockUser1)
+//                 callback(null, blockUser)
+//             }
+//         })
+//     }
+// })
+
 
 const getAllBlockUser = (params, callback) => {
     let limit = parseInt(params.limit);
@@ -1434,6 +1795,71 @@ const followingCelebritiesByMember = (params, callback) => {
 
 }
 
+const followingCelebritiesByMemberAsync = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let createdAt = query.createdAt
+            let getNotificatonByTime = new Date();
+            if (createdAt != "null" && createdAt != "0") {
+                getNotificatonByTime = createdAt
+            }
+            Memberpreferences.aggregate(
+                [
+                    { $match: { memberId: ObjectId(query.id) } },
+                    { $unwind: "$celebrities" },
+                    { $match: { "celebrities.isFollower": true, "celebrities.createdAt": { $lt: new Date(getNotificatonByTime) } } },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "celebrities.CelebrityId",
+                            foreignField: "_id",
+                            as: "celebProfile"
+                        }
+                    },
+                    {
+                        $unwind: "$celebProfile"
+                    },
+                    {
+                        $sort: {
+                            "celebrities.createdAt": -1
+                        }
+                    },
+                    {
+                        $match: {
+                            $and: [
+                                { "celebProfile._id": { $ne: ObjectId(query.id) } },
+                                { celebProfile: { $ne: [] } }
+                            ]
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            celebrities: { $push: { "celebrities": "$celebrities", "celebProfile": "$celebProfile" } },
+                        }
+                    },
+                    {
+                        $unwind: "$celebrities"
+                    },
+                    {
+                        $limit: query.limit
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            "celebrities.celebProfile": provideData,
+                            "celebrities.celebrities": {
+                                CelebrityId: 1,
+                                isFan: 1,
+                                createdAt: 1
+                            },
+                        }
+                    }
+                ]).then(memberFollowerList => resolve(memberFollowerList))
+                .catch(err => reject(err))
+        }, 100)
+    })
+
 const fanCelebritiesbyMember = (params, callback) => {
     let id = params.userId;
     let limit = parseInt(params.limit);
@@ -1528,6 +1954,73 @@ const fanCelebritiesbyMember = (params, callback) => {
 
 }
 
+const fanCelebritiesbyMemberAsync = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let createdAt = query.createdAt
+            let getNotificatonByTime = new Date();
+            if (createdAt != "null" && createdAt != "0") {
+                getNotificatonByTime = createdAt
+            }
+            Memberpreferences.aggregate(
+                [
+                    { $match: { $and: [{ memberId: ObjectId(query.id) }] } },
+                    { $unwind: "$celebrities" },
+                    { $match: { "celebrities.isFan": true, "celebrities.createdAt": { $lt: new Date(getNotificatonByTime) } } },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "celebrities.CelebrityId",
+                            foreignField: "_id",
+                            as: "celebProfile"
+                        }
+                    },
+                    {
+                        $unwind: "$celebProfile"
+                    },
+                    {
+                        $sort: {
+                            "celebrities.createdAt": -1
+                        }
+                    },
+                    {
+                        $match: {
+                            $and: [
+                                { "celebProfile._id": { $ne: ObjectId(query.id) } },
+                                { celebProfile: { $ne: [] } }
+                            ]
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            celebrities: { $push: { "celebrities": "$celebrities", "celebProfile": "$celebProfile" } },
+                            total: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $unwind: "$celebrities"
+                    },
+                    {
+                        $limit: query.limit
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            "celebrities.celebProfile": provideData,
+                            "celebrities.celebrities": {
+                                CelebrityId: 1,
+                                isFan: 1,
+                                createdAt: 1
+                            },
+                        }
+                    }
+                ]).then(memberFanList => resolve(memberFanList))
+                .catch(err => reject(err))
+        }, 100)
+    })
+
+
 const fanMembersbyCelebrity = (params, callback) => {
     let id = params.celebId;
     let limit = parseInt(params.limit);
@@ -1536,7 +2029,7 @@ const fanMembersbyCelebrity = (params, callback) => {
     if (createdAt != "null" && createdAt != "0") {
         getNotificatonByTime = createdAt
     }
-    Memberpreferences.count({ celebrities: { $elemMatch: { CelebrityId: ObjectId(id), isFan: true } } }, (err, totalFanCount) => {
+    Memberpreferences.countDocuments({ celebrities: { $elemMatch: { CelebrityId: ObjectId(id), isFan: true } } }, (err, totalFanCount) => {
         if (err) {
             return res.status(404).json({ success: 0, message: "Error while fetching the FAN count" })
         } else {
@@ -1614,6 +2107,69 @@ const fanMembersbyCelebrity = (params, callback) => {
 
 }
 
+const fanMembersbyCelebrityAsync = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let createdAt = query.createdAt;
+            let getNotificatonByTime = new Date();
+            if (createdAt != "null" && createdAt != "0") {
+                getNotificatonByTime = createdAt
+            }
+            Memberpreferences.aggregate([
+                { $unwind: "$celebrities" },
+                {
+                    $match: { "celebrities.CelebrityId": ObjectId(query.celebrityId), "celebrities.isFan": true, "celebrities.createdAt": { $lt: new Date(getNotificatonByTime) } }
+                },
+                {
+                    $sort: { "celebrities.createdAt": -1 }
+                },
+                {
+                    $limit: query.limit
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "memberId",
+                        foreignField: "_id",
+                        as: "memberProfile"
+                    }
+                },
+                {
+                    $unwind: "$memberProfile"
+                },
+                {
+                    $match: {
+                        "memberProfile._id": { $ne: ObjectId(query.celebrityId) }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        celebrities: { $push: { "celebrities": "$celebrities", "memberProfile": "$memberProfile" } },
+                        // total: { $sum: 1 }
+                    }
+                },
+                {
+                    $unwind: "$celebrities"
+                },
+
+                {
+                    $project: {
+                        _id: 0,
+                        "celebrities.memberProfile": provideData,
+                        "celebrities.celebrities": {
+                            CelebrityId: 1,
+                            isFan: 1,
+                            createdAt: 1
+                        },
+                        // total: 1
+                    }
+                }
+            ]).then(celebFanListObj => resolve(celebFanListObj))
+                .catch(err => reject(err))
+        }, 100)
+    })
+
 const followingMembersbyCelebrity = (params, callback) => {
     let id = params.celebId;
     let limit = parseInt(params.limit);
@@ -1624,7 +2180,7 @@ const followingMembersbyCelebrity = (params, callback) => {
     }
     // console.log(getNotificatonByTime)
 
-    Memberpreferences.count({ celebrities: { $elemMatch: { CelebrityId: ObjectId(id), isFollower: true } } }, (err, totalFollowerCount) => {
+    Memberpreferences.countDocuments({ celebrities: { $elemMatch: { CelebrityId: ObjectId(id), isFollower: true } } }, (err, totalFollowerCount) => {
         if (err) {
             return res.status(404).json({ success: 0, message: "Error while fetching the FOLLOWER count" })
         } else {
@@ -1708,6 +2264,69 @@ const followingMembersbyCelebrity = (params, callback) => {
         }
     });
 }
+
+const followingMembersbyCelebrityAsync = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let createdAt = query.createdAt;
+            let getNotificatonByTime = new Date();
+            if (createdAt != "null" && createdAt != "0") {
+                getNotificatonByTime = createdAt
+            }
+            Memberpreferences.aggregate([
+                { $unwind: "$celebrities" },
+                {
+                    $match: { "celebrities.CelebrityId": ObjectId(query.celebrityId), "celebrities.isFollower": true, "celebrities.createdAt": { $lt: new Date(getNotificatonByTime) } }
+                },
+                {
+                    $sort: { "celebrities.createdAt": -1 }
+                },
+                {
+                    $limit: query.limit
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "memberId",
+                        foreignField: "_id",
+                        as: "memberProfile"
+                    }
+                },
+                {
+                    $unwind: "$memberProfile"
+                },
+                {
+                    $match: {
+                        "memberProfile._id": { $ne: ObjectId(query.celebrityId) }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        celebrities: { $push: { "celebrities": "$celebrities", "memberProfile": "$memberProfile" } },
+                        total: { $sum: 1 }
+                    }
+                },
+                {
+                    $unwind: "$celebrities"
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        "celebrities.memberProfile": provideData,
+                        "celebrities.celebrities": {
+                            CelebrityId: 1,
+                            isFan: 1,
+                            createdAt: 1
+                        },
+                        total: 1
+                    }
+                }
+            ]).then(celebFollowersList => resolve(celebFollowersList))
+                .catch(err => reject(err))
+
+        }, 1000)
+    })
 
 const getAllUnfanWithReason = (params, callback) => {
     let limit = parseInt(params.limit);
@@ -1912,6 +2531,77 @@ let findFanFollowByMemberId = function (memberId, callback) {
     });
 }
 
+const getFanCount = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            Memberpreferences.countDocuments({ celebrities: { $elemMatch: { CelebrityId: ObjectId(query.celebrityId), isFan: true } } })
+                .then(fanCount => resolve(fanCount))
+                .catch(err => reject(err))
+        }, 100)
+    })
+
+const getFollowCount = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            Memberpreferences.countDocuments({ celebrities: { $elemMatch: { CelebrityId: ObjectId(query.celebrityId), isFollower: true } } })
+                .then(fanCount => resolve(fanCount))
+                .catch(err => reject(err))
+        }, 100)
+    })
+
+const getBlockedCount = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            Feedback.countDocuments({ "celebrityId": ObjectId(query.celebrityId), "reason": "Block/Report" })
+                .then((blockedCount1) => {
+                    ServiceTransaction.countDocuments({ receiverId: ObjectId(query.celebrityId), callRemarks: "Block/Report" })
+                        .then((blockedCount2) => {
+                            let blockedCount = parseInt(blockedCount1) + parseInt(blockedCount2);
+                            resolve(blockedCount)
+                        })
+                })
+                .catch(err => reject(err))
+        }, 100)
+    })
+
+const getMemberFanCount = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            Memberpreferences.findOne({ memberId: ObjectId(query.id) }, { celebrities: 1 }).then(function (memberFanObj) {
+                let totalFanCount = 0;
+                memberFanObj.celebrities.map((celeb) => {
+                    if (celeb.isFan == true)
+                        totalFanCount = totalFanCount + 1
+                    return celeb
+                });
+                const error = totalFanCount < 0 ? true : false
+                if (error) {
+                    reject(new Error('Ooops, something broke!'));
+                } else
+                    resolve(totalFanCount)
+            })
+        }, 100)
+    })
+
+const getMemberFollowerCount = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            Memberpreferences.findOne({ memberId: ObjectId(query.id) }, { celebrities: 1 }).then(function (memberFanObj) {
+                let totalFollowerCount = 0;
+                memberFanObj.celebrities.map((celeb) => {
+                    if (celeb.isFollower == true)
+                        totalFollowerCount = totalFollowerCount + 1
+                    return celeb
+                });
+                const error = totalFollowerCount < 0 ? true : false
+                if (error) {
+                    reject(new Error('Ooops, something broke!'));
+                } else
+                    resolve(totalFollowerCount)
+            })
+        }, 100)
+    })
+
 let memberPreferenceServices = {
     findAllMyPreferencesByMemberId: findAllMyPreferencesByMemberId,
     saveMemberPreference: saveMemberPreference,
@@ -1936,7 +2626,25 @@ let memberPreferenceServices = {
     getAllUnfanWithReason: getAllUnfanWithReason,
     getUnfanWithReasonByCelebrityId: getUnfanWithReasonByCelebrityId,
     getFanFollowFromMemberPreferancesOfMember: getFanFollowFromMemberPreferancesOfMember,
-    findFanFollowByMemberId: findFanFollowByMemberId
+    findFanFollowByMemberId: findFanFollowByMemberId,
+
+
+    //async
+    fanCelebritiesbyMemberAsync: fanCelebritiesbyMemberAsync,
+    getFanFollowFromMemberPreferancesOfMemberAsync: getFanFollowFromMemberPreferancesOfMemberAsync,
+    getBlockersListAsync1: getBlockersListAsync1,
+    getBlockersListAsync2: getBlockersListAsync2,
+    getBlockUserFromFeedbackListAsync: getBlockUserFromFeedbackListAsync,
+    getBlockUserFromServiceTransactionListAsync: getBlockUserFromServiceTransactionListAsync,
+    followingMembersbyCelebrityAsync: followingMembersbyCelebrityAsync,
+    getFanCount: getFanCount,
+    getFollowCount: getFollowCount,
+    getBlockedCount: getBlockedCount,
+    //current member fan and follow count
+    getMemberFanCount: getMemberFanCount,
+    getMemberFollowerCount: getMemberFollowerCount,
+    fanMembersbyCelebrityAsync: fanMembersbyCelebrityAsync,
+    followingCelebritiesByMemberAsync: followingCelebritiesByMemberAsync
 }
 
 module.exports = memberPreferenceServices

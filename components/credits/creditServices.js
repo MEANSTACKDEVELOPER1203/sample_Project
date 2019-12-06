@@ -5,6 +5,9 @@ let Notification = require('../notification/notificationModel');
 let notificationSetting = require("../notificationSettings/notificationSettingsModel");
 let otpService = require('../otp/otpRouter');
 let ObjectId = require("mongodb").ObjectID;
+let User = require('../users/userModel');
+let celebrityContractsService = require('../celebrityContract/celebrityContractsService')
+
 
 const createCreditBalance = (memberId, callBack) => {
     let newCredits = new CreditModel({
@@ -13,6 +16,7 @@ const createCreditBalance = (memberId, callBack) => {
         creditValue: parseInt(0),
         cumulativeCreditValue: parseInt(0),
         referralCreditValue: "",
+        memberReferCreditValue: parseInt(0),
         createdBy: memberId
     });
 
@@ -59,6 +63,7 @@ const insertCreditForBeingOnline = (body, callback) => {
                 creditValue: result.creditValue,
                 cumulativeCreditValue: parseInt(result.cumulativeCreditValue) + parseInt(1),
                 referralCreditValue: result.referralCreditValue,
+                memberReferCreditValue: result.memberReferCreditValue,
                 createdBy: result.memberId,
                 remarks: "BeingOnlineEarning",
             });
@@ -85,7 +90,7 @@ const getAll = (params, callback) => {
     let pageNo = parseInt(params.pageNo);
     let startFrom = params.limit * (pageNo - 1);
     let limit = parseInt(params.limit);
-    CreditModel.count({}, (err, count) => {
+    CreditModel.countDocuments({}, (err, count) => {
         if (err) {
             callback(err, null)
         }
@@ -159,6 +164,7 @@ let updateCreditValue = function (body, callBack) {
                     newCumulativeCreditValue =
                         parseInt(oldCumulativeCreditValue) + parseInt(body.creditValue);
                     newReferralCreditValue = cBalObj.referralCreditValue;
+                    newMemberReferCreditValue = cBalObj.memberReferCreditValue;
                     paymentTranRefId = body.paymentTranRefId;
                     creditRefCartId = body.creditRefCartId;
                     memberId = body.memberId;
@@ -175,6 +181,7 @@ let updateCreditValue = function (body, callBack) {
                         creditValue: creditValue,
                         cumulativeCreditValue: newCumulativeCreditValue,
                         referralCreditValue: newReferralCreditValue,
+                        memberReferCreditValue: newMemberReferCreditValue,
                         remarks: remarks,
                         couponCode: couponCode,
                         createdBy: createdBy
@@ -268,6 +275,83 @@ let updateCreditValue = function (body, callBack) {
     })
 }
 
+const getMemberAllDetails = function (memberId, callBack) {
+    let data = {};
+    User.findById(ObjectId(memberId), { pastProfileImages: 0, preferenceId: 0, pastCoverImages: 0, celebritiesWorkedFor: 0 }, (err, userInfo) => {
+        if (err)
+            callBack(err, null);
+        else {
+            logins.findOne({ memberId: ObjectId(memberId) }, (err, memberDeviceInfo) => {
+                if (err)
+                    callBack(err, null);
+                else {
+                    CreditModel.find({ memberId: memberId }, (err, creditBalanceInfo) => {
+                        if (err) {
+                            callBack(err, null)
+                        }
+                        let query = { $and: [{ memberId: ObjectId(memberId) }, { notificationSettingId: ObjectId("5b5ebe31fef3737e09fb3849") }, { isEnabled: true }] };  //check current member notification setting
+                        notificationSetting.findOne(query, (err, memberNotificationInfo) => {
+                            if (err)
+                                callBack(err, null);
+                            else {
+                                data.memberInfo = userInfo;
+                                data.memberDeviceInfo = memberDeviceInfo;
+                                data.creditBalanceInfo = creditBalanceInfo[0];
+                                data.memberNotificationInfo = memberNotificationInfo
+                                callBack(null, data)
+                            }
+                        })
+                    }).sort({ createdAt: -1 }).limit(1); //end of credits
+                }
+            })
+        }
+    })
+
+}
+
+const getCelebAllDetails = function (celebId, callBack) {
+    let data = {};
+    User.findById(ObjectId(celebId), { pastProfileImages: 0, preferenceId: 0, pastCoverImages: 0, celebritiesWorkedFor: 0 }, (err, userInfo) => {
+        if (err)
+            callBack(err, null);
+        else {
+            logins.findOne({ memberId: ObjectId(celebId) }, (err, memberDeviceInfo) => {
+                if (err)
+                    callBack(err, null);
+                else {
+                    CreditModel.find({ memberId: celebId }, (err, creditBalanceInfo) => {
+                        if (err) {
+                            callBack(err, null)
+                        }
+                        let query = { $and: [{ memberId: ObjectId(celebId) }, { notificationSettingId: ObjectId("5b5ebe31fef3737e09fb3849") }, { isEnabled: true }] };  //check current member notification setting
+                        notificationSetting.findOne(query, (err, memberNotificationInfo) => {
+                            if (err)
+                                callBack(err, null);
+                            else {
+                                celebrityContractsService.getCelebContractsForFan(celebId, (err, celebContractInfo)=>{
+                                    if(err)
+                                    callBack(err, null)
+                                    else{
+                                        data.celebInfo = userInfo;
+                                        data.celebDeviceInfo = memberDeviceInfo;
+                                        data.celebCreditBalanceInfo = creditBalanceInfo[0];
+                                        data.celebNotificationInfo = memberNotificationInfo
+                                        data.celebContractInfo = celebContractInfo
+                                        callBack(null, data)
+                                    }
+                                })
+
+                              
+                            }
+                        })
+                    }).sort({ createdAt: -1 }).limit(1); //end of credits
+                }
+            })
+        }
+    })
+}
+
+
 module.exports = {
     getCreditBalance: getCreditBalance,
     createCreditBalance: createCreditBalance,
@@ -275,5 +359,7 @@ module.exports = {
     getCreditHistoryByMemberID: getCreditHistoryByMemberID,
     getAll: getAll,
     getCreditBalanceByTransactionId: getCreditBalanceByTransactionId,
-    updateCreditValue: updateCreditValue
+    updateCreditValue: updateCreditValue,
+    getMemberAllDetails: getMemberAllDetails,
+    getCelebAllDetails: getCelebAllDetails
 }

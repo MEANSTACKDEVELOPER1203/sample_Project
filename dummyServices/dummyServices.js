@@ -23,6 +23,7 @@ let LiveTimeLog = require('../components/liveTimeLog/liveTimeLogModel');
 let Feedback = require('../components/feedback/feedbackModel');
 let ReferralCode = require('../components/referralCode/referralCodeModel');
 const comLog = require("../components/comLog/comLogModel");
+let StoryTracking = require('../components/storyTracking/storyTrackingModel');
 
 
 
@@ -238,7 +239,7 @@ let deleteFeedBackHistory = function (memberId, callback) {
 }
 
 let removeFromFanFollowHistory = function (memberId, callback) {
-  Memberpreferences.update({}, { $pull: { celebrities: { CelebrityId: memberId } } }, { multi: true }, (err, updateObj) => {
+  Memberpreferences.updateMany({}, { $pull: { celebrities: { CelebrityId: memberId } } }, { multi: true }, (err, updateObj) => {
     if (!err)
       callback(null, updateObj);
     else
@@ -282,7 +283,6 @@ let findAllCelebs = function (callback) {
 let findActiveCelebInApp = function (callback) {
   let today = new Date();
   let lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 10);
-  console.log("lastWeek===========  ", lastWeek);
   Feeddata.aggregate([
     {
       $match: { created_at: { $lte: today, $gte: lastWeek }, isDelete: false }
@@ -330,7 +330,6 @@ let findActiveCelebInApp = function (callback) {
     if (err)
       callback(err, null)
     else {
-      console.log(listOfActiveCelebObj.length)
       callback(null, listOfActiveCelebObj)
     }
 
@@ -339,7 +338,6 @@ let findActiveCelebInApp = function (callback) {
 let findFanFollowTrandingCelebs = function (celebIds, callback) {
   let today = new Date();
   let lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 20);
-  console.log("lastWeek===========  ", lastWeek);
   Memberpreferences.aggregate([
     {
       $match: {
@@ -514,10 +512,119 @@ let findLastCredit = function (memberId, creditValue, callback) {
 //   })
 // }
 
+let deleteStorySeenStatus = function (memberId, callback) {
+  StoryTracking.deleteMany({ memberId: memberId }, (err, obj) => {
+    if (!err)
+      callback(null, obj);
+    else
+      callback(err, null)
+  })
+}
+
+const Story = require('../components/story/storyModel')
+const findStory = query => {
+  celebId = ObjectId(query.celebId);
+  let now = new Date();
+  let endTime = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+  new Promise((resolve, reject) => {
+    Story.aggregate([
+      {
+        $match: { $and: [{ memberId: celebId, createdAt: { $lt: new Date(now), $gt: new Date(endTime) }, isDeleted: false }] }
+      },
+      {
+        $sort: { createdAT: -1 }
+      },
+      {
+        $lookup: {
+          from: "storyTracking",
+          localField: "_id",
+          foreignField: "storyId",
+          as: "storyStats"
+        }
+      },
+      {
+        $lookup: {
+          "from": "storyTracking",
+          "let": { "storyId": "$_id" },
+          "pipeline": [
+            { "$match": { "$expr": { "$eq": ["$storyId", "$$storyId"] } } },
+            {
+              $lookup: {
+                "from": "users",
+                "let": { "memberId": "$memberId" },
+                "pipeline": [
+                  { "$match": { "$expr": { "$eq": ["$_id", "$$memberId"] } } }
+                ],
+                "as": "userDetails"
+              }
+            }
+          ],
+          "as": "storyTrackingDetails"
+        }
+      },
+
+      {
+        $project: {
+          "_id": 1,
+          "src": 1,
+          "mediaCaption": 1,
+          "videoDuration": 1,
+          "mediaType": 1,
+          "mediaName": 1,
+          "memberId": 1,
+          "title": 1,
+          "createdAt": 1,
+          "faceFeatures": 1,
+          "isDeleted": 1,
+          "storyTrackingDetails": 1,
+          "userDetails": 1,
+          seenCount: {
+            $size: {
+              $filter: {
+                input: "$storyStats",
+                cond: { "$eq": ["$$this.isSeen", true] }
+              }
+            }
+          },
+          isSeen: {
+            $size: {
+              $filter: {
+                input: "$storyStats",
+                cond: {
+                  $and: [{ $or: [{ "$eq": ["$$this.memberId", ObjectId(query.currentUserId)] }] },
+                  { "$eq": ["$$this.isSeen", true] }]
+                }
+              }
+            }
+          },
+        }
+      }
+    ])
+      .then(storyObj => resolve(storyObj))
+      .catch(err => reject(err))
+  })
+}
 
 
 
+const getCelebDetailsById1 = query => {
+  celebId = ObjectId(query.celebId);
+  new Promise((resolve, reject) => {
+    User.find({ _id: celebId })
+      .then(userObj => resolve(userObj))
+      .catch(err => reject(err))
+  })
+}
 
+const findFanSubscriptionAsync = query =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log("Query ===== ", query)
+      Memberpreferences.find({ celebrities: { $elemMatch: { CelebrityId: ObjectId(query.id), isFan: true } }}).sort({ "celebrities.createdAt": -1 }).limit(10)
+        .then(fanObj => resolve(fanObj))
+        .catch(err => reject(err))
+    }, 100)
+  })
 
 
 
@@ -549,9 +656,14 @@ let dumyService = {
   findFanFollowTrandingCelebs: findFanFollowTrandingCelebs,
   findUser: findUser,
   findLastCredit: findLastCredit,
-  removeReferelCodeFromUsersHistory: removeReferelCodeFromUsersHistory
+  removeReferelCodeFromUsersHistory: removeReferelCodeFromUsersHistory,
+  deleteStorySeenStatus: deleteStorySeenStatus,
+  getCelebDetailsById1: getCelebDetailsById1,
+  findStory: findStory,
+  // findStoryDummy: findStoryDummy
   //findMemberMedia: findMemberMedia,
   //findMemberMediaBothSide: findMemberMediaBothSide
+  findFanSubscriptionAsync: findFanSubscriptionAsync
 
 }
 

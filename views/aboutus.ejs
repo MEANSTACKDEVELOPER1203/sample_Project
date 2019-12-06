@@ -12,14 +12,18 @@
     body{ font-family: 'Lato', sans-serif; font-size:13px; color: #000;}
     .cont_hdng{ font-size: 24px; font-weight: bold; color: #000; text-emphasis: left;}
     .comp_branche{ padding: 0px; margin: 0px;}
-    .branch_country{ font-size: 20px; font-weight: bold; color: #297ec1; padding-bottom: 0px;}
+    .branch_country{ font-size: 20px; font-weight: bold; color: #4579c7; padding-bottom: 0px;}
+    .branch_country1{ font-size: 20px; font-weight: bold; color: #4579c7; padding-bottom: 0px;padding-left: 50px;;}
     .branch_city{ font-size: 16px; font-weight: bold; color: #333131;}
-    .comp_branche > p{     font-size: 16px;color: #8d97ad;}
+    .comp_branche > p{     font-size: 16px;color: #8d97ad; margin: 0px 0px 0px 10px;}
     .spacebtm{ margin-bottom: 30px!important;}
     .comp_branche > p > a{ text-decoration: none;}
     .comp_branche > p > a:hover{ text-decoration: none;}
-    .cnt_hdr{ letter-spacing: .06em;font-size: 20px;font-weight: 800;border-bottom: 1px solid rgba(0,0,0,0.14);padding: 0px 0px 10px;color: rgba(0,0,0,0.87);}
-	.comp_branche p strong {color: #2b7ec1;}
+    .cnt_hdr{ letter-spacing: .06em;font-size: 20px;font-weight: 800;padding: 0px 0px 10px;color: rgba(0,0,0,0.87);}
+    /* .cnt_hdr{ letter-spacing: .06em;font-size: 20px;font-weight: 800;border-bottom: 1px solid rgba(0,0,0,0.14);padding: 0px 0px 10px;color: rgba(0,0,0,0.87);} */
+	.comp_branche p strong {color: #4579c7;}
+    h4.branch_country i{width:25px;vertical-align:text-bottom;padding:0 15px 0 0}.cnt_hdr i img{height:22px;margin-top: -7px;}.cnt_hdr i{width:25px;vertical-align:text-bottom;padding:0 15px 0 0}.comp_branche > p a{color:#333;font-weight:600}h4.branch_country i img{height:22px;vertical-align:middle;margin-top:-7px;}.comp_branche_bha{box-shadow:0 0 6.25px .75px rgba(0,0,0,.2);-webkit-box-shadow:0 0 6.25px -1.25px rgba(0,0,0,.2);-moz-box-shadow:0 0 6.25px .75px rgba(0,0,0,.2);-o-box-shadow:0 0 6.25px .75px rgba(0,0,0,.2);display:block;padding:10px;border-radius:15px}.hr{margin-top:20px;margin-bottom:20px;border:0};
+    h4.branch_country span b{font-weight:700;color:#333}.branch_country span b{color:#333;font-weight:800;margin-left: 8px}
 </style>
 </head>
 
@@ -47,16 +51,16 @@
 <div class="container">
     <div class="row">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 ">
-                <h3 class="cnt_hdr">Contact Us</h3>
+                <h3 class="cnt_hdr"><i><img src="https://testapi.celebkonect.com:4300/uploads/icons/Contactus.png" alt=""></i>Contact Us</h3>
                
-            <div class="comp_branche">
+            <div class="comp_branche_bha">
                 <h4 class="branch_country">Australia</h4>
                 <h5 class="branch_city">Sydney</h5>
                 <p>Level 10, 220 George Street, Sydney NSW 2000.</p>
                 <!-- <p>Phone :<span> <b>+61 402 374 747</b></span></p> -->
             </div>
-            <hr>
-            <div class="comp_branche">
+            <hr class="hr">
+            <div class="comp_branche_bha">
                 <h4 class="branch_country">India</h4>
                 <h5 class="branch_city">Bengaluru</h5>
                 <p>#811, 10th A Main, 1st Floor, Suite 234, indira Nagar, Bengaluru - 560038.</p>
@@ -67,10 +71,14 @@
                 <p>1250, Rd Number 62, Jubilee Hills, Hyderabad, Telangana - 500033.</p>
                 <p><b>Phone :</b><span> 040 23555521,  &nbsp;+91 8186948581 </span></p>
             </div>
-            <hr>
+            <hr class="hr">
             <div class="comp_branche">
-                <h4 class="branch_country">E-mail Us</h4>
-                <p><a href="mailto:support@celebkonect.com" target="_top">support@celebkonect.com</a></p>
+                    <h4 class="branch_country"><i><img src="https://testapi.celebkonect.com:4300/uploads/icons/Emailus.png" alt=""></i><span><b>E-mail Us</b></span></h4>
+                   
+                <p ><a href="mailto:support@celebkonect.com" style=" margin-left: 35px;" target="_top">support@celebkonect.com</a></p>
+                <br>
+                <br>
+                <br>
             </div>
 
 
@@ -86,5 +94,3 @@
 
 </body>
 </html>
-
-

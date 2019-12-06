@@ -29,6 +29,14 @@ const slotMaster = require("../slotMaster/slotMasterModel");
 const Feed = require("../../models/feeddata");
 const celebrityContract = require("../celebrityContract/celebrityContractsModel");
 
+let provideData = {
+  _id: 1, avtar_imgPath: 1, avtar_originalname: 1, cover_imgPath: 1, custom_imgPath: 1,
+  imageRatio: 1, name: 1, firstName: 1, lastName: 1, prefix: 1, role: 1, profession: 1, industry: 1, isCeleb: 1,
+  isTrending: 1, aboutMe: 1, category: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
+}
+
+
+
 const findAllMemberFanFollowers = (memberId, callback) => {
   Memberpreferences.find({ celebrities: { $elemMatch: { CelebrityId: memberId } } }).exec((err, memberIdFanFollwerObj) => {
     if (!err)
@@ -137,6 +145,8 @@ const memberRegistrationAndProfileUpdate = (memberId, body, files, callback) => 
   let referralCode = body.referralCode;
   let country = body.country ? body.country : undefined;
   let loginType = body.loginType;
+  let socialMediaType = body.socialMediaType;
+  let location = body.location;
   let osType = body.osType;
   let mobile = undefined
   if (country && mobileNumber)
@@ -217,6 +227,7 @@ const memberRegistrationAndProfileUpdate = (memberId, body, files, callback) => 
                                     creditValue: parseInt(0),
                                     cumulativeCreditValue: parseInt(0),
                                     referralCreditValue: refResult.referralCreditValue,
+                                    memberReferCreditValue: refResult.memberReferCreditValue,
                                     createdBy: existingUser.fName
                                   });
 
@@ -265,6 +276,7 @@ const memberRegistrationAndProfileUpdate = (memberId, body, files, callback) => 
                                 creditValue: parseInt(0),
                                 cumulativeCreditValue: parseInt(0),
                                 referralCreditValue: parseInt(0),
+                                memberReferCreditValue: parseInt(0),
                                 createdBy: existingUser.firstName
                               });
 
@@ -350,6 +362,7 @@ const memberRegistrationAndProfileUpdate = (memberId, body, files, callback) => 
                                         creditValue: parseInt(0),
                                         cumulativeCreditValue: parseInt(0),
                                         referralCreditValue: refResult.referralCreditValue,
+                                        memberReferCreditValue: refResult.memberReferCreditValue,
                                         createdBy: uresult.fName
                                       });
 
@@ -383,6 +396,7 @@ const memberRegistrationAndProfileUpdate = (memberId, body, files, callback) => 
                                 creditValue: parseInt(0),
                                 cumulativeCreditValue: parseInt(0),
                                 referralCreditValue: parseInt(0),
+                                memberReferCreditValue: parseInt(0),
                                 createdBy: existingUser.firstName
                               });
 
@@ -498,6 +512,8 @@ const memberRegistrationAndProfileUpdate = (memberId, body, files, callback) => 
                 role: role,
                 loginType: loginType,
                 country: country,
+                location: location,
+                socialMediaType: socialMediaType,
                 referralCode: referralCode,
                 osType: osType
               }
@@ -525,6 +541,7 @@ const memberRegistrationAndProfileUpdate = (memberId, body, files, callback) => 
                     password: userDetails.password,
                     mobileNumber: userDetails.mobileNumber,
                     mobile: userDetails.mobile,
+                    socialMediaType: userDetails.socialMediaType,
                     osType: userDetails.osType,
                     memberId: userDetails._id,
                     token: token
@@ -852,9 +869,17 @@ const findByIdAndUpdateUserDetails = (id, updateDoc, reqbody, callback) => {
                             }
                             else if (refResult && rCode != undefined) {
                               //console.log("refResult.creditValue",refResult.creditValue);
+                              // console.log("regi with r_code",refResult.isCeleb)
+                              // console.log("regi with r_code",refResult)
                               let referralCreditValue = refResult.referralCreditValue
-                              if (refResult.isCeleb) {
-                                referralCreditValue = parseInt(250)
+                              let memberReferCreditValue = parseInt(referralCreditValue)
+                              if (refResult.memberId.isCeleb == true) {
+                                referralCreditValue = parseInt(250);
+                                memberReferCreditValue = parseInt(0)
+                              }
+                              if (refResult.memberId.isCeleb == false) {
+                                referralCreditValue = parseInt(0);
+                                memberReferCreditValue = memberReferCreditValue
                               }
                               let newCredits = new Credits({
                                 memberId: uresult._id,
@@ -862,6 +887,7 @@ const findByIdAndUpdateUserDetails = (id, updateDoc, reqbody, callback) => {
                                 creditValue: parseInt(0),
                                 cumulativeCreditValue: parseInt(0),
                                 referralCreditValue: referralCreditValue,
+                                memberReferCreditValue: memberReferCreditValue,
                                 createdBy: uresult.fName
                               });
 
@@ -910,6 +936,7 @@ const findByIdAndUpdateUserDetails = (id, updateDoc, reqbody, callback) => {
                             creditValue: parseInt(0),
                             cumulativeCreditValue: parseInt(0),
                             referralCreditValue: parseInt(0),
+                            memberReferCreditValue: parseInt(0),
                             createdBy: uresult.fName
                           });
 
@@ -1140,173 +1167,6 @@ const getSugessionByPreferances = (memberId, contractsCelebArray, listOfMyPrefer
             callback(null, data)
           }
         })
-
-
-        // User.find({ _id: { $nin: [ObjectId(memberId)] }, preferenceId: { $in: memberPreferancesObj.preferences }, isCeleb: true, IsDeleted: false }, { _id: 1 }, (err, allCelebrity) => {
-        //   if (err) {
-        //     callback(err, null)
-        //   } else if (allCelebrity) {
-        //     allCelebrity = allCelebrity.map((celebObj) => {
-        //       return celebObj._id;
-        //     })
-
-        //     let today = new Date();
-        //     let lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
-        //     Feeddata.aggregate([
-        //       {
-        //         $match: {
-        //           memberId: { $in: allCelebrity },
-        //           created_at: { $gte: lastWeek }
-        //         }
-        //       },
-        //       {
-        //         $lookup: {
-        //           from: "users",
-        //           localField: "memberId",
-        //           foreignField: "_id",
-        //           as: "celebProfile"
-        //         }
-        //       },
-        //       {
-        //         $group: {
-        //           _id: "$celebProfile",
-        //           feed: { $push: "$_id" },
-        //           size: { $sum: 1 }
-        //         }
-        //       },
-        //       {
-        //         $sort: { size: -1 }
-        //       },
-        //       {
-        //         $unwind: "$_id"
-        //       },
-        //       {
-        //         $limit: 30
-        //       },
-        //       {
-        //         $project: {
-        //           _id: {
-        //             _id: 1,
-        //             email: 1,
-        //             username: 1,
-        //             //pastProfileImages: 1,
-        //             avtar_originalname: 1,
-        //             avtar_imgPath: 1,
-        //             aboutMe: 1,
-        //             isCeleb: 1,
-        //             firstName: 1,
-        //             lastName: 1,
-        //             profession: 1,
-        //             cover_imgPath: 1
-        //           }
-        //         }
-        //       }
-        //     ], (err, celebProfileArray1) => {
-        //       if (err) {
-        //         callback(err, null)
-        //       } else {
-        //         // console.log("AAAAAA === ", celebProfileArray1.length)
-        //         celebProfileArray1 = celebProfileArray1.map((celeb) => {
-        //           return celeb._id
-        //         })
-        //         let length = 30 - celebProfileArray1.length;
-        //         if (length <= 0) {
-        //           celebProfileArray = celebProfileArray1;
-        //           celebProfileArray.map((celebDetails) => {
-        //             if (listOfMyPreferences && listOfMyPreferences.celebrities) {
-        //               celebDetails.isFan = listOfMyPreferences.celebrities.some((s) => {
-        //                 return ((celebDetails._id + "" == s.CelebrityId + "") && (s.isFan == true))
-        //               });
-        //               celebDetails.isFollower = listOfMyPreferences.celebrities.some((s) => {
-        //                 return ((celebDetails._id + "" == s.CelebrityId + "") && (s.isFollower == true))
-        //               });
-        //             }
-        //             else {
-        //               celebDetails.isFan = false;
-        //               celebDetails.isFollower = false;
-        //             }
-        //             if (youblockedByCelebrity && youblockedByCelebrity.length) {
-        //               celebDetails.isBlocked = youblockedByCelebrity.some((s) => {
-        //                 return (celebDetails._id + "" == s.celebrityId + "")
-        //               });
-        //             }
-        //             else {
-        //               celebDetails.isBlocked = false;
-        //             }
-        //           })
-        //           callback(null, celebProfileArray)
-        //         } else {
-        //           Memberpreferences.aggregate([
-        //             { $unwind: "$celebrities" },
-        //             { $group: { _id: "$celebrities.CelebrityId", len: { $sum: 1 } } },
-        //             {
-        //               $lookup: {
-        //                 from: "users",
-        //                 localField: "_id",
-        //                 foreignField: "_id",
-        //                 as: "celebProfile"
-        //               }
-        //             },
-        //             { $sort: { len: -1 } },
-        //             { $limit: length },
-        //             { $unwind: "$celebProfile" },
-        //             {
-        //               $project: {
-        //                 celebProfile: {
-        //                   _id: 1,
-        //                   email: 1,
-        //                   username: 1,
-        //                   // pastProfileImages: 1,
-        //                   avtar_originalname: 1,
-        //                   avtar_imgPath: 1,
-        //                   firstName: 1,
-        //                   lastName: 1,
-        //                   aboutMe: 1,
-        //                   isCeleb: 1,
-        //                   profession: 1,
-        //                   cover_imgPath: 1
-        //                 }
-        //               }
-        //             }
-        //           ], (err, celebProfileArray2) => {
-        //             if (err) {
-        //               callback(err, null)
-        //             } else {
-        //               // console.log("BBBBBB === ", celebProfileArray2.length)
-        //               celebProfileArray2 = celebProfileArray2.map((celeb) => {
-        //                 return celeb.celebProfile
-        //               })
-        //               celebProfileArray = celebProfileArray1.concat(celebProfileArray2)
-        //               celebProfileArray.map((celebDetails) => {
-        //                 if (listOfMyPreferences && listOfMyPreferences.celebrities) {
-        //                   celebDetails.isFan = listOfMyPreferences.celebrities.some((s) => {
-        //                     return ((celebDetails._id + "" == s.CelebrityId + "") && (s.isFan == true))
-        //                   });
-        //                   celebDetails.isFollower = listOfMyPreferences.celebrities.some((s) => {
-        //                     return ((celebDetails._id + "" == s.CelebrityId + "") && (s.isFollower == true))
-        //                   });
-        //                 }
-        //                 else {
-        //                   celebDetails.isFan = false;
-        //                   celebDetails.isFollower = false;
-        //                 }
-        //                 if (youblockedByCelebrity && youblockedByCelebrity.length) {
-        //                   celebDetails.isBlocked = youblockedByCelebrity.some((s) => {
-        //                     return (celebDetails._id + "" == s.celebrityId + "")
-        //                   });
-        //                 }
-        //                 else {
-        //                   celebDetails.isBlocked = false;
-        //                 }
-        //               })
-        //               callback(null, celebProfileArray)
-        //             }
-        //           })
-        //         }
-        //       }
-        //     })
-        //   }
-        // })
       } else {
         callback("Please select preferences", null)
       }
@@ -1315,6 +1175,39 @@ const getSugessionByPreferances = (memberId, contractsCelebArray, listOfMyPrefer
     }
   })
 }
+//(memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback)
+const getSugessionByPreferancesAsync = query =>
+  new Promise((resolve, reject) => {
+
+    let celebContractArray = query.contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
+    if (query.listOfMyPreferences.preferences.length) {
+      fanFollowersArray = query.listOfMyPreferences.celebrities;
+      followingCelebs = fanFollowersArray.map((celebId) => {
+        return (celebId.CelebrityId);
+      })
+      followingCelebs.push(ObjectId(query.memberId))
+    }
+    User.aggregate([
+      {
+        $match: {
+          _id: { $in: celebContractArray },
+          _id: { $nin: followingCelebs }, IsDeleted: false, isCeleb: true,
+          preferenceId: { $in: query.listOfMyPreferences.preferences },
+        }
+      },
+      {
+        $project: {
+          _id: 1, username: 1, isCeleb: 1, firstName: 1, lastName: 1, aboutMe: 1,
+          profession: 1, avtar_imgPath: 1, imageRatio: 1,
+          email: 1, cover_imgPath: 1, category: 1
+        }
+      },
+      {
+        $limit: 30
+      }
+    ]).then(data => resolve(data))
+      .catch(err => reject(err))
+  })
 
 const getTrendingCelebrities = (memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback) => {
   let today = new Date();
@@ -1467,7 +1360,7 @@ const getTrendingCelebrities = (memberId, contractsCelebArray, listOfMyPreferenc
             }
           }
         ], (err, celebProfileArray2) => {
-          console.log("Tranding Celebs 222 ======= ", celebProfileArray2.length)
+          // console.log("Tranding Celebs 222 ======= ", celebProfileArray2.length)
           if (err) {
             callback(err, null)
           } else {
@@ -1645,210 +1538,6 @@ const MembersList1 = (params, callback) => {
   );
 }
 //by page number we are not using just for test
-const MembersList = (params, callback) => {
-  let pageNo = parseInt(params.pageNo);
-  let startFrom = params.limit * (pageNo - 1);
-  let limit = parseInt(params.limit);
-
-  User.count({ "IsDeleted": false, "dua": false, "isCeleb": false, "isManager": false }, (err, count) => {
-    if (err) {
-      callback(err, null)
-    } else {
-      User.aggregate([
-        { $match: { "IsDeleted": false, "dua": false, "isCeleb": false, "isManager": false } },
-        {
-          $skip: parseInt(startFrom)
-        },
-        {
-          $limit: limit
-        },
-        {
-          $lookup: {
-            from: "logins",
-            localField: "_id",
-            foreignField: "memberId",
-            as: "deviceToken" // to get all the views, comments, shares count
-          }
-        },
-        {
-          $project: {
-            username: 1,
-            mobileNumber: 1,
-            avtar_imgPath: 1,
-            avtar_originalname: 1,
-            imageRatio: 1,
-            password: 1,
-            email: 1,
-            name: 1,
-            firstName: 1,
-            lastName: 1,
-            prefix: 1,
-            aboutMe: 1,
-            location: 1,
-            country: 1,
-            loginType: 1,
-            role: 1,
-            gender: 1,
-            dateOfBirth: 1,
-            address: 1,
-            referralCode: 1,
-            cumulativeSpent: 1,
-            cumulativeEarnings: 1,
-            lastActivity: 1,
-            profession: 1,
-            industry: 1,
-            userCategory: 1,
-            liveStatus: 1,
-            status: 1,
-            isCeleb: 1,
-            isTrending: 1,
-            isOnline: 1,
-            isEditorChoice: 1,
-            isPromoted: 1,
-            isEmailVerified: 1,
-            isMobileVerified: 1,
-            emailVerificationCode: 1,
-            mobileVerificationCode: 1,
-            celebRecommendations: 1,
-            Dnd: 1,
-            celebToManager: 1,
-            author_status: 1,
-            iosUpdatedAt: 1,
-            created_at: 1,
-            updated_at: 1,
-            created_by: 1,
-            updated_by: 1,
-            IsDeleted: 1,
-            isPromoter: 1,
-            isManager: 1,
-            managerRefId: 1,
-            promoterRefId: 1,
-            charityRefId: 1,
-            celebCredits: 1,
-            deviceToken: "$deviceToken.deviceToken"
-          }
-        }
-      ], (err, result) => {
-        if (err) {
-          callback(err, null)
-        } else {
-          let data = {};
-          data.result = result
-          let total_pages = count / limit
-          let div = count % limit;
-          data.pagination = {
-            "total_count": count,
-            "total_pages": div == 0 ? total_pages : parseInt(total_pages) + 1,
-            "current_page": pageNo,
-            "limit": limit
-          }
-          callback(null, data)
-        }
-      })
-    }
-  })
-  // User.aggregate(
-  //   [
-  //     { $match: { "IsDeleted": false, "dua": false } },
-  //     { $sort: { created_at: -1 } },
-  //     {
-  //       $lookup: {
-  //         from: "logins",
-  //         localField: "_id",
-  //         foreignField: "memberId",
-  //         as: "deviceToken" // to get all the views, comments, shares count
-  //       }
-  //     },
-  //     {
-  //       $group:{
-  //         _id:null,
-  //         count: { $sum: 1 },
-  //         users:{
-  //           $push:{ 
-  //             username: "$username",
-  //             mobileNumber: "$mobileNumber",
-  //             avtar_imgPath: "$avtar_imgPath",
-  //             avtar_originalname: "$avtar_originalname",
-  //             imageRatio: "$imageRatio",
-  //             password: "$password",
-  //             email: "$email",
-  //             name: "$name",
-  //             firstName: "$firstName",
-  //             lastName: "$lastName",
-  //             prefix: "$prefix",
-  //             aboutMe: "$aboutMe",
-  //             location: "$location",
-  //             country: "$country",
-  //             loginType: "$loginType",
-  //             role: "$role",
-  //             gender: "$gender",
-  //             dateOfBirth:"$dateOfBirth",
-  //             address: "$address",
-  //             referralCode: "$referralCode",
-  //             cumulativeSpent: "$cumulativeSpent",
-  //             cumulativeEarnings:"$cumulativeEarnings",
-  //             lastActivity: "$lastActivity",
-  //             profession: "$profession",
-  //             industry: "$industry",
-  //             userCategory: "$userCategory",
-  //             liveStatus:"$liveStatus",
-  //             status: "$status",
-  //             isCeleb:"$isCeleb",
-  //             isTrending:"$isTrending",
-  //             isOnline: "$isOnline",
-  //             isEditorChoice: "$isEditorChoice",
-  //             isPromoted: "$isPromoted",
-  //             isEmailVerified: "$isEmailVerified",
-  //             isMobileVerified:"$isMobileVerified",
-  //             emailVerificationCode: "$emailVerificationCode",
-  //             mobileVerificationCode: "$mobileVerificationCode",
-  //             celebRecommendations: "$celebRecommendations",
-  //             Dnd: "$celebToManager",
-  //             celebToManager: "$celebToManager",
-  //             author_status: "$author_status",
-  //             iosUpdatedAt: "$iosUpdatedAt",
-  //             created_at: "$updated_at",
-  //             updated_at: "$updated_at",
-  //             created_by: "$created_by",
-  //             updated_by: "$updated_by",
-  //             IsDeleted: "$isPromoter",
-  //             isPromoter: "$isPromoter",
-  //             isManager: "$isManager",
-  //             managerRefId: "$managerRefId",
-  //             promoterRefId: "$promoterRefId",
-  //             charityRefId: "$charityRefId",
-  //             celebCredits: "$celebCredits",
-  //             deviceToken: "$deviceToken.deviceToken"
-  //           }
-  //         }
-  //       }
-  //     },
-  //     {
-  //       $project: {
-  //         _id:0,
-  //         count:1,
-  //         "users": { "$slice": ["$users",startFrom,limit] }
-  //       }
-  //     }
-  //   ],
-  //   (err, result)=>{
-  //     if (err) {
-  //       callback(err,null)
-  //     }
-  //     else{
-  //       let total_pages = result[0].count/limit
-  //       result[0].pagination ={
-  //         "total_count": result[0].count,
-  //         "total_pages": total_pages == 0 ? total_pages : parseInt(total_pages)+1 ,
-  //         "current_page": pageNo,
-  //         "limit": limit
-  //       }
-  //       callback(null,result[0])
-  //     }
-  //   }
-  // );
-}
-
 
 const getOnlineCelebrity = (memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback) => {
   let objectIdArray = contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
@@ -1883,6 +1572,41 @@ const getOnlineCelebrity = (memberId, contractsCelebArray, listOfMyPreferences, 
     }
   })
 }
+//(memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback)
+const getOnlineCelebrityAsync = query =>
+  new Promise((resolve, reject) => {
+    let objectIdArray = query.contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
+    // console.log("objectIdArray", objectIdArray)
+    // objectIdArray.push(memberId);
+    let provideData = { aboutMe: 1, profession: 1, isCeleb: 1, isOnline: 1, username: 1, firstName: 1, lastName: 1, imageRatio: 1, avtar_imgPath: 1, cover_imgPath: 1 }
+    // let findQuery = {
+    //   $and: [{ '_id': { $in: objectIdArray } }, { isOnline: true }, { liveStatus: "online" }, { isCeleb: true }, { IsDeleted: false }]
+    // };
+    User.aggregate([
+      {
+        $match: {
+          _id: { $in: objectIdArray },
+          _id: { $nin: [] },
+          IsDeleted: false,
+          isCeleb: true,
+          isOnline: true,
+          liveStatus: "online"
+        }
+      },
+      {
+        $project: provideData
+      },
+    ])
+      .then(listOfOnlineCelebObj => resolve(listOfOnlineCelebObj))
+      .catch(err => reject(err))
+    // User.find(findQuery, provideData).lean()
+    //   .then(listOfOnlineCelebObj => resolve(listOfOnlineCelebObj))
+    //   .catch(err => reject(err))
+  })
+
+
+
+
 
 const getCelebrityWhoHasContract = (memberId, callback) => {
   CelebrityContract.distinct("memberId", (err, contractsCelebArray) => {
@@ -1897,6 +1621,14 @@ const getCelebrityWhoHasContract = (memberId, callback) => {
     }
   });
 }
+const getCelebrityWhoHasContractAsync = query =>
+  new Promise((resolve, reject) => {
+    CelebrityContract.distinct("memberId")
+      .then(contractsCelebArray => resolve(contractsCelebArray))
+      .catch(err => reject(err))
+  })
+
+
 
 const getAllCelebrity = (memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback) => {
   let objectIdArray = contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
@@ -1940,16 +1672,52 @@ const getAllCelebrity = (memberId, contractsCelebArray, listOfMyPreferences, you
     }
   }).lean();
 }
+//(memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback)
+const getAllCelebrityAsync = query =>
 
-let getAllEditorChoice = (memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback) => {
-  let objectIdArray = contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
+  new Promise((resolve, reject) => {
+    let objectIdArray = query.contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
+    let provideData = {
+      _id: 1, avtar_imgPath: 1, avtar_originalname: 1, cover_imgPath: 1,
+      imageRatio: 1, name: 1, firstName: 1, lastName: 1, prefix: 1, role: 1, profession: 1, industry: 1, isCeleb: 1,
+      isTrending: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
+    }
+    User.aggregate([
+      {
+        $match: {
+          _id: { $in: objectIdArray },
+          _id: { $nin: [] },
+          IsDeleted: false,
+          isCeleb: true,
+        }
+      },
+      {
+        $project: provideData
+      },
+    ])
+      .then(listOfOnlineCelebObj => resolve(listOfOnlineCelebObj))
+      .catch(err => reject(err))
+    // User.find({
+    //   _id: { $nin: [ObjectId(query.memberId)], $in: objectIdArray },
+    //   IsDeleted: false,
+    //   isCeleb: true
+    // }, provideData).lean()
+    //   .then(celebrities => resolve(celebrities))
+    //   .catch(err => reject(err))
+  })
+
+
+
+
+let getAllEditorChoice = (objectIdArray, callback) => {
+  // let objectIdArray = contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
   let provideData = {
     _id: 1, avtar_imgPath: 1, avtar_originalname: 1, cover_imgPath: 1, custom_imgPath: 1,
     imageRatio: 1, name: 1, firstName: 1, lastName: 1, prefix: 1, role: 1, profession: 1, industry: 1, isCeleb: 1,
-    isTrending: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
+    isTrending: 1, category: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
   }
   User.find({
-    _id: { $nin: [ObjectId(memberId)], $in: objectIdArray },
+    _id: { $in: objectIdArray },
     IsDeleted: false,
     isCeleb: true,
     isEditorChoice: true
@@ -1958,32 +1726,38 @@ let getAllEditorChoice = (memberId, contractsCelebArray, listOfMyPreferences, yo
       callback(err, null)
     }
     else {
-      celebrities.map((celebDetails) => {
-        if (listOfMyPreferences && listOfMyPreferences.celebrities) {
-          celebDetails.isFan = listOfMyPreferences.celebrities.some((s) => {
-            return ((celebDetails._id + "" == s.CelebrityId + "") && (s.isFan == true))
-          });
-          celebDetails.isFollower = listOfMyPreferences.celebrities.some((s) => {
-            return ((celebDetails._id + "" == s.CelebrityId + "") && (s.isFollower == true))
-          });
-        }
-        else {
-          celebDetails.isFan = false;
-          celebDetails.isFollower = false;
-        }
-        if (youblockedByCelebrity && youblockedByCelebrity.length) {
-          celebDetails.isBlocked = youblockedByCelebrity.some((s) => {
-            return (celebDetails._id + "" == s.celebrityId + "")
-          });
-        }
-        else {
-          celebDetails.isBlocked = false;
-        }
-      })
       callback(null, celebrities)
     }
   }).lean().sort({ firstName: 1 });
 }
+
+//(memberId, contractsCelebArray, listOfMyPreferences, youblockedByCelebrity, callback)
+let getAllEditorChoiceAsync = query =>
+  new Promise((resolve, reject) => {
+    let objectIdArray = query.contractsCelebArray.map(s => mongoose.Types.ObjectId(s));
+    let provideData = {
+      _id: 1, avtar_imgPath: 1, avtar_originalname: 1, cover_imgPath: 1, custom_imgPath: 1,
+      imageRatio: 1, name: 1, firstName: 1, lastName: 1, prefix: 1, role: 1, profession: 1, industry: 1, isCeleb: 1,
+      isTrending: 1, category: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
+    }
+    User.aggregate([
+      {
+        $match: {
+          _id: { $in: objectIdArray },
+          _id: { $nin: [ObjectId(query.memberId)] },
+          IsDeleted: false,
+          isCeleb: true,
+          isEditorChoice: true
+        }
+      },
+      {
+        $project: provideData
+      }
+    ])
+      .then(celebrities => resolve(celebrities))
+      .catch(err => reject(err))
+  })
+
 
 const getBrandsByMemberID = (params, callback) => {
   let memberId = ObjectId(params.memberId);
@@ -2190,7 +1964,7 @@ const getAllDetailsOfCelebrityForMemberId = (params, callback) => {
       ], (err, fanFollowerCount) => {
         let query = {
           $and: [
-            { $or: [{ startTime: { $gte: new Date() } }, { endTime: { $gte: new Date() } }] },
+            //{ $or: [{ startTime: { $gte: new Date() } }, { endTime: { $gte: new Date() } }] },
             { memberId: ObjectId(celebrityId) },
             { slotStatus: "inactive" }
           ]
@@ -2216,7 +1990,7 @@ const getAllDetailsOfCelebrityForMemberId = (params, callback) => {
                 isFollower: fanFollowerCount[0].isFollower.length ? true : false,
                 scheduleCount: count
               }
-              Feed.count({ memberId: celebrityId, isDelete: false }, (err, feedCount) => {
+              Feed.countDocuments({ memberId: celebrityId, isDelete: false }, (err, feedCount) => {
                 if (err) {
                   console.log(err)
                   callback(err, null)
@@ -2316,7 +2090,7 @@ const getAllDetailsOfCelebrityForMemberId = (params, callback) => {
 
 
                                     if (fancount[0] && fancount[0].fancount) {
-                                      console.log("2");
+                                      // console.log("2");
                                       fanFollowingFollowerFeedCount.fanOfUr = fancount[0].fancount;
                                       getImagesByMemberID({ memberId: celebrityId, createdAt: "0", limit: params.limit }, (err, memberMedia) => {
                                         if (err) {
@@ -2328,7 +2102,7 @@ const getAllDetailsOfCelebrityForMemberId = (params, callback) => {
                                       });
                                     }
                                     else {
-                                      console.log("3");
+                                      // console.log("3");
                                       getImagesByMemberID({ memberId: celebrityId, createdAt: "0", limit: params.limit }, (err, memberMedia) => {
                                         if (err) {
                                           callback(err, null)
@@ -2444,7 +2218,7 @@ const getAllDetailsOfCelebrity = (params, callback) => {
                 Followers: fanFollowerCount[0].Followers.length ? fanFollowerCount[0].Followers[0].Followers : 0
               }
               // media: { $ne: [] }
-              Feed.count({ memberId: celebrityId, isDelete: false }, (err, feedCount) => {
+              Feed.countDocuments({ memberId: celebrityId, isDelete: false }, (err, feedCount) => {
                 if (err) {
                   callback(err, null)
                 }
@@ -2598,6 +2372,23 @@ let getCelebDetailsById = function (memberId, callback) {
       callback(err, null)
   })
 }
+
+const getOnlineAndOfflineCelebsAsync = query =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      User.aggregate([
+        {
+          $match: {
+            '_id': { $nin: [ObjectId(query.memberId)], $in: query.celebContractIds }, isCeleb: true, IsDeleted: false
+          }
+        },
+        {
+          $project: provideData
+        }
+      ]).then(userObj => resolve(userObj))
+        .catch(err => reject(err))
+    }, 100)
+  })
 let userService = {
   findAllMemberFanFollowers: findAllMemberFanFollowers,
   checkOnLineUserIsCelebrityOrNot: checkOnLineUserIsCelebrityOrNot,
@@ -2611,7 +2402,7 @@ let userService = {
   getTrendingCelebrities: getTrendingCelebrities,
   getUserDetailsById: getUserDetailsById,
   isPasswordverified: isPasswordverified,
-  MembersList: MembersList,
+  // MembersList: MembersList,
   getOnlineCelebrity: getOnlineCelebrity,
   getCelebrityWhoHasContract: getCelebrityWhoHasContract,
   getAllCelebrity: getAllCelebrity,
@@ -2621,7 +2412,15 @@ let userService = {
   getAllDetailsOfCelebrityForMemberId: getAllDetailsOfCelebrityForMemberId,
   getAllDetailsOfCelebrity: getAllDetailsOfCelebrity,
   getBrandsByMemberID: getBrandsByMemberID,
-  getCelebDetailsById: getCelebDetailsById
+  getCelebDetailsById: getCelebDetailsById,
+
+
+  getCelebrityWhoHasContractAsync: getCelebrityWhoHasContractAsync,
+  getAllCelebrityAsync: getAllCelebrityAsync,
+  getAllEditorChoiceAsync: getAllEditorChoiceAsync,
+  getOnlineCelebrityAsync: getOnlineCelebrityAsync,
+  getSugessionByPreferancesAsync: getSugessionByPreferancesAsync,
+  getOnlineAndOfflineCelebsAsync: getOnlineAndOfflineCelebsAsync
 }
 
 module.exports = userService;

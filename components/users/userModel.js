@@ -69,15 +69,33 @@ let UserSchema = mongoose.Schema({
     type: String,
     default: ""
   },
-  location: {
-    type: String,
-    default: ""
-  },
+  // location: {
+  //   type: String,
+  //   default: ""
+  // },
   country: {
     type: String,
     default: ""
   },
   loginType: {
+    type: String,
+    default: ""
+  },
+  location: {
+    latitude: {
+      type: String,
+      default: ""
+    },
+    longitude: {
+      type: String,
+      default: ""
+    },
+    areaName: {
+      type: String,
+      default: ""
+    }
+  },
+  socialMediaType: {
     type: String,
     default: ""
   },
@@ -368,8 +386,8 @@ let UserSchema = mongoose.Schema({
     type: String
   }
 }, {
-    versionKey: false
-  });
+  versionKey: false
+});
 
 let User = (module.exports = mongoose.model("User", UserSchema));
 
@@ -487,7 +505,7 @@ module.exports.findOnlineCelebrities = function (objectIdArray, cb) {
   let query = {
     $and: [{ '_id': { $in: objectIdArray } }, { isOnline: true }, { liveStatus: "online" }, { isCeleb: true }, { IsDeleted: false }]
   };
-  User.find(query, { aboutMe: 1, profession: 1, isCeleb: 1, isOnline: 1, username: 1, firstName: 1, lastName: 1, imageRatio: 1, avtar_imgPath: 1, cover_imgPath:1 }, (err, listOfOnlineCelebObj) => {
+  User.find(query, { aboutMe: 1, profession: 1, isCeleb: 1, isOnline: 1, username: 1, firstName: 1, lastName: 1, imageRatio: 1, avtar_imgPath: 1, cover_imgPath: 1 }, (err, listOfOnlineCelebObj) => {
     if (!err)
       return cb(null, listOfOnlineCelebObj);
     else

@@ -28,6 +28,10 @@ let notificationSchema = new mongoose.Schema({
         ref: 'audition',
         index: true
     },
+    scheduleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'serviceSchedule'
+    },
     roleId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'role',

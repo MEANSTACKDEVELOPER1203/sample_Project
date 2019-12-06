@@ -282,6 +282,30 @@ let verifyOTP = (medium, mobileNumber, email, OTPcode, callback) => {
 
 //Push notification for adndriod
 let sendAndriodPushNotification = (token, collapse_key, data, callback) => {
+
+  // let message = {
+  //   "registration_ids": token, //["eOUi7xeV_sM:APA91bHIJ-4h9WnRSqZJVWC_X5PrsNGwEekd8_6pRuVz9SfET3Sp7I9A_uBIr-nY5sZOIylHzSKI5kHTY9BolvL8isiC6UYJLjncl7iq3cOp5MJ0OgD_Cf_-tr0twfXvG0xsIJQbje9R"],
+  //   "data":   //data payload will work based on app open/close
+  //   {
+  //     "type": "data payload will work based on app ope",
+  //     "title": "data payload will work based on app ope",
+  //     "message": "data payload will work based on app ope",
+  //     "body": "data payload will work based on app ope",
+  //     "url": "data payload will work based on app ope",
+  //   }
+  // };
+
+  // //console.log('================ message ==================');
+  // //console.log(message);
+  // fcm.send(message, function (err, response) {
+  //   if (err) {
+  //     console.log("Something has gone wrong!", err);
+  //     return callback(err, 'fail');
+  //   } else {
+  //     console.log("Successfully sent with response: ", response);
+  //     return callback(null, response);
+  //   }
+  // });
   let message = {
     to: token,
     collapse_key: collapse_key,
@@ -312,9 +336,26 @@ let sendIOSPushNotification = (token, notification, callback) => {
   });
 }
 // End Push notification adndriod
+
+
+let subscribeToTopics = (token, topic, callback) => {
+  console.log("token ", token);
+  console.log("topic ", topic);
+  fcm.subscribeToTopic(topic, (err, res) => {
+    assert.ifError(err);
+    assert.ok(res);
+    done();
+    console.log("Errror ", err)
+    // if (err)
+    //   callback(err, null)
+    // else
+    //   callback(null, res)
+  });
+}
 module.exports = {
   getOTP: getOTP,
   verifyOTP: verifyOTP,
   sendAndriodPushNotification: sendAndriodPushNotification,
-  sendIOSPushNotification: sendIOSPushNotification
+  sendIOSPushNotification: sendIOSPushNotification,
+  subscribeToTopics: subscribeToTopics
 };

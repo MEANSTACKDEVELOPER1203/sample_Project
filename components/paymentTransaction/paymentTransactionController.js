@@ -12,13 +12,13 @@ const getAll = (req, res) => {
         if (err) {
             res.json({ success: 0, token: req.headers['x-access-token'], message: err })
         } else {
-            res.json({ success: 0, token: req.headers['x-access-token'], data: allCreditObjects })
+            res.json({ success: 1, token: req.headers['x-access-token'], data: allCreditObjects })
         }
     })
 }
 
 let checkoutPaytmAndIntamojo = (req, res) => {
-    // console.log(req.body);
+    //console.log("P",req.body);
     let orderId = req.body.orderId;
     let customerId = req.body.customerId;
     let countryCode = req.body.countryCode;
@@ -27,7 +27,8 @@ let checkoutPaytmAndIntamojo = (req, res) => {
     let gatewayResponse = req.body.gatewayResponse;
     let paymentStatus = req.body.paymentStatus
     // console.log(paymentStatus);
-    if (paymentStatus == "Failed") {
+    //console.log("orderId",orderId)
+    if ((paymentStatus == "Failed")||(paymentStatus == "TXN_FAILURE")) {
         PaymentTransactionServices.updateCreditStatus(ObjectId(orderId), { status: false, creditUpdateStatus: false, paymentStatus: paymentStatus }, (err, updatePayTransactionObj) => {
             if (err) {
                 return res.status(200).json({ success: 0, message: "Order Id not recieved", err })
@@ -57,7 +58,7 @@ let checkoutPaytmAndIntamojo = (req, res) => {
                         countryCode = countryCode;
                         paymentMode = paymentMode;
                         paymentStatus = "Success";
-                        PaymentTransactionServices.updateCreditStatus(ObjectId(orderId), { transactionRefId: transactionRefId, gatewayResponse: gatewayResponse, status: true, creditUpdateStatus: true, paymentStatus: paymentStatus }, (err, updatePayTransactionObj) => {
+                        PaymentTransactionServices.updateCreditStatus(ObjectId(orderId), { countryCode: countryCode, transactionRefId: transactionRefId, gatewayResponse: gatewayResponse, status: true, creditUpdateStatus: true, paymentStatus: paymentStatus }, (err, updatePayTransactionObj) => {
                             if (err)
                                 console.log(err)
                             else {

@@ -17,9 +17,6 @@ let request = require('request');
 let email = require("../../routes/email");
 let OTP = require("../otp/otpModel");
 
-router.post("/sendNotification")
-
-
 router.post("/createNotification", (req, res) => {
   let memberId = req.body.memberId;
   let activity = req.body.activity;
@@ -477,7 +474,8 @@ router.get("/getNotificationsCount/:memberId", (req, res) => {
     err,
     result
   ) => {
-      if (err) return res.send(err);
+      //if (err) return res.send(err);
+      //console.log("noteREesult",result)
       if (result) {
         res.send(result);
       } else {
@@ -523,110 +521,8 @@ router.get("/getNotificationsByMemberIdMissed/:memberId", (req, res) => {
 
 router.get("/getNotificationsByMemberIdAudition/:memberId", (req, res) => {
   let id = req.params.memberId;
-  // Notification.aggregate([
-  //   {
-  //     $match :{
-  //       memberId: ObjectId(id),
-  //       notificationType: "audition",
-  //       $or:[{status: "active"}, {status: "isViewed"}],
-  //     }
-  //   },
-  //   {
-  //     $sort:{
-  //       createdAt : 1
-  //     }
-  //   },
-  //   {
-  //     $lookup: {
-  //         from: "audition",
-  //         localField: "auditionId",
-  //         foreignField: "_id",
-  //         as: "auditionId"
-  //     }
-  //   },
-  //   {
-  //     $unwind:"$auditionId"
-  //   },
-  //   {
-  //     $unwind:"$auditionId.favoritedBy"
-  //   },
-  //   {
-  //     $addFields: {
-  //       isFevourite: { $eq:["$auditionId.favoritedBy.memberId",ObjectId(id)]} 
-  //     }
-  //   },
-  //   {
-  //     $group:{
-  //       _id : {
-  //         "_id":"$_id",
-  //         "activity": "$title",
-  //         "title": "$title",
-  //         "body": "$body",
-  //         "notificationIcon": "$notificationIcon",
-  //         "status": "$status",
-  //         "notificationType": "$notificationType",
-  //         "createdBy": "$createdBy",
-  //         "updatedBy": "$updatedBy",
-  //         "memberId": "$memberId",
-  //         "roleId": "$roleId",
-  //         "auditionId": "$auditionId._id",
-  //         "createdAt": "$createdAt",
-  //         "updatedAt": "$updatedAt"
-  //       }, 
-  //       isFavourated : { $push: "$isFevourite" },
-  //       favoritedBy: { $push: {"memberId":"$auditionId.favoritedBy.memberId","_id":"$auditionId.favoritedBy._id" }}
-  //     }
-  //   },
-
-  //   {
-  //     $project:{
-  //       "_id" : "$_id._id",
-  //       "activity": "$_id.title",
-  //       "title": "$_id.title",
-  //       "body": "$_id.body",
-  //       "notificationIcon": "$_id.notificationIcon",
-  //       "status": "$_id.status",
-  //       "notificationType": "$_id.notificationType",
-  //       "createdBy": "$_id.createdBy",
-  //       "updatedBy": "$_id.updatedBy",
-  //       "memberId": "$_id.memberId",
-  //       "roleId": "$_id.roleId",
-  //       "auditionId": "$_id.auditionId",
-  //       "createdAt": "$_id.createdAt",
-  //       "updatedAt": "$_id.updatedAt",
-  //       "isFevourite" : { $in: [ true , "$isFavourated"] },
-  //       "favoritedBy":"$favoritedBy",
-  //       "isFavourated":"$isFavourated"
-  //     }
-  //   }
-  // ],(err,result)=>{
-  //   // console.log(result)
-  //   if (err) return res.send(err);
-  //   if (result) {
-  //     result.map((res)=>{
-  //       res.isFevourite = res.favoritedBy ? res.favoritedBy.some((user)=>{
-  //         return user.memberId.toString() == id;
-  //       }) : false;
-  //     })
-  //     res.send(result);
-  //   } else {
-  //     res.json({
-  //       error: "Notifications not exits / send a valid memberId"
-  //     });
-  //   }
-  // })
-
-  //old code start
-
   let query = {
     memberId: ObjectId(id), notificationType: "audition", $or: [{ status: "active" }, { status: "isViewed" }]
-    // $and: [
-    //   { $or: [{ memberId: ObjectId(id) }] },
-    //   { $or: [{ notificationType: "audition" }] },
-    //   { $or: [{ status: "active" }] },
-    //   { $or: [{ status: "isViewed" }] }
-
-    // ]
   };
   Notification.find(query, (
     err,

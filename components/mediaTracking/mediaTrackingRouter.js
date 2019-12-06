@@ -14,26 +14,40 @@ const activityLogService = require("../activityLog/activityLogService");
 /********************************************************* Political Konnect Feeds Integration Start************************************************************************************************************************** */
 // set Like feed
 router.post('/setLike', (req, res, next) => {
-    let likeObj = req.body;
+    // console.log("Like Body=== ", req.body);
+    var likeObj = req.body;
     let feedIdForMediaLike = likeObj.feedId
     likeObj.updated_at = new Date();
     likeObj.created_at = new Date();
-    let queryForCeleb = { _id: ObjectId(likeObj.feedId) }
-    if ((likeObj.feedId != "" && likeObj.feedId != undefined) && (likeObj.mediaId != "" && likeObj.mediaId != undefined)) {
-        likeObj.feedId = "";
-        queryForCeleb = { media: { $elemMatch: { mediaId: ObjectId(likeObj.mediaId) } } }
-    }
-
+    // let isFeedLike = false;
+    // let queryForCeleb = { _id: ObjectId(likeObj.feedId) }
+    // if ((likeObj.feedId != "" && likeObj.feedId != undefined) && (likeObj.mediaId != "" && likeObj.mediaId != undefined)) {
+    //     isFeedLike = true
+    //     // queryForCeleb = { _id: ObjectId(likeObj.feedId), media: { $elemMatch: { mediaId: ObjectId(likeObj.mediaId) } } }
+    // }
     //check isliked 
     let activityType = "Like";
     if (likeObj.isLike == false)
         activityType = "unLike"
-    Feed.find(queryForCeleb, (err, feedObj) => {
+
+    Feed.findById(ObjectId(likeObj.feedId), { memberId: 1, media: 1 }, (err, feedObj) => {
         if (err)
             console.log("***** Error while fetching the feedback ********", err)
         else {
-            likeObj.celebId = "" + feedObj[0].memberId;
+            // if (isFeedLike)
+            //     likeObj.feedId = "";
+            // console.log("feedObj ===== ", feedObj)
+            if (feedObj.media.length <= 1 && (likeObj.mediaId != "" && likeObj.mediaId != undefined)) {
+                likeObj.mediaId = "";
+                delete likeObj.mediaId;
+            }
+            if (feedObj.media.length >= 1 && (likeObj.mediaId != "" && likeObj.mediaId != undefined)) {
+                delete likeObj.feedId;
+            }
+            likeObj.celebId = "" + feedObj.memberId;
+            // console.log("likeObj ===== ", likeObj)
             mediaTracking.findIsLiked(likeObj, (err, isLikedObj) => {
+                // console.log("isLikedObj ============ ", isLikedObj)
                 if (err) {
                     res.status(404).json({ token: req.headers['x-access-token'], success: 0, message: "Error while like the member." + err.message });
                 } else if (isLikedObj.length <= 0) {
@@ -49,20 +63,18 @@ router.post('/setLike', (req, res, next) => {
                                 activityOn: likeObj.celebId,
                                 likeId: createdlikeObj._id
                             }
+                            res.status(200).json({ token: req.headers['x-access-token'], success: 1, message: "Liked successfully", });
                             activityLogService.createActivityLogByProvidingActivityTypeNameAndContent(activityType, body, (err, newActivityLog) => {
                                 if (err) {
                                     res.json({ success: 0, message: "Please try again." + err });
                                 } else {
                                 }
                             });
-                            return res.status(200).json({ token: req.headers['x-access-token'], success: 1, message: "Liked successfully", });
                         }
                     });
                 } else if (isLikedObj.length > 0) {
                     // console.log("Creating22222 ........")
                     isLikedObj[0].isLike = likeObj.isLike;
-                    // isLikedObj[0].updated_at = likeObj.updated_at;
-                    // isLikedObj[0].created_at = likeObj.created_at;
                     mediaTracking.updateMedia(isLikedObj[0], (err, updatedMediaObj) => {
                         if (err) {
                             console.log(err.message);
@@ -74,16 +86,16 @@ router.post('/setLike', (req, res, next) => {
                                 activityOn: likeObj.celebId,
                                 likeId: isLikedObj[0]._id
                             }
+                            let msg = "Unliked successfully";
+                            if (likeObj.isLike)
+                                msg = "Liked successfully";
+                            res.status(200).json({ token: req.headers['x-access-token'], success: 1, message: msg, });
                             activityLogService.createActivityLogByProvidingActivityTypeNameAndContent(activityType, body, (err, newActivityLog) => {
                                 if (err) {
                                     res.json({ success: 0, message: "Please try again." + err });
                                 } else {
                                 }
                             });
-                            let msg = "Unliked successfully";
-                            if (likeObj.isLike)
-                                msg = "Liked successfully";
-                            return res.status(200).json({ token: req.headers['x-access-token'], success: 1, message: msg, });
                         }
                     })
                 }
@@ -95,18 +107,34 @@ router.post('/setLike', (req, res, next) => {
 
 // set Comment on feed
 router.post('/setComments', (req, res, next) => {
+    // console.log("body ", req.body)
     let commentObj = req.body;
+    let isFeedLike = false;
     let feedIdForMediaComments = commentObj.feedId;
     let queryForCeleb = { _id: ObjectId(commentObj.feedId) }
-    if ((commentObj.feedId != "" && commentObj.feedId != undefined) && (commentObj.mediaId != "" && commentObj.mediaId != undefined)) {
-        commentObj.feedId = "";
-        queryForCeleb = { media: { $elemMatch: { mediaId: ObjectId(commentObj.mediaId) } } }
-    }
+    // if ((commentObj.feedId != "" && commentObj.feedId != undefined) && (commentObj.mediaId != "" && commentObj.mediaId != undefined)) {
+    //     // commentObj.feedId = "";
+    //     isFeedLike = true
+    //     queryForCeleb = { _id: ObjectId(commentObj.feedId) }
+    //     // queryForCeleb = { media: { $elemMatch: { mediaId: ObjectId(commentObj.mediaId) } } }
+    // }
     Feed.find(queryForCeleb, (err, feedObj) => {
         if (err)
             console.log("***** Error while fetching the feedback ********", err)
         else {
+            // console.log(feedObj);
+            if (feedObj[0].media.length <= 1) {
+                commentObj.mediaId = ""
+                // console.log("single  feed here ")
+            } else if (feedObj[0].media.length > 1 && (commentObj.mediaId != "" && commentObj.mediaId != undefined)) {
+                commentObj.feedId = ""
+            }
+            // else{
+            //     commentObj.feedId = ""
+            //     // console.log("multiple  feed here ")
+            // }
             commentObj.celebId = "" + feedObj[0].memberId;
+            // console.log(commentObj)
             let feedbackQuery = {
                 reason: "Block/Report", celebrityId: ObjectId(commentObj.celebId), memberId: ObjectId(commentObj.memberId)
             };

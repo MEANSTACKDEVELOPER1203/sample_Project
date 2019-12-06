@@ -67,7 +67,7 @@ let findMemberMediaPreAndNext = function (query, callback) {
                 callback(null, preMemberMediaObj[0])
         })
     } else {
-        console.log("*************** NEXT      **********************", query)
+        // console.log("*************** NEXT      **********************", query)
         MemberMedia.aggregate([
             {
                 $match: { $and: [{ memberId: ObjectId(query.memberId) }] }

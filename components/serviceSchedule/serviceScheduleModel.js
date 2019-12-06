@@ -29,9 +29,13 @@ let serviceScheduleSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true
   },
+  scheduleId: { 
+    type: mongoose.Schema.Types.ObjectId,
+    //required: true
+  },
   startTime: { 
     type: Date, 
-    required: true
+    //required: true
   },
   endTime: { 
     type: Date
@@ -40,7 +44,7 @@ let serviceScheduleSchema = new mongoose.Schema({
     type : Number,
     default: 0
   },
-  schuduledDuration: {
+  scheduledDuration: {
     type : Number,
     default: 0
   },

@@ -19,6 +19,7 @@ let getDefaultCreditPackage = (req, res) => {
         if (err) {
             return res.status(404).json({ success: 0, message: "Error while fetching member credit details." })
         } else {
+            creditObj.referralCreditValue = creditObj.referralCreditValue + creditObj.memberReferCreditValue;
             referralCodeService.getReferalCode(ObjectId(memberId), (err, referalCodeObj) => {
                 if (err) {
                     return res.status(404).json({ success: 0, message: "Error while fetching member referal code details." })

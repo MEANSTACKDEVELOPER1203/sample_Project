@@ -1094,7 +1094,7 @@ var getAllAuditionByLimit = (params, callback) => {
     let pageNo = parseInt(params.pageNo);
     let startFrom = params.limit * (pageNo - 1);
     let limit = parseInt(params.limit);
-    audition.count({}, (err, count) => {
+    audition.countDocuments({}, (err, count) => {
         if (err) {
             callback(err, null);
         }

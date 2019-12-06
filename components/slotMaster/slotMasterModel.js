@@ -29,7 +29,7 @@ let slotMasterSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    scheduleDurarion: {
+    scheduleDuration: {
         type: Number,
         default: 0
     },
@@ -53,38 +53,41 @@ let slotMasterSchema = new mongoose.Schema({
         type: Boolean,
         default: "false"
     },
-    slotStatus: {
+    scheduleStatus: {
         type: String,
         enum: [active, inactive,expired],
         default: "inactive"
     },
-    serviceType: {
-        type: [String],
-        enum: [audio, video, chat],
-        default: []
+    scheduleNotificationStatus: {
+        type: String,
+        enum: ["inactive","create", "delete"],
+        default: "inactive"
     },
-    scheduleArray: [{
-        scheduleId: {
+    serviceType: {
+        type: String,
+        default: ""
+    },
+    slotArray: [{
+        slotId: {
             type: mongoose.Schema.Types.ObjectId
         },
         serviceType: {
-            type: [String],
-            enum: [audio, video, chat],
-            default: []
+            type: String,
+            default: ""
         },
         memberId: {
             type: mongoose.Schema.Types.ObjectId,
             ref:'User'
         },
-        scheduleStartTime: { 
+        slotStartTime: { 
             type: Date, 
-            required: true 
+            //required: true 
         },
-        scheduleEndTime: { 
+        slotEndTime: { 
             type: Date,
-            required: true 
+            //required: true 
         },
-        scheduleDurarion: { 
+        slotDuration: { 
             type: Number, 
             default: 0 
         },
@@ -96,11 +99,15 @@ let slotMasterSchema = new mongoose.Schema({
             type: Date, 
             default: Date.now 
         },
-        scheduleStatus: {
+        slotStatus: {
             type: String,
-            enum: [reserved, unreserved],
+            enum: [reserved, unreserved,expired],
             default: unreserved
         },
+        scheduledDuration: {
+            type : Number,
+            default: 0
+          },
     }],
     createdAt: { 
         type: Date, 

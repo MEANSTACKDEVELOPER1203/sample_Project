@@ -26,8 +26,8 @@ var advertiseSchema = new mongoose.Schema({
         mediaType: {
             type: String
         },
-        mediaRatio:{
-            type:Float
+        mediaRatio: {
+            type: Float
         }
     },
     appLogoUrl: {
@@ -46,6 +46,10 @@ var advertiseSchema = new mongoose.Schema({
     webUrl: {
         type: String
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: new Date()
@@ -63,8 +67,8 @@ var advertiseSchema = new mongoose.Schema({
         default: "Active"
     }
 }, {
-        versionKey: false
-    });
+    versionKey: false
+});
 
 let collName = "advertisement";
 let Advertise = mongoose.model('Advertise', advertiseSchema, collName);

@@ -130,7 +130,7 @@ const getListOfPermissions = (req, res)=>{
     let query1 = { $and: [{ managerId: managerId }, 
       { celebrityId: celebrityId },
       {managerSettingsMasterId:  ObjectId("5b97b71035aa150522f81c58")}]};
-      managerPermissions.count(query1,(err,data)=>{
+      managerPermissions.countDocuments(query1,(err,data)=>{
         //console.log(data)
         if(data == 13 || data == "13")
         {
@@ -435,7 +435,7 @@ const getListOfPermissionsManagerLoginSubManager  = (req, res)=>{
     let query1 = { $and: [{ managerId: managerId }, 
       { celebrityId: celebrityId },
       {managerSettingsMasterId:  ObjectId("5b97b71035aa150522f81c58")}]};
-      managerPermissions.count(query1,(err,data)=>{
+      managerPermissions.countDocuments(query1,(err,data)=>{
         //console.log(data)
         if(data == 13 || data == "13")
         {

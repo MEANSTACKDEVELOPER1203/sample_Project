@@ -791,7 +791,7 @@ const celebToManagerRequest = (req, res, next) => {
         isCelebAccepted: isCelebAccepted,
         createdBy: req.body.createdBy
     });
-    console.log(newCelebManager)
+    // console.log(newCelebManager)
     ///update previous permission if there
     ManagerPermissions.update({ celebrityId: celebrityId, managerId: managerId }, {
         $set: {

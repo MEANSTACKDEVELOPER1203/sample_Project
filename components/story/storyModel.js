@@ -17,7 +17,7 @@ let storySchema = new mongoose.Schema({
     },
     mediaRatio: {
         type: Float,
-        default: 0.000
+        default: 0.0
     },
     faceFeatures: {
         type: Array
@@ -27,6 +27,12 @@ let storySchema = new mongoose.Schema({
     },
     mediaName: {
         type: String
+    },
+    mediaCaption: {
+        type: String
+    },
+    videoDuration: {
+        type: Float
     },
     src: {
         mediaUrl: {

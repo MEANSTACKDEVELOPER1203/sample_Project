@@ -19,6 +19,38 @@ let ordersSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    celebId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    celebFirstName: {
+        type: String,
+        default: ""
+    },
+    celebLastName: {
+        type: String,
+        default: ""
+    },
+    celebProfilepic: {
+        type: String,
+        default: ""
+    },
+    slotId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'slotmasters'
+    },
+    serviceType: {
+        type: String,
+        default: ""
+    },
+    startTime: {
+        type: Date,
+        default: ""
+    },
+    endTime: {
+        type: Date,
+        default: ""
+    },
     orderId: {
         type: String
     },

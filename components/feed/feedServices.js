@@ -3,7 +3,12 @@ let ObjectId = require('mongodb').ObjectId;
 const MediaTracking = require("../mediaTracking/mediaTrackingModel")
 const FeedMappingModel = require("./feedMappingModel");
 let User = require('../users/userModel');
-// let MediaTracking = require('../mediaTracking/mediaTrackingModel');
+
+let provideData = {
+    _id: 1, avtar_imgPath: 1, avtar_originalname: 1, cover_imgPath: 1, custom_imgPath: 1,
+    imageRatio: 1, name: 1, firstName: 1, lastName: 1, prefix: 1, role: 1, profession: 1, industry: 1, isCeleb: 1,
+    isTrending: 1, aboutMe: 1, category: 1, preferenceId: 1, isOnline: 1, created_at: 1, isEditorChoice: 1, isPromoted: 1, celebRecommendations: 1
+}
 
 let findCelebFeedDate = function (celebId, callback) {
     let today = new Date();
@@ -110,6 +115,17 @@ let findFeedByMemberIdNew = function (query, callback) {
             }
         },
         {
+            $lookup: {
+                from: "feedsettings",
+                localField: "memberId",
+                foreignField: "celebId",
+                as: "feedSettingsDetails"
+            }
+        },
+        // {
+        //     "$unwind": "$feedSettingsDetails"
+        // },
+        {
             $project: {
                 "_id": 1,
                 "title": 1,
@@ -146,7 +162,20 @@ let findFeedByMemberIdNew = function (query, callback) {
                     gender: 1,
                     username: 1,
                     country: 1,
-                    cover_imgPath: 1
+                    cover_imgPath: 1,
+                    category: 1
+                },
+                // feedSettingsDetails:1,
+                feedSettingsDetails: {
+                    $size: {
+                        $filter: {
+                            input: "$feedSettingsDetails",
+                            cond: {
+                                $and: [{ $or: [{ "$eq": ["$$this.memberId", ObjectId(memberId)] }] },
+                                { "$eq": ["$$this.isEnabled", true] }]
+                            }
+                        }
+                    }
                 },
                 feedLikesCount: {
                     $size: {
@@ -180,6 +209,7 @@ let findFeedByMemberIdNew = function (query, callback) {
             $sort: { created_at: -1, country: -1 }
         },
     ], function (err, listOfFeedObj) {
+        //console.log("listOfFeedObj", listOfFeedObj)
         if (err) {
             callback(err, null)
         } else {
@@ -714,19 +744,8 @@ let findFeedById = (feedId, memberId, callback) => {
                 isHide: {
                     $cond: { if: { $and: [{ "$eq": ["$hideObj.hideById", ObjectId(memberId)] }, { "$eq": ["$hideObj.isHide", true] }] }, then: true, else: false }
                 },
-                feedByMemberDetails: {
-                    _id: 1,
-                    isCeleb: 1,
-                    isManager: 1,
-                    isOnline: 1,
-                    avtar_imgPath: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    profession: 1,
-                    gender: 1,
-                    username: 1,
-                    cover_imgPath: 1
-                }, feedLikesCount: {
+                feedByMemberDetails: provideData,
+                feedLikesCount: {
                     $size: {
                         $filter: {
                             input: "$feedStats",
@@ -862,6 +881,254 @@ let hideAndUnhideFeed = function (body, callback) {
     })
 }
 
+let findIndividualMediaCount = function (memberId, mediaId, feedId, callback) {
+    Feed.findById(ObjectId(feedId), (err, feedObj) => {
+        if (err) {
+            callback(err, null)
+        } else {
+            if (feedObj.media.length <= 1) {
+                Feed.aggregate([
+                    { $match: { _id: ObjectId(feedId), isDelete: false } },
+                    {
+                        $lookup: {
+                            from: "mediatrackings",
+                            localField: "_id",
+                            foreignField: "feedId",
+                            as: "feedStats"
+                        }
+                    },
+                    {
+                        $project: {
+
+                            feedLikesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: "$feedStats",
+                                        cond: { $and: [{ "$eq": ["$$this.activities", "views"] }, { "$eq": ["$$this.isLike", true] }] }
+                                    }
+                                }
+                            },
+                            feedCommentsCount: {
+                                $size: {
+                                    $filter: {
+                                        input: "$feedStats",
+                                        cond: { "$eq": ["$$this.activities", "comment"] }
+                                    }
+                                }
+                            },
+                            isFeedLikedByCurrentUser: {
+                                $size: {
+                                    $filter: {
+                                        input: "$feedStats",
+                                        //cond: { "$eq": ["$$this.memberId", ObjectId(memberId)] }
+                                        cond: {
+                                            $and: [{ $or: [{ "$eq": ["$$this.memberId", ObjectId(memberId)] }] },
+                                            { "$eq": ["$$this.activities", "views"] }, { "$eq": ["$$this.isLike", true] }]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+
+                ], (err, feedDetails) => {
+                    if (err) {
+                        callback(err, null)
+                    } else if (feedDetails.length <= 0) {
+                        countObj = {};
+                        mediaCommentCount = 0;
+                        mediaLikeCount = 0;
+                        isMediaLikedByCurrentUser = false;
+                        countObj.mediaCommentCount = mediaCommentCount;
+                        countObj.mediaLikeCount = mediaLikeCount;
+                        countObj.isMediaLikedByCurrentUser = isMediaLikedByCurrentUser;
+                        callback(null, countObj)
+                    }
+                    else if (feedDetails.length) {
+                        //console.log(feedDetails)
+                        countObj = {};
+                        countObj.mediaCommentCount = feedDetails[0].feedCommentsCount;
+                        countObj.mediaLikeCount = feedDetails[0].feedLikesCount;
+                        countObj.isMediaLikedByCurrentUser = feedDetails[0].isFeedLikedByCurrentUser;
+                        callback(null, countObj)
+                    }
+                });
+            } else {
+                Feed.aggregate([
+                    // {
+                    //     $match:
+                    //         //{ pull: { media: { $elemMatch: { mediaId: ObjectId(mediaId) } } } },
+                    //         {  }
+                    // },
+                    {
+                        $match: {
+                            media: { $elemMatch: { mediaId: ObjectId(mediaId) } }, isDelete: false
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "mediatrackings",
+                            localField: "media.mediaId",
+                            foreignField: "mediaId",
+                            as: "mediaStats"
+                        }
+                    },
+                    {
+                        "$unwind": "$mediaStats"
+                    },
+                    {
+                        $group: {
+                            "_id": {
+                                "mediaId": "$mediaStats.mediaId",
+                                "activities": "$mediaStats.activities",
+                                "isLike": "$mediaStats.isLike"
+                            },
+                            mediaLikes: { $push: "$mediaStats" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            count: 1,
+                            mediaLikes: 1,
+                            isMediaLikedByCurrentUser: {
+                                $size: {
+                                    $filter: {
+                                        input: "$mediaLikes",
+                                        //cond: { "$eq": ["$$this.memberId", ObjectId(memberId)] }
+                                        cond: {
+                                            $and: [{ $or: [{ "$eq": ["$$this.memberId", ObjectId(memberId)] }] },
+                                            { "$eq": ["$$this.activities", "views"] }, { "$eq": ["$$this.isLike", true] }]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ], function (err, mediaObj) {
+                    if (!err) {
+                        countObj = {};
+                        mediaCommentCount = 0;
+                        mediaLikeCount = 0
+                        isMediaLikedByCurrentUser = false
+
+                        //get media comment count
+                        mediaObj.map((mObj) => {
+                            if (mObj._id.activities == "comment" && "" + mediaId == "" + mObj._id.mediaId) {
+                                mediaCommentCount = mObj.count
+                            }
+                        });
+                        countObj.mediaCommentCount = mediaCommentCount;
+                        //get media like count
+                        mediaObj.map((mObj) => {
+                            if (mObj._id.activities == "views" && mObj._id.isLike == true && "" + mediaId == "" + mObj._id.mediaId) {
+                                mediaLikeCount = mObj.mediaLikes.length
+                                isMediaLikedByCurrentUser = mObj.isMediaLikedByCurrentUser ? true : false
+                                //mediaCommentCount = mObj.count
+                                // mObj.mediaLikes.map((likeObj) => {
+                                //     if (likeObj.isLike == true) {
+                                //         mediaLikeCount = mediaLikeCount + 1
+                                //     }
+                                // })
+                            }
+                        });
+                        countObj.mediaLikeCount = mediaLikeCount;
+                        countObj.isMediaLikedByCurrentUser = isMediaLikedByCurrentUser;
+                        // console.log(countObj);
+                        callback(null, countObj);
+                    }
+
+                    else
+                        callback(err, null)
+                })
+            }
+        }
+    })
+
+}
+
+const findFeedByIdForMediaCount = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            Feed.findById(ObjectId(query.feedId))
+                .then(feedObj => resolve(feedObj))
+                .catch(err => reject(err))
+        }, 100)
+    })
+
+
+const findMediaLikedUsersProfileById = query =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let condition = {};
+            let getLikesByTime = new Date();
+            if (query.createdAt != "null" && query.createdAt != "0") {
+                getLikesByTime = new Date(createdAt)
+            }
+            if (query.feedId == undefined || query.feedId == "") {
+                condition = { $and: [{ mediaId: ObjectId(query.mediaId) }, { activities: "views" }, { isLike: true }, { created_at: { $lt: new Date(getLikesByTime) } }] }
+            } else {
+                condition = { $and: [{ feedId: ObjectId(query.feedId) }, { activities: "views" }, { isLike: true }, { created_at: { $lt: new Date(getLikesByTime) } }] }
+            }
+            MediaTracking.aggregate([
+                {
+                    $match: condition
+                },
+                {
+                    $sort: { created_at: -1 }
+                },
+                {
+                    $limit: 50
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "memberId",
+                        foreignField: "_id",
+                        as: "memberProfile"
+                    }
+                },
+                {
+                    $match: { $and: [{ memberProfile: { $ne: [] } }] }
+                },
+                { "$unwind": "$memberProfile" },
+                {
+                    $project: {
+                        _id: 1,
+                        isLike: 1,
+                        created_at: 1,
+                        updated_at: 1,
+                        memberProfile: {
+                            _id: 1,
+                            email: 1,
+                            isCeleb: 1,
+                            profession: 1,
+                            aboutMe: 1,
+                            name: 1,
+                            firstName: 1,
+                            lastName: 1,
+                            avtar_imgPath: 1
+
+                        },
+                        // "memberProfile._id": 1,
+                        // "memberProfile.username": 1,
+                        // "memberProfile.avtar_imgPath": 1,
+                        // "memberProfile.email": 1,
+                        // "memberProfile.name": 1,
+                        // "memberProfile.firstName": 1,
+                        // "memberProfile.lastName": 1,
+                        // "memberProfile.isCeleb": 1,
+                        // "memberProfile.profession": 1,
+                        // "memberProfile.aboutMe": 1,
+                    }
+                }
+            ]).then(mediaLikedProfileObjs => resolve(mediaLikedProfileObjs))
+                .catch(err => reject(err))
+        }, 100)
+    })
+
+
 let feedServices = {
     findFeedByMemberId: findFeedByMemberId,
     findFeedByFeedPreferences: findFeedByFeedPreferences,
@@ -871,7 +1138,10 @@ let feedServices = {
     createFeedMappingObj: createFeedMappingObj,
     updateFeedMappingObj: updateFeedMappingObj,
     findCelebFeedDate: findCelebFeedDate,
-    hideAndUnhideFeed: hideAndUnhideFeed
+    hideAndUnhideFeed: hideAndUnhideFeed,
+    findIndividualMediaCount: findIndividualMediaCount,
+    findFeedByIdForMediaCount: findFeedByIdForMediaCount,
+    findMediaLikedUsersProfileById: findMediaLikedUsersProfileById
 }
 
 module.exports = feedServices;

@@ -1,6 +1,5 @@
 let mongoose = require("mongoose");
 let ObjectId = require("mongodb").ObjectID;
-
 let credit;
 let debit;
 let netBanking;
@@ -59,6 +58,9 @@ let paymentTransactionSchema = new mongoose.Schema({
         type: String,
         enum: [active, inActive]
     },
+    countryCode: {
+        type: String
+    },
     status: {
         type: Boolean,
         default: false
@@ -84,8 +86,8 @@ let paymentTransactionSchema = new mongoose.Schema({
         default: ""
     }
 }, {
-        versionKey: false
-    });
+    versionKey: false
+});
 
 let paymentTransaction = (module.exports = mongoose.model("paymentTransaction", paymentTransactionSchema));
 
